@@ -1,4 +1,6 @@
-// Type definitions
-// Will be implemented in task 2
+/**
+ * Type definitions for the Projection portfolio generator
+ */
 
-export {};
+export * from './project';
+export * from './config';
