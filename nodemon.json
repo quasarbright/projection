@@ -1,0 +1,8 @@
+{
+  "watch": ["projects.yaml", "projects.json"],
+  "ext": "yaml,json",
+  "ignore": ["dist/**", "node_modules/**"],
+  "delay": 1000,
+  "verbose": false,
+  "exec": "npm run build"
+} 

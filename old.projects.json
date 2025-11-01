@@ -1,0 +1,981 @@
+{
+  "config": {
+    "title": "Mike Delmonaco",
+    "description": "My coding projects",
+    "defaultScreenshot": "https://quasarbright.github.io/images/magnet pendulum.PNG",
+    "itemsPerPage": 20,
+    "baseUrl": "https://quasarbright.github.io/"
+  },
+  "projects": [
+    {
+      "id": "minesweeper",
+      "title": "Minesweeper",
+      "description": "Guess-free minesweeper with an animated solver.",
+      "creationDate": "2024-03-29",
+      "tags": [
+        "game",
+        "AI",
+        "web"
+      ],
+      "pageLink": "https://quasarbright.github.io/minesweeper",
+      "featured": true
+    },
+    {
+      "id": "dinner-debt",
+      "title": "Dinner Debt",
+      "description": "A little tool to figure out how much you owe someone for dinner.",
+      "creationDate": "2024-04-19",
+      "tags": [
+        "utility",
+        "web"
+      ],
+      "pageLink": "https://quasarbright.github.io/dinner-debt",
+      "thumbnailLink": "https://quasarbright.github.io/dinner-debt/logo512.png",
+      "featured": true
+    },
+    {
+      "id": "julia-image",
+      "title": "Image to Julia Set",
+      "description": "Upload an image and see it get transformed into a julia set. This was vibe-coded using cursor and claude 3.7 sonnet.",
+      "creationDate": "2025-06-15",
+      "tags": [
+        "fractal",
+        "shader",
+        "upload-image",
+        "vibe-coded",
+        "funny",
+        "web"
+      ],
+      "pageLink": "./julia-image",
+      "thumbnailLink": "./screenshots/julia-image.png",
+      "featured": true
+    },
+    {
+      "id": "seam-carving",
+      "title": "Seam Carving",
+      "description": "Shrinking an image by removing the \"least interesting\" seams of pixels.",
+      "creationDate": "2024-08-09",
+      "tags": [
+        "upload-image",
+        "algorithm",
+        "funny",
+        "web"
+      ],
+      "pageLink": "./seam-carving",
+      "thumbnailLink": "/images/energy-broomstick.png"
+    },
+    {
+      "id": "fractal-curve-editor",
+      "title": "Fractal Curve Editor",
+      "description": "Create a fractal curve from a seed pattern of line segments by replacing each segment with a scaled copy of the whole seed. This was vibe-coded.",
+      "creationDate": "2025-06-08",
+      "tags": [
+        "fractal",
+        "vibe-coded",
+        "web"
+      ],
+      "pageLink": "./fractal-curve-editor/",
+      "thumbnailLink": "./screenshots/fractal-curve-editor.png"
+    },
+    {
+      "id": "complex-dynamics",
+      "title": "General Complex Dynamics Visualizer",
+      "description": "A general, interactive visualizer for complex dynamics, featuring the mandelbrot set, julia sets, newton's fractal, and more. This was vibe-coded.",
+      "creationDate": "2025-07-05",
+      "tags": [
+        "fractal",
+        "shader",
+        "vibe-coded",
+        "pretty",
+        "web"
+      ],
+      "pageLink": "./complex-dynamics/",
+      "thumbnailLink": "./screenshots/complex-dynamics.png",
+      "featured": true
+    },
+    {
+      "id": "mandelbrot-shader",
+      "title": "Mandelbrot Set",
+      "description": "Instead of coloring each pixel discretely based on the iteration count upon escape, this shader uses a continuous coloring which takes into account the iteration count as well as the modulus of the final value. Zoom by scrolling and pan the camera by clicking and dragging.",
+      "creationDate": "2020-07-14",
+      "tags": [
+        "fractal",
+        "shader",
+        "web"
+      ],
+      "pageLink": "https://quasarbright.github.io/p5js/mandelbrotShaderRenormalized/",
+      "thumbnailLink": "https://quasarbright.github.io/p5js/mandelbrotShaderRenormalized/screenshot.png"
+    },
+    {
+      "id": "julia-shader",
+      "title": "Julia Set",
+      "description": "This shader uses the same coloring method as the Mandelbrot set shader, but you can select the c-value used to generate the julia set by clicking/dragging the mouse on the screen.",
+      "creationDate": "2020-07-14",
+      "tags": [
+        "fractal",
+        "shader",
+        "pretty",
+        "web"
+      ],
+      "pageLink": "https://quasarbright.github.io/p5js/juliaShader/",
+      "thumbnailLink": "https://quasarbright.github.io/p5js/juliaShader/screenshot.png"
+    },
+    {
+      "id": "magnet-shader",
+      "title": "Magnet Pendulum",
+      "description": "The fractal is generated from simulating a magnetic pendulum swinging over a table with three magnets on it. Each pixel is colored based on which magnet it ends up at and darkened based on how long it took to stop at a magnet.",
+      "creationDate": "2020-07-16",
+      "tags": [
+        "physics",
+        "shader",
+        "fractal",
+        "web"
+      ],
+      "pageLink": "https://quasarbright.github.io/p5js/magnetShader/",
+      "thumbnailLink": "https://quasarbright.github.io/p5js/magnetShader/screenshot.png"
+    },
+    {
+      "id": "majority-automaton-gpu",
+      "title": "Majority Cellular Automaton",
+      "description": "A multi-state cellular automaton where the next value is determined by majority vote of the neighbors. This project was originally implemented by me (without AI), and it ran on the CPU, but I vibe-coded a GPU port using cline.",
+      "creationDate": "2025-06-15",
+      "tags": [
+        "cellular-automata",
+        "shader",
+        "vibe-coded",
+        "web"
+      ],
+      "pageLink": "https://quasarbright.github.io/p5js/majority-automaton-gpu",
+      "thumbnailLink": "https://quasarbright.github.io/p5js/screenshots/majority.png"
+    },
+    {
+      "id": "newton-fractal",
+      "title": "Newton's Fractal",
+      "description": "This visualizes newton's fractal, which is a root-finding algorithm. Inspired by 3blue1brown's great video on this fractal.",
+      "creationDate": "2025-06-17",
+      "tags": [
+        "fractal",
+        "shader",
+        "vibe-coded",
+        "web"
+      ],
+      "pageLink": "./newton-fractal",
+      "thumbnailLink": "./screenshots/newton.png"
+    },
+    {
+      "id": "spring-wave",
+      "title": "Double Slit Interference",
+      "description": "A physics-simulation of waves powered by balls connected with springs, demonstrating diffraction and double-slit interference.",
+      "creationDate": "2024-12-08",
+      "tags": [
+        "physics",
+        "web"
+      ],
+      "pageLink": "https://quasarbright.github.io/spring-wave/dist/index.html",
+      "thumbnailLink": "./screenshots/spring-wave.png"
+    },
+    {
+      "id": "3-point-perspective",
+      "title": "3 Point Perspective",
+      "description": "3 point perspective is a drawing technique to draw realistic-looking objects in 3D. You can click and drag the 3 white perspective points and one of the vertices of the cube.",
+      "creationDate": "2021-01-22",
+      "tags": [
+        "web"
+      ],
+      "pageLink": "https://quasarbright.github.io/p5js/3PointPerspective"
+    },
+    {
+      "id": "complex-grid-transformation",
+      "title": "Complex Function Grid Transformation",
+      "description": "This is an interactive visualization of functions on complex numbers. It shows how points along grid lines get transformed by the complex function. This was completely vibe-coded using ChatGPT.",
+      "creationDate": "2025-05-24",
+      "tags": [
+        "vibe-coded",
+        "web"
+      ],
+      "pageLink": "https://quasarbright.github.io/p5js/complex-function-grid-visualizer",
+      "thumbnailLink": "./screenshots/complex-grid-transformation.png"
+    },
+    {
+      "id": "braille-dithering",
+      "title": "Braille Dithering",
+      "description": "Convert images to braille characters for text-based image display.",
+      "creationDate": "2019-08-24",
+      "tags": [
+        "upload-image",
+        "web"
+      ],
+      "pageLink": "https://quasarbright.github.io/p5js/braille"
+    },
+    {
+      "id": "moon-dithering",
+      "title": "Moon Dithering",
+      "description": "Similar to braille dithering, but uses moon phase emojis.",
+      "creationDate": "2021-01-22",
+      "tags": [
+        "upload-image",
+        "web"
+      ],
+      "pageLink": "https://quasarbright.github.io/p5js/moon-dithering"
+    },
+    {
+      "id": "gpu-gol",
+      "title": "Image → Conway's Game of Life on the GPU",
+      "description": "A GPU-powered version for higher performance. This was vibe-coded using cline.",
+      "creationDate": "2025-06-07",
+      "tags": [
+        "cellular-automata",
+        "shader",
+        "conway",
+        "vibe-coded",
+        "web"
+      ],
+      "pageLink": "https://quasarbright.github.io/p5js/gpu-gol"
+    },
+    {
+      "id": "sand2",
+      "title": "Sand",
+      "description": "Add sand, water, stone, acid, fire, and more to the screen and watch them interact. This is a cellular automaton where each \"grain\" interacts with its neighbors depending on what material it is.",
+      "creationDate": "2024-09-19",
+      "tags": [
+        "cellular-automata",
+        "game",
+        "web"
+      ],
+      "pageLink": "https://quasarbright.github.io/p5js/sand2",
+      "thumbnailLink": "https://quasarbright.github.io/p5js/sand2/screenshot.png"
+    },
+    {
+      "id": "boids",
+      "title": "Boids",
+      "description": "A simulation of bird flocking behavior. The boids try to stay near the center of the flock, avoid getting too close to other boids, and try to head in the same direction and speed as nearby boids.",
+      "creationDate": "2023-08-20",
+      "tags": [
+        "AI",
+        "web"
+      ],
+      "pageLink": "https://quasarbright.github.io/p5js/boids",
+      "thumbnailLink": "https://quasarbright.github.io/p5js/boids/screenshot.png"
+    },
+    {
+      "id": "random-walk",
+      "title": "2D Random Walkers",
+      "description": "A bunch of random walkers animated with a trail. Each little walker randomly decides to move up, down, left, or right.",
+      "creationDate": "2025-02-02",
+      "tags": [
+        "pretty",
+        "web"
+      ],
+      "pageLink": "https://quasarbright.github.io/p5js/random-walk",
+      "thumbnailLink": "https://quasarbright.github.io/p5js/screenshots/random-walk.png"
+    },
+    {
+      "id": "voronoi",
+      "title": "Voronoi",
+      "description": "An animated voronoi diagram where the centers move around and bounce off the walls. Also includes alternative distance functions.",
+      "creationDate": "2025-08-22",
+      "tags": [
+        "shader",
+        "vibe-coded",
+        "web"
+      ],
+      "pageLink": "./voronoi",
+      "thumbnailLink": "./screenshots/voronoi.png"
+    },
+    {
+      "id": "raindrops",
+      "title": "Raindrops",
+      "description": "Inspired by watching raindrops drip down a car window and collide with each other. Raindrops move down, but their horizontal movement is random. When two drops collide, they combine and the survivor is randomly chosen.",
+      "creationDate": "2025-02-02",
+      "tags": [
+        "web"
+      ],
+      "pageLink": "https://quasarbright.github.io/p5js/raindrops",
+      "thumbnailLink": "https://quasarbright.github.io/p5js/screenshots/raindrops.png"
+    },
+    {
+      "id": "wave-equation",
+      "title": "Wave Equation",
+      "description": "A numerical approximation of the wave equation, visualized as a heat map. It's like a simulation of the surface of a pond, starting off flat with a few splashes. An accumulating numerical error ends up producing an interesting pattern",
+      "creationDate": "2023-09-13",
+      "tags": [
+        "physics",
+        "cellular-automata",
+        "web"
+      ],
+      "pageLink": "https://quasarbright.github.io/p5js/wave-equation",
+      "thumbnailLink": "https://quasarbright.github.io/p5js/wave-equation/screenshot.png"
+    },
+    {
+      "id": "rps-automaton",
+      "title": "Rock Paper Scissors Cellular Automaton",
+      "description": "A cellular automaton based on rock paper scissors where if a neighboring cell beats this cell, this cell becomes the winner.",
+      "creationDate": "2025-01-31",
+      "tags": [
+        "cellular-automata",
+        "web"
+      ],
+      "pageLink": "https://quasarbright.github.io/p5js/rock-paper-scissors-automaton",
+      "thumbnailLink": "https://quasarbright.github.io/p5js/screenshots/rps.png"
+    },
+    {
+      "id": "conway",
+      "title": "Conway's Game of Life",
+      "description": "This is John Conway's game of life, a cellular automaton where cells live or die depending on the state of their neighbors. Click on the cells to toggle their life state and hit start to see what happens.",
+      "creationDate": "2018-07-13",
+      "tags": [
+        "cellular-automata",
+        "conway",
+        "web"
+      ],
+      "pageLink": "https://quasarbright.github.io/p5js/conway"
+    },
+    {
+      "id": "unbounded-conway",
+      "title": "Unbounded Conway's Game of Life",
+      "description": "Conway's game of life, but the size of the world is unlimited. Rather than storing a grid of cells, we store the positions of living cells and update those cells and their neighbors to compute the next generation.",
+      "creationDate": "2024-03-31",
+      "tags": [
+        "cellular-automata",
+        "conway",
+        "web"
+      ],
+      "pageLink": "https://quasarbright.github.io/p5js/unbounded-conway",
+      "thumbnailLink": "https://quasarbright.github.io/p5js/screenshots/unbounded-conway.png"
+    },
+    {
+      "id": "genetic-steering",
+      "title": "Genetic Steering",
+      "description": "These creatures need to eat green food and avoid red poison to survive. They starve if they don't eat enough, and have a random chance of reproducing with some mutation at every moment.",
+      "creationDate": "2019-07-13",
+      "tags": [
+        "AI",
+        "web"
+      ],
+      "pageLink": "https://editor.p5js.org/mdelmonaco/present/HJpO5IJ7Z",
+      "thumbnailLink": "https://quasarbright.github.io/p5js/screenshots/genetic-steering.png"
+    },
+    {
+      "id": "smart-rockets",
+      "title": "Smart Rockets",
+      "description": "There are two competing populations of rockets, each using genetics and evolution to try to learn to reach the target by applying a series of forces to themselves.",
+      "creationDate": "2017-03-23",
+      "tags": [
+        "AI",
+        "web"
+      ],
+      "pageLink": "https://editor.p5js.org/mdelmonaco/present/BkJquZ1Ae",
+      "thumbnailLink": "https://quasarbright.github.io/p5js/screenshots/smart-rockets.png"
+    },
+    {
+      "id": "monty-hall",
+      "title": "Monty Hall Game",
+      "description": "Interactive game for the monty hall problem. Includes an explanation of the math.",
+      "creationDate": "2024-09-21",
+      "tags": [
+        "education",
+        "web"
+      ],
+      "pageLink": "https://quasarbright.github.io/monty-hall-game"
+    },
+    {
+      "id": "dragon-curve",
+      "title": "Dragon Curve",
+      "description": "This is the dragon curve. It's the fractal generated by folding a piece of paper in half over and over again.",
+      "creationDate": "2023-12-30",
+      "tags": [
+        "fractal",
+        "web"
+      ],
+      "pageLink": "https://quasarbright.github.io/p5js/dragon-curve/",
+      "thumbnailLink": "https://quasarbright.github.io/p5js/dragon-curve/screenshot.png"
+    },
+    {
+      "id": "ginchology",
+      "title": "Ginchology",
+      "description": "This randomly generates two ginchulates, which are a consonant sound, a vowel, and finally, an \"nch\". Ex: \"dench\". They just sound funny.",
+      "creationDate": "2018-07-13",
+      "tags": [
+        "funny",
+        "web"
+      ],
+      "pageLink": "https://quasarbright.github.io/p5js/ginchology"
+    },
+    {
+      "id": "kana-word-generator",
+      "title": "Kana Word Generator",
+      "description": "This page randomly generates \"Japanese-sounding\" words using hiragana syllable rules.",
+      "creationDate": "2019-07-13",
+      "tags": [
+        "web"
+      ],
+      "pageLink": "https://quasarbright.github.io/p5js/kanaWordGenerator"
+    },
+    {
+      "id": "magnetic-pendulum",
+      "title": "Magnetic Pendulum",
+      "description": "This simulates three magnets on a table with a pendulum hanging a magnetic object above the center. Where the pendulum ends up is extremely sensitive to the initial dropping position.",
+      "creationDate": "2018-07-13",
+      "tags": [
+        "physics",
+        "web"
+      ],
+      "pageLink": "https://quasarbright.github.io/p5js/magnetic%20pendulum",
+      "thumbnailLink": "https://quasarbright.github.io/images/magnet%20pendulum.PNG"
+    },
+    {
+      "id": "elastic-sphere-collision",
+      "title": "Elastic Sphere Collisions",
+      "description": "A bunch of balls (really circles) colliding with each other elastically, conserving kinetic energy and momentum like billiard balls.",
+      "creationDate": "2025-02-09",
+      "tags": [
+        "physics",
+        "web"
+      ],
+      "pageLink": "https://quasarbright.github.io/p5js/elastic-sphere-collision"
+    },
+    {
+      "id": "polygon-fractal",
+      "title": "Polygon Fractals",
+      "description": "Colorful polygon fractals. Click to iterate the fractal, press a key to switch between center mode and prism mode.",
+      "creationDate": "2019-05-08",
+      "tags": [
+        "fractal",
+        "web"
+      ],
+      "pageLink": "https://quasarbright.github.io/p5js/polygon%20fractal"
+    },
+    {
+      "id": "radiation",
+      "title": "Rainbow Radiation",
+      "description": "Colorful lines fly out of your mouse cursor. Move the mouse and click to make the lines fly out in a spiral.",
+      "creationDate": "2019-05-08",
+      "tags": [
+        "web"
+      ],
+      "pageLink": "https://quasarbright.github.io/p5js/radiation"
+    },
+    {
+      "id": "random-circles",
+      "title": "Random Circles with No Overlap",
+      "description": "Randomly placed circles that don't overlap with each other.",
+      "creationDate": "2019-07-06",
+      "tags": [
+        "web"
+      ],
+      "pageLink": "https://quasarbright.github.io/p5js/random%20circles%20no%20overlap"
+    },
+    {
+      "id": "random-squares",
+      "title": "Random Squares with No Overlap",
+      "description": "Randomly placed squares that don't overlap with each other.",
+      "creationDate": "2019-07-06",
+      "tags": [
+        "web"
+      ],
+      "pageLink": "https://quasarbright.github.io/p5js/random%20squares%20no%20overlap"
+    },
+    {
+      "id": "spanning-tree",
+      "title": "Minimum Spanning Tree",
+      "description": "This generates a minimum spanning tree of a random collection of points. You can add points to see how the MST changes.",
+      "creationDate": "2023-09-13",
+      "tags": [
+        "algorithm",
+        "web"
+      ],
+      "pageLink": "https://quasarbright.github.io/p5js/spanning%20tree"
+    },
+    {
+      "id": "moving-spanning-tree",
+      "title": "Moving Minimum Spanning Tree",
+      "description": "This generates a minimum spanning tree of a random collection of points that bounce around. You can add points by clicking on the screen.",
+      "creationDate": "2018-07-13",
+      "tags": [
+        "algorithm",
+        "web"
+      ],
+      "pageLink": "https://quasarbright.github.io/p5js/moving-spanning-tree"
+    },
+    {
+      "id": "display-graph",
+      "title": "Display Graph",
+      "description": "This allows you to display any graph and then edit the locations of vertices by clicking and dragging. Currently, it randomly generates a graph.",
+      "creationDate": "2018-07-13",
+      "tags": [
+        "web"
+      ],
+      "pageLink": "https://quasarbright.github.io/p5js/display%20graph"
+    },
+    {
+      "id": "travelling-salesman",
+      "title": "Travelling Salesman Problem",
+      "description": "This solves the travelling salesman problem for a random collection of points.",
+      "creationDate": "2019-07-06",
+      "tags": [
+        "algorithm",
+        "web"
+      ],
+      "pageLink": "https://quasarbright.github.io/p5js/travelling%20salesman"
+    },
+    {
+      "id": "sudoku",
+      "title": "Sudoku",
+      "description": "Sudoku, implemented using React.",
+      "creationDate": "2024-03-23",
+      "tags": [
+        "game",
+        "web"
+      ],
+      "pageLink": "https://quasarbright.github.io/sudoku/"
+    },
+    {
+      "id": "blog",
+      "title": "Blog",
+      "description": "A blog about programming languages and math.",
+      "creationDate": "2022-10-02",
+      "tags": [
+        "blog",
+        "programming-language",
+        "web"
+      ],
+      "pageLink": "./blog",
+      "featured": true
+    },
+    {
+      "id": "subduce",
+      "title": "Subduce",
+      "description": "The first programming language I made. A functional programming language based on Python and racket's advanced student language.",
+      "creationDate": "2020-02-11",
+      "tags": [
+        "programming-language"
+      ],
+      "pageLink": "https://subduce.readthedocs.io/en/latest/#",
+      "sourceLink": "https://github.com/quasarbright/Subduce"
+    },
+    {
+      "id": "pongchamp",
+      "title": "PongChamp",
+      "description": "An imperative programming language with syntax inspired by JavaScript. Originally created as a scripting language for a game engine. I made this with my friend Ryan Mitchell.",
+      "creationDate": "2021-07-14",
+      "tags": [
+        "programming-language",
+        "haskell"
+      ],
+      "pageLink": "https://github.com/quasarbright/PongChamp",
+      "sourceLink": "https://github.com/quasarbright/PongChamp"
+    },
+    {
+      "id": "ocovid",
+      "title": "OCovid",
+      "description": "An OCaml subset with algebraic data types, deep pattern matching, and type inference written in Haskell.",
+      "creationDate": "2021-01-18",
+      "tags": [
+        "programming-language",
+        "haskell",
+        "type-system"
+      ],
+      "pageLink": "https://github.com/quasarbright/OCovid",
+      "sourceLink": "https://github.com/quasarbright/OCovid"
+    },
+    {
+      "id": "hcc",
+      "title": "HCC",
+      "description": "A C compiler written in Haskell. Supports functions, arrays, pointers, ints. Targets x86 assembly.",
+      "creationDate": "2021-01-14",
+      "tags": [
+        "programming-language",
+        "haskell",
+        "compiler"
+      ],
+      "pageLink": "https://github.com/quasarbright/HCC",
+      "sourceLink": "https://github.com/quasarbright/HCC"
+    },
+    {
+      "id": "funduce",
+      "title": "Funduce",
+      "description": "A Haskell remake of subduce. An implementation of a subset of advanced student language with S-expression syntax.",
+      "creationDate": "2020-12-12",
+      "tags": [
+        "programming-language",
+        "haskell"
+      ],
+      "pageLink": "https://github.com/quasarbright/Funduce",
+      "sourceLink": "https://github.com/quasarbright/Funduce"
+    },
+    {
+      "id": "macro-interpreter",
+      "title": "Language with Lisp-like Macros",
+      "description": "A little language with lisp-like macros and quasi-quoting in racket. An enriched lambda calculus with syntax-to-syntax transformations.",
+      "creationDate": "2021-07-03",
+      "tags": [
+        "programming-language",
+        "racket",
+        "macro"
+      ],
+      "pageLink": "https://github.com/quasarbright/learn-racket/blob/master/macro-interpreter.rkt",
+      "sourceLink": "https://github.com/quasarbright/learn-racket/blob/master/macro-interpreter.rkt"
+    },
+    {
+      "id": "conteffects",
+      "title": "ContEffects",
+      "description": "A tiny language with simple algebraic effects. Effects are treated as 'resumable exceptions' with handlers.",
+      "creationDate": "2021-04-22",
+      "tags": [
+        "programming-language",
+        "algebraic-effects",
+        "haskell"
+      ],
+      "pageLink": "https://github.com/quasarbright/ContEffects",
+      "sourceLink": "https://github.com/quasarbright/ContEffects"
+    },
+    {
+      "id": "reactive",
+      "title": "Reactive",
+      "description": "An excel-like reactive programming language. Define 'cells' with formulas that reactively update when dependencies change.",
+      "creationDate": "2020-07-14",
+      "tags": [
+        "programming-language",
+        "reactive",
+        "dsl"
+      ],
+      "pageLink": "https://github.com/quasarbright/Reactive",
+      "sourceLink": "https://github.com/quasarbright/Reactive"
+    },
+    {
+      "id": "miniml",
+      "title": "MiniML",
+      "description": "A small OCaml subset with type inference, arithmetic, boolean logic, and functions written in OCaml.",
+      "creationDate": "2020-03-16",
+      "tags": [
+        "programming-language",
+        "type-system"
+      ],
+      "pageLink": "https://github.com/quasarbright/MiniML",
+      "sourceLink": "https://github.com/quasarbright/MiniML"
+    },
+    {
+      "id": "counter-machine",
+      "title": "Counter Machine Language",
+      "description": "An assembly-like language for counter machines.",
+      "creationDate": "2023-09-09",
+      "tags": [
+        "programming-language",
+        "racket"
+      ],
+      "pageLink": "https://github.com/quasarbright/learn-racket/blob/master/counter-machine.rkt",
+      "sourceLink": "https://github.com/quasarbright/learn-racket/blob/master/counter-machine.rkt"
+    },
+    {
+      "id": "delimited-continuations",
+      "title": "Delimited Continuations",
+      "description": "A pre-processor for racket that transforms programs to continuation passing style supporting delimited continuations.",
+      "creationDate": "2023-10-02",
+      "tags": [
+        "programming-language",
+        "continuation",
+        "racket"
+      ],
+      "pageLink": "https://github.com/quasarbright/learn-racket/blob/master/delimited-continuations.rkt",
+      "sourceLink": "https://github.com/quasarbright/learn-racket/blob/master/delimited-continuations.rkt"
+    },
+    {
+      "id": "pattern-matcher",
+      "title": "Pattern Matcher",
+      "description": "Pattern matching DSL that allows case analysis and de-structuring data based on its shape.",
+      "creationDate": "2023-03-19",
+      "tags": [
+        "programming-language",
+        "racket",
+        "macro",
+        "dsl"
+      ],
+      "pageLink": "https://github.com/quasarbright/learn-racket/blob/master/match.rkt",
+      "sourceLink": "https://github.com/quasarbright/learn-racket/blob/master/match.rkt"
+    },
+    {
+      "id": "miniclass",
+      "title": "Miniclass",
+      "description": "An implementation of a basic class system for Racket using macros that compile to struct usages.",
+      "creationDate": "2023-03-08",
+      "tags": [
+        "programming-language",
+        "racket",
+        "macro",
+        "dsl"
+      ],
+      "pageLink": "https://github.com/quasarbright/miniclass",
+      "sourceLink": "https://github.com/quasarbright/miniclass"
+    },
+    {
+      "id": "syntax-spec",
+      "title": "Syntax Spec",
+      "description": "A meta language for creating sophisticated domain specific languages in Racket. Research project with Michael Ballantyne.",
+      "creationDate": "2022-09-21",
+      "tags": [
+        "macro",
+        "dsl",
+        "racket",
+        "research",
+        "programming-language"
+      ],
+      "pageLink": "https://github.com/michaelballantyne/syntax-spec",
+      "sourceLink": "https://github.com/michaelballantyne/syntax-spec",
+      "featured": true
+    },
+    {
+      "id": "frp",
+      "title": "Functional Reactive Programming",
+      "description": "A tiny functional reactive programming library/DSL. Like a spreadsheet where formula cells update automatically when dependencies change.",
+      "creationDate": "2022-12-18",
+      "tags": [
+        "dsl",
+        "reactive",
+        "programming-language",
+        "racket",
+        "macro"
+      ],
+      "pageLink": "https://github.com/quasarbright/frp/blob/master/main.rkt",
+      "sourceLink": "https://github.com/quasarbright/frp/blob/master/main.rkt"
+    },
+    {
+      "id": "pi-calculus",
+      "title": "Pi Calculus",
+      "description": "An implementation of the pi calculus. Like lambda calculus but for concurrent programming instead of functional programming.",
+      "creationDate": "2022-09-20",
+      "tags": [
+        "dsl",
+        "racket",
+        "programming-language",
+        "macro",
+        "concurrency"
+      ],
+      "pageLink": "https://github.com/quasarbright/pi-calculus/blob/master/main.rkt",
+      "sourceLink": "https://github.com/quasarbright/pi-calculus/blob/master/main.rkt"
+    },
+    {
+      "id": "mini-kanren",
+      "title": "Mini Kanren",
+      "description": "An implementation of mini kanren, a logic programming language like prolog. Includes a type checker implemented using mini kanren.",
+      "creationDate": "2022-08-04",
+      "tags": [
+        "programming-language",
+        "logic",
+        "racket",
+        "dsl",
+        "macro"
+      ],
+      "pageLink": "https://github.com/quasarbright/mike-kanren/blob/master/main.rkt",
+      "sourceLink": "https://github.com/quasarbright/mike-kanren/blob/master/main.rkt"
+    },
+    {
+      "id": "zfcpp",
+      "title": "ZFC++",
+      "description": "An implementation of ZFC++, an esoteric language that operates on sets.",
+      "creationDate": "2023-09-17",
+      "tags": [
+        "programming-language",
+        "racket",
+        "dsl",
+        "esolang"
+      ],
+      "pageLink": "https://github.com/quasarbright/learn-racket/blob/master/zfcpp.rkt",
+      "sourceLink": "https://github.com/quasarbright/learn-racket/blob/master/zfcpp.rkt"
+    },
+    {
+      "id": "async-await",
+      "title": "Async Await",
+      "description": "An implementation of JavaScript-style promises and the desugaring of async/await to using promises in Racket.",
+      "creationDate": "2023-09-21",
+      "tags": [
+        "programming-language",
+        "racket",
+        "dsl",
+        "macro",
+        "concurrency"
+      ],
+      "pageLink": "https://github.com/quasarbright/learn-racket/blob/master/async-await.rkt",
+      "sourceLink": "https://github.com/quasarbright/learn-racket/blob/master/async-await.rkt"
+    },
+    {
+      "id": "dependent-types",
+      "title": "Dependent Types",
+      "description": "A dependently typed language supporting dependent products (functions), dependent sums (pairs), and booleans.",
+      "creationDate": "2023-09-21",
+      "tags": [
+        "programming-language",
+        "racket",
+        "type-system"
+      ],
+      "pageLink": "https://github.com/quasarbright/learn-racket/blob/master/dependent-types.rkt",
+      "sourceLink": "https://github.com/quasarbright/learn-racket/blob/master/dependent-types.rkt",
+      "featured": true
+    },
+    {
+      "id": "rico-blaze",
+      "title": "Rico Blaze",
+      "description": "A hardware description language, and an (unfinished) CPU written in that language.",
+      "creationDate": "2024-10-04",
+      "tags": [
+        "programming-language",
+        "racket",
+        "dsl",
+        "macros",
+        "compiler",
+        "unfinished"
+      ],
+      "pageLink": "https://github.com/quasarbright/rico-blaze",
+      "sourceLink": "https://github.com/quasarbright/rico-blaze",
+      "featured": true
+    },
+    {
+      "id": "ski",
+      "title": "SKI Combinator Calculus",
+      "description": "A compiler from lambda calculus to SKI combinator calculus.",
+      "creationDate": "2024-09-19",
+      "tags": [
+        "programming-language",
+        "racket",
+        "compiler"
+      ],
+      "pageLink": "https://github.com/quasarbright/learn-racket/blob/master/ski.rkt",
+      "sourceLink": "https://github.com/quasarbright/learn-racket/blob/master/ski.rkt"
+    },
+    {
+      "id": "proof-checker",
+      "title": "Proof Checker",
+      "description": "A proof checker inspired by system LK",
+      "creationDate": "2023-06-23",
+      "tags": [
+        "programming-language",
+        "racket",
+        "macro",
+        "dsl"
+      ],
+      "pageLink": "https://github.com/quasarbright/sc-proof-checker",
+      "sourceLink": "https://github.com/quasarbright/sc-proof-checker",
+      "featured": true
+    },
+    {
+      "id": "word-hunt-bot",
+      "title": "Word Hunt Bot",
+      "description": "A bot for cheating at word hunt.",
+      "creationDate": "2024-08-23",
+      "tags": [
+        "AI",
+        "racket"
+      ],
+      "pageLink": "https://github.com/quasarbright/learn-racket/blob/master/word-hunt.rkt",
+      "sourceLink": "https://github.com/quasarbright/learn-racket/blob/master/word-hunt.rkt"
+    },
+    {
+      "id": "anagrams-bot",
+      "title": "Anagrams Bot",
+      "description": "A bot for cheating at anagrams.",
+      "creationDate": "2024-08-23",
+      "tags": [
+        "AI",
+        "racket"
+      ],
+      "pageLink": "https://github.com/quasarbright/learn-racket/blob/master/anagrams.rkt",
+      "sourceLink": "https://github.com/quasarbright/learn-racket/blob/master/anagrams.rkt"
+    },
+    {
+      "id": "actors",
+      "title": "Actor Model",
+      "description": "An implementation of the actor model in Racket.",
+      "creationDate": "2022-10-14",
+      "tags": [
+        "programming-language",
+        "racket",
+        "dsl",
+        "macro",
+        "concurrency"
+      ],
+      "pageLink": "https://github.com/quasarbright/learn-racket/blob/master/actors.rkt",
+      "sourceLink": "https://github.com/quasarbright/learn-racket/blob/master/actors.rkt"
+    },
+    {
+      "id": "list-monad",
+      "title": "List monad-like DSL for Racket",
+      "description": "Similar to for* loops in Racket, but more convenient syntax",
+      "creationDate": "2025-04-13",
+      "tags": [
+        "programming-language",
+        "racket",
+        "dsl",
+        "macro"
+      ],
+      "pageLink": "https://github.com/quasarbright/learn-racket/blob/master/list-monad.rkt",
+      "sourceLink": "https://github.com/quasarbright/learn-racket/blob/master/list-monad.rkt"
+    },
+    {
+      "id": "ocular-patdown",
+      "title": "Ocular Patdown",
+      "description": "An optics library featuring a match-like DSL for deep immutable updates.",
+      "creationDate": "2022-08-06",
+      "tags": [
+        "programming-language",
+        "racket",
+        "dsl",
+        "macro",
+        "optics"
+      ],
+      "pageLink": "https://github.com/quasarbright/ocular-patdown",
+      "sourceLink": "https://github.com/quasarbright/ocular-patdown"
+    },
+    {
+      "id": "launder",
+      "title": "Launder",
+      "description": "A DSL/tool for tracking work hours and payment",
+      "creationDate": "2024-10-07",
+      "tags": [
+        "racket",
+        "dsl",
+        "utility"
+      ],
+      "pageLink": "https://github.com/quasarbright/launder",
+      "sourceLink": "https://github.com/quasarbright/launder"
+    },
+    {
+      "id": "online-tic-tac-toe",
+      "title": "Online Tic Tac Toe",
+      "description": "multiplayer tic-tac-toe with a game server written from scratch",
+      "creationDate": "2024-02-29",
+      "tags": [
+        "game",
+        "racket"
+      ],
+      "pageLink": "https://github.com/quasarbright/tic-tac-toe",
+      "sourceLink": "https://github.com/quasarbright/tic-tac-toe",
+      "featured": true
+    },
+    {
+      "id": "student-gui",
+      "title": "Student GUI DSL",
+      "description": "An elm-like GUI DSL for computer science students.",
+      "creationDate": "2024-02-29",
+      "tags": [
+        "programming-language",
+        "racket",
+        "dsl",
+        "macro",
+        "education"
+      ],
+      "pageLink": "https://github.com/quasarbright/student-gui",
+      "sourceLink": "https://github.com/quasarbright/student-gui"
+    },
+    {
+      "id": "project-display",
+      "title": "Projection",
+      "description": "A static site generator for displaying my projects (the site you're on right now!).",
+      "creationDate": "2025-08-24",
+      "tags": [
+        "web",
+        "utility"
+      ],
+      "pageLink": "./project-display/dist",
+      "sourceLink": "https://github.com/quasarbright/p5js/project-display"
+    }
+  ]
+}
