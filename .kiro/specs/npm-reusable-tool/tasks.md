@@ -28,14 +28,14 @@
   - Create src/utils/errors.ts with ProjectionError class
   - _Requirements: 4.2, 4.3, 10.1_
 
-- [ ] 3. Implement configuration loading system
+- [x] 3. Implement configuration loading system
   - Create src/generator/config.ts with ConfigLoader class
   - Implement config file discovery (projection.config.js, projection.config.json, embedded in YAML)
   - Implement config merging with defaults
   - Implement config validation with clear error messages
   - _Requirements: 3.1, 3.2, 3.3, 3.4_
 
-- [ ] 3.1 Write unit tests for configuration loading
+- [x] 3.1 Write unit tests for configuration loading
   - Test config file discovery priority
   - Test config merging and defaults
   - Test config validation errors
