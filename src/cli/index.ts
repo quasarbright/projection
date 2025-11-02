@@ -163,7 +163,7 @@ EXAMPLES:
   projection serve --open
 
 DOCUMENTATION:
-  https://github.com/quasarbright/quasarbright.github.io/tree/master/p5js/project-display
+  https://github.com/quasarbright/projection
 
 `);
   }

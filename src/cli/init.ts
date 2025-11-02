@@ -243,7 +243,7 @@ function displaySuccessMessage(projectsFile: string, configFile: string): void {
     `Run 'projection dev' to start development server`
   ]);
   Logger.newline();
-  Logger.dim('📚 Documentation: https://github.com/quasarbright/quasarbright.github.io/tree/master/p5js/project-display');
+  Logger.dim('📚 Documentation: https://github.com/quasarbright/projection');
   Logger.newline();
   Logger.icon('🚀', 'Happy building!', '\x1b[36m');
   Logger.newline();

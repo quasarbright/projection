@@ -18,9 +18,8 @@ config:
   # Optional: URLs to dynamic visual webpages
   # These will be displayed as iframes in the background
   dynamicBackgrounds: []
-    # - https://quasarbright.github.io/p5js/random-walk
-    # - https://quasarbright.github.io/p5js/voronoi?background
-    # - https://quasarbright.github.io/p5js/majority-automaton-gpu?background
+    # - https://example.com/background1
+    # - https://example.com/background2
   
   # Optional: Default screenshot to use when a project has no thumbnailLink
   # defaultScreenshot: "https://example.com/default-screenshot.png"

@@ -91,10 +91,7 @@ class ProjectModal {
   
   resolveThumbnailPath(thumbnailLink) {
     if (!thumbnailLink) {
-      const baseUrl = window.PROJECTS_DATA && window.PROJECTS_DATA.config && window.PROJECTS_DATA.config.baseUrl 
-        ? window.PROJECTS_DATA.config.baseUrl 
-        : 'https://quasarbright.github.io/';
-      return baseUrl + 'images/magnet pendulum.PNG';
+      return null; // No default thumbnail
     }
     
     // If it's already an absolute URL (http/https), return as-is
@@ -110,20 +107,22 @@ class ProjectModal {
     // Get base URL from config
     const baseUrl = window.PROJECTS_DATA && window.PROJECTS_DATA.config && window.PROJECTS_DATA.config.baseUrl 
       ? window.PROJECTS_DATA.config.baseUrl 
-      : 'https://quasarbright.github.io/';
+      : './';
     
-    // If it starts with './', it's relative to base URL + p5js/
+    // If it starts with './', it's relative to base URL
     if (thumbnailLink.startsWith('./')) {
-      return baseUrl + 'p5js/' + thumbnailLink.substring(2);
+      return baseUrl + thumbnailLink.substring(2);
     }
     
-    // If it starts with '../', it's relative to base URL (one level up from p5js/)
+    // If it starts with '../', resolve relative to base URL
     if (thumbnailLink.startsWith('../')) {
-      return baseUrl + thumbnailLink.substring(3);
+      const cleanBaseUrl = baseUrl.replace(/\/$/, '');
+      const parentUrl = cleanBaseUrl.substring(0, cleanBaseUrl.lastIndexOf('/') + 1);
+      return parentUrl + thumbnailLink.substring(3);
     }
     
-    // Otherwise, treat as relative to base URL + p5js/
-    return baseUrl + 'p5js/' + thumbnailLink;
+    // Otherwise, treat as relative to base URL
+    return baseUrl + thumbnailLink;
   }
   
   resolvePageLink(pageLink) {
@@ -144,20 +143,22 @@ class ProjectModal {
     // Get base URL from config
     const baseUrl = window.PROJECTS_DATA && window.PROJECTS_DATA.config && window.PROJECTS_DATA.config.baseUrl 
       ? window.PROJECTS_DATA.config.baseUrl 
-      : 'https://quasarbright.github.io/';
+      : './';
     
-    // If it starts with './', it's relative to base URL + p5js/
+    // If it starts with './', it's relative to base URL
     if (pageLink.startsWith('./')) {
-      return baseUrl + 'p5js/' + pageLink.substring(2);
+      return baseUrl + pageLink.substring(2);
     }
     
-    // If it starts with '../', it's relative to base URL (one level up from p5js/)
+    // If it starts with '../', resolve relative to base URL
     if (pageLink.startsWith('../')) {
-      return baseUrl + pageLink.substring(3);
+      const cleanBaseUrl = baseUrl.replace(/\/$/, '');
+      const parentUrl = cleanBaseUrl.substring(0, cleanBaseUrl.lastIndexOf('/') + 1);
+      return parentUrl + pageLink.substring(3);
     }
     
-    // Otherwise, treat as relative to base URL + p5js/
-    return baseUrl + 'p5js/' + pageLink;
+    // Otherwise, treat as relative to base URL
+    return baseUrl + pageLink;
   }
 
   populateModal(project) {
@@ -217,7 +218,6 @@ class ProjectModal {
   getLinkText(url) {
     if (url.includes('github.com')) return 'View on GitHub';
     if (url.includes('youtube.com') || url.includes('youtu.be')) return 'Watch Video';
-    if (url.includes('editor.p5js.org')) return 'View on p5.js Editor';
     return 'View Project';
   }
   
@@ -277,7 +277,7 @@ document.addEventListener('click', (e) => {
       // Resolve page link using the same logic as the modal would
       const baseUrl = window.PROJECTS_DATA && window.PROJECTS_DATA.config && window.PROJECTS_DATA.config.baseUrl 
         ? window.PROJECTS_DATA.config.baseUrl 
-        : 'https://quasarbright.github.io/';
+        : './';
       
       let resolvedUrl;
       if (project.pageLink.startsWith('http://') || project.pageLink.startsWith('https://')) {
