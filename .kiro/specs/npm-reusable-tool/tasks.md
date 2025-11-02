@@ -57,7 +57,7 @@
   - Test duplicate ID detection
   - _Requirements: 4.2, 4.3_
 
-- [ ] 5. Refactor HTML generation to TypeScript
+- [x] 5. Refactor HTML generation to TypeScript
   - Create src/generator/html-builder.ts with HTMLBuilder class
   - Port generateHTML function from generator.js
   - Port generateProjectCard function
@@ -66,7 +66,7 @@
   - Maintain backward compatibility with existing output
   - _Requirements: 6.2, 6.3, 10.3, 10.4_
 
-- [ ] 5.1 Write unit tests for HTML generation
+- [x] 5.1 Write unit tests for HTML generation
   - Test project card HTML generation
   - Test tag filter generation
   - Test path resolution (relative, absolute, URLs)
