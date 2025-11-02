@@ -12,10 +12,7 @@
   "scripts": {
     "build": "tsc && npm run copy-templates",
     "copy-templates": "mkdir -p lib/templates && cp -r src/templates/* lib/templates/",
-    "serve": "npx http-server dist -p 8080 -o",
-    "start": "npm run build && npm run serve",
     "clean": "rm -rf dist node_modules lib",
-    "rebuild": "npm run clean && npm install && npm run build",
     "test": "jest",
     "test:watch": "jest --watch",
     "prepublishOnly": "npm run build"
