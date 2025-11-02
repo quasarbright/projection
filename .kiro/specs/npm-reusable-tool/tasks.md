@@ -80,7 +80,7 @@
   - Copy bundled templates from lib/templates/default/ as fallback
   - _Requirements: 1.2, 5.1, 5.2, 5.3, 7.1, 7.2, 7.3_
 
-- [ ] 7. Create main generator orchestrator
+- [x] 7. Create main generator orchestrator
   - Create src/generator/index.ts with Generator class
   - Implement generate() method that orchestrates the build process
   - Implement loadProjectData() to find and parse projects.yaml/json
