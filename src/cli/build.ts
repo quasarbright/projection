@@ -1,5 +1,6 @@
 import { Generator, GeneratorOptions } from '../generator';
 import { ProjectionError } from '../utils/errors';
+import { Logger } from '../utils/logger';
 
 /**
  * Options for the build command
@@ -34,36 +35,47 @@ export async function build(options: BuildOptions = {}): Promise<void> {
 
     // Display success message
     const outputDir = generator.getOutputDir();
-    console.log(`\n✨ Build successful!`);
-    console.log(`📁 Output location: ${outputDir}`);
-    console.log(`\n💡 Next steps:`);
-    console.log(`   - Open ${outputDir}/index.html in your browser`);
-    console.log(`   - Run 'projection serve' to preview with a local server`);
-    console.log(`   - Run 'projection dev' for development with live reload\n`);
+    Logger.newline();
+    Logger.icon('✨', 'Build successful!', '\x1b[32m');
+    Logger.keyValue('Output location', outputDir);
+    Logger.newline();
+    Logger.info('Next steps:');
+    Logger.list([
+      `Open ${outputDir}/index.html in your browser`,
+      `Run 'projection serve' to preview with a local server`,
+      `Run 'projection dev' for development with live reload`
+    ]);
+    Logger.newline();
 
   } catch (error) {
     if (error instanceof ProjectionError) {
       // Display user-friendly error message
-      console.error(`\n❌ Build failed: ${error.message}\n`);
+      Logger.newline();
+      Logger.error(`Build failed: ${error.message}`);
+      Logger.newline();
       
       if (error.details) {
         if (error.details.errors && Array.isArray(error.details.errors)) {
-          console.error('Errors:');
+          Logger.error('Errors:');
           error.details.errors.forEach((err: string) => {
-            console.error(`  - ${err}`);
+            Logger.dim(`  • ${err}`);
           });
-          console.error('');
+          Logger.newline();
         } else if (error.details.message) {
-          console.error(`${error.details.message}\n`);
+          Logger.dim(error.details.message);
+          Logger.newline();
         }
       }
       
       process.exit(1);
     } else {
       // Unexpected error
-      console.error(`\n❌ Unexpected error during build:\n`);
-      console.error((error as Error).message);
-      console.error('\nPlease report this issue if it persists.\n');
+      Logger.newline();
+      Logger.error('Unexpected error during build:');
+      Logger.dim((error as Error).message);
+      Logger.newline();
+      Logger.dim('Please report this issue if it persists.');
+      Logger.newline();
       process.exit(1);
     }
   }

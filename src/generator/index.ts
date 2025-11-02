@@ -8,6 +8,7 @@ import { Validator } from './validator';
 import { HTMLBuilder } from './html-builder';
 import { AssetCopier } from './asset-copier';
 import { ProjectionError, ErrorCodes } from '../utils/errors';
+import { Logger } from '../utils/logger';
 
 /**
  * Options for the Generator
@@ -73,50 +74,53 @@ export class Generator {
    */
   async generate(): Promise<void> {
     try {
-      console.log('🚀 Starting build process...');
+      Logger.header('🚀 Starting build process');
 
       // 1. Load project data
-      console.log('📂 Loading project data...');
+      Logger.step('Loading project data...');
       const projectsData = await this.loadProjectData();
-      console.log(`✓ Loaded ${projectsData.projects.length} projects`);
+      Logger.success(`Loaded ${projectsData.projects.length} project${projectsData.projects.length !== 1 ? 's' : ''}`);
 
       // 2. Validate projects
-      console.log('✓ Validating project data...');
+      Logger.step('Validating project data...');
       const warnings = this.validator.validate(projectsData.projects);
-      console.log('✓ Validation passed');
+      Logger.success('Validation passed');
 
       // Display warnings if any
       if (warnings.length > 0) {
-        console.log(`\n⚠️  Found ${warnings.length} warning(s):`);
+        Logger.newline();
+        Logger.warn(`Found ${warnings.length} warning${warnings.length !== 1 ? 's' : ''}:`);
         warnings.forEach(warning => {
           const projectInfo = warning.projectId ? `[${warning.projectId}]` : `[Project ${warning.projectIndex}]`;
-          console.log(`   ${projectInfo} ${warning.field}: ${warning.message}`);
+          Logger.dim(`   ${projectInfo} ${warning.field}: ${warning.message}`);
         });
-        console.log('');
+        Logger.newline();
       }
 
       // 3. Clean output directory if requested
       if (this.outputDir && fs.existsSync(this.outputDir)) {
-        console.log('🧹 Cleaning output directory...');
+        Logger.step('Cleaning output directory...');
         this.cleanOutputDirectory();
+        Logger.success('Output directory cleaned');
       }
 
       // 4. Generate HTML
-      console.log('📝 Generating HTML...');
+      Logger.step('Generating HTML...');
       const html = this.htmlBuilder.generateHTML(projectsData);
-      console.log('✓ HTML generated');
+      Logger.success('HTML generated');
 
       // 5. Write output
-      console.log('💾 Writing output files...');
+      Logger.step('Writing output files...');
       await this.writeOutput(html);
-      console.log('✓ Output written');
+      Logger.success('Output written');
 
       // 6. Copy assets
-      console.log('📦 Copying assets...');
+      Logger.step('Copying assets...');
       await this.assetCopier.copyAssets(this.config);
-      console.log('✓ Assets copied');
+      Logger.success('Assets copied');
 
-      console.log(`\n✨ Build complete! Output: ${this.outputDir}`);
+      Logger.newline();
+      Logger.icon('✨', `Build complete! Output: ${this.outputDir}`, '\x1b[32m');
     } catch (error) {
       if (error instanceof ProjectionError) {
         throw error;

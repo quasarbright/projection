@@ -1,6 +1,7 @@
 import * as fs from 'fs';
 import * as path from 'path';
 import { spawn } from 'child_process';
+import { Logger } from '../utils/logger';
 
 /**
  * Options for the serve command
@@ -26,28 +27,37 @@ export async function serve(options: ServeOptions = {}): Promise<void> {
 
   // Check if dist directory exists
   if (!fs.existsSync(distPath)) {
-    console.error(`\n❌ Error: Directory '${dir}' not found.`);
-    console.error(`\n💡 Run 'projection build' first to generate the site.\n`);
+    Logger.newline();
+    Logger.error(`Directory '${dir}' not found.`);
+    Logger.newline();
+    Logger.info(`Run 'projection build' first to generate the site.`);
+    Logger.newline();
     process.exit(1);
   }
 
   // Check if index.html exists
   const indexPath = path.join(distPath, 'index.html');
   if (!fs.existsSync(indexPath)) {
-    console.error(`\n❌ Error: No index.html found in '${dir}' directory.`);
-    console.error(`\n💡 Run 'projection build' first to generate the site.\n`);
+    Logger.newline();
+    Logger.error(`No index.html found in '${dir}' directory.`);
+    Logger.newline();
+    Logger.info(`Run 'projection build' first to generate the site.`);
+    Logger.newline();
     process.exit(1);
   }
 
-  console.log(`\n🚀 Starting server...`);
-  console.log(`📁 Serving: ${distPath}`);
-  console.log(`🌐 Server URL: http://localhost:${port}`);
+  Logger.newline();
+  Logger.header('🚀 Starting server');
+  Logger.keyValue('Serving', distPath);
+  Logger.keyValue('Server URL', `http://localhost:${port}`);
   
   if (shouldOpen) {
-    console.log(`🔗 Opening browser...`);
+    Logger.icon('🔗', 'Opening browser...', '\x1b[36m');
   }
   
-  console.log(`\n💡 Press Ctrl+C to stop the server\n`);
+  Logger.newline();
+  Logger.dim('💡 Press Ctrl+C to stop the server');
+  Logger.newline();
 
   // Start http-server using npx
   const args = [
@@ -69,21 +79,29 @@ export async function serve(options: ServeOptions = {}): Promise<void> {
 
   // Handle process termination
   serverProcess.on('error', (error) => {
-    console.error(`\n❌ Failed to start server: ${error.message}`);
-    console.error(`\n💡 Make sure you have Node.js installed.\n`);
+    Logger.newline();
+    Logger.error(`Failed to start server: ${error.message}`);
+    Logger.newline();
+    Logger.info('Make sure you have Node.js installed.');
+    Logger.newline();
     process.exit(1);
   });
 
   serverProcess.on('exit', (code) => {
     if (code !== 0 && code !== null) {
-      console.error(`\n❌ Server exited with code ${code}\n`);
+      Logger.newline();
+      Logger.error(`Server exited with code ${code}`);
+      Logger.newline();
       process.exit(code);
     }
   });
 
   // Handle Ctrl+C gracefully
   process.on('SIGINT', () => {
-    console.log('\n\n👋 Shutting down server...\n');
+    Logger.newline();
+    Logger.newline();
+    Logger.icon('👋', 'Shutting down server...', '\x1b[33m');
+    Logger.newline();
     serverProcess.kill('SIGINT');
     process.exit(0);
   });

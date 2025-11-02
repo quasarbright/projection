@@ -795,6 +795,121 @@ my-portfolio/
     └── assets/
 ```
 
+## 🔄 Migration Guide
+
+### Migrating from Version 1.x
+
+If you were using the original version of Projection (running `node generator.js` directly), here's how to migrate to the new npm package version:
+
+#### What Changed
+
+**Version 2.0** is a complete refactor that transforms Projection from a personal tool into a reusable npm package. The good news: **your existing project data works without any changes!**
+
+#### Migration Steps
+
+1. **Install the new version:**
+   ```bash
+   # From source (recommended for now)
+   cd /path/to/projection
+   npm install
+   npm run build
+   npm link
+   ```
+
+2. **Your existing files work as-is:**
+   - `projects.yaml` - No changes needed ✅
+   - Embedded config in YAML - Still supported ✅
+   - Custom styles/scripts - Still work ✅
+
+3. **Update your workflow:**
+   ```bash
+   # Old way:
+   node generator.js
+   
+   # New way:
+   projection build
+   
+   # For development with live reload:
+   projection dev
+   ```
+
+4. **Optional: Extract configuration (recommended):**
+   
+   If you have config embedded in your `projects.yaml`:
+   ```yaml
+   config:
+     title: "My Projects"
+     description: "..."
+   
+   projects:
+     - id: "project-1"
+       # ...
+   ```
+   
+   You can extract it to a separate `projection.config.js`:
+   ```javascript
+   module.exports = {
+     title: "My Projects",
+     description: "...",
+     // ... other config
+   };
+   ```
+   
+   Then remove the `config:` section from `projects.yaml`. Both approaches work!
+
+#### What Was Moved to Archive
+
+To preserve the original implementation while transitioning to the new architecture:
+
+- **`archive/generator.js`** - Original generator script (kept for reference)
+- **`archive/design.md`** - Original design document
+
+These files are preserved but no longer used. The new implementation is in `src/` and compiles to `lib/`.
+
+#### New Features You Get
+
+- ✨ **CLI Commands** - `init`, `build`, `dev`, `serve`
+- 🔥 **Hot Reload** - Automatic rebuild and browser refresh
+- 🎨 **Better Logging** - Colored, informative console output
+- ✅ **Validation** - Better error messages with suggestions
+- 📦 **Bundled Templates** - No need to copy template files
+- 🔧 **TypeScript** - Better code quality and maintainability
+
+#### Troubleshooting Migration
+
+**Problem:** "Command not found: projection"
+
+**Solution:**
+```bash
+# Make sure you've linked the package
+cd /path/to/projection
+npm link
+
+# Or use npx
+npx projection build
+```
+
+**Problem:** "Projects file not found"
+
+**Solution:** Make sure you're in the directory containing `projects.yaml`:
+```bash
+cd /path/to/your/portfolio
+projection build
+```
+
+**Problem:** Build output looks different
+
+**Solution:** The HTML structure is the same, but if you had custom modifications to the generator, you may need to:
+- Use custom styles in `styles/` directory
+- Use custom scripts in `scripts/` directory
+- Check the new configuration options
+
+#### Need Help?
+
+- Check the [Troubleshooting](#-troubleshooting) section
+- Review the [CHANGELOG.md](CHANGELOG.md) for detailed changes
+- Open an issue on [GitHub](https://github.com/quasarbright/projection/issues)
+
 ## 🤝 Contributing
 
 Contributions are welcome! Here's how you can help:

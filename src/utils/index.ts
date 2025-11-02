@@ -1,4 +1,3 @@
-// Utility functions
-// Will be implemented in later tasks
-
-export {};
+// Utility exports
+export * from './errors';
+export * from './logger';

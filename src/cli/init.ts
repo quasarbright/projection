@@ -1,6 +1,7 @@
 import * as fs from 'fs';
 import * as path from 'path';
 import * as readline from 'readline';
+import { Logger } from '../utils/logger';
 
 interface InitOptions {
   force?: boolean;
@@ -29,13 +30,18 @@ export async function init(options: InitOptions = {}): Promise<void> {
     if (projectsExists) existingFiles.push(projectsFileName);
     if (configExists) existingFiles.push(configFileName);
 
-    console.log(`\n⚠️  The following files already exist:`);
-    existingFiles.forEach(file => console.log(`   - ${file}`));
-    console.log(`\nUse --force to overwrite existing files.\n`);
+    Logger.newline();
+    Logger.warn('The following files already exist:');
+    Logger.list(existingFiles);
+    Logger.newline();
+    Logger.dim('Use --force to overwrite existing files.');
+    Logger.newline();
     
     const shouldContinue = await promptUser('Do you want to overwrite these files? (y/N): ');
     if (!shouldContinue.toLowerCase().startsWith('y')) {
-      console.log('\n❌ Initialization cancelled.\n');
+      Logger.newline();
+      Logger.error('Initialization cancelled.');
+      Logger.newline();
       return;
     }
   }
@@ -102,7 +108,7 @@ async function copyProjectsTemplate(
   }
 
   fs.writeFileSync(targetPath, content, 'utf-8');
-  console.log(`✅ Created ${path.basename(targetPath)}`);
+  Logger.success(`Created ${path.basename(targetPath)}`);
 }
 
 /**
@@ -117,7 +123,7 @@ async function copyConfigTemplate(templateDir: string, targetPath: string): Prom
 
   const content = fs.readFileSync(templatePath, 'utf-8');
   fs.writeFileSync(targetPath, content, 'utf-8');
-  console.log(`✅ Created ${path.basename(targetPath)}`);
+  Logger.success(`Created ${path.basename(targetPath)}`);
 }
 
 /**
@@ -223,21 +229,22 @@ function promptUser(question: string): Promise<string> {
  * Display success message with next steps
  */
 function displaySuccessMessage(projectsFile: string, configFile: string): void {
-  console.log(`
-🎉 Successfully initialized Projection project!
-
-📁 Created files:
-   - ${projectsFile}
-   - ${configFile}
-
-📝 Next steps:
-   1. Edit ${projectsFile} to add your projects
-   2. Customize ${configFile} if needed
-   3. Run 'projection build' to generate your site
-   4. Run 'projection dev' to start development server
-
-📚 Documentation: https://github.com/quasarbright/quasarbright.github.io/tree/master/p5js/project-display
-
-Happy building! 🚀
-`);
+  Logger.newline();
+  Logger.icon('🎉', 'Successfully initialized Projection project!', '\x1b[32m');
+  Logger.newline();
+  Logger.info('Created files:');
+  Logger.list([projectsFile, configFile]);
+  Logger.newline();
+  Logger.info('Next steps:');
+  Logger.numberedList([
+    `Edit ${projectsFile} to add your projects`,
+    `Customize ${configFile} if needed`,
+    `Run 'projection build' to generate your site`,
+    `Run 'projection dev' to start development server`
+  ]);
+  Logger.newline();
+  Logger.dim('📚 Documentation: https://github.com/quasarbright/quasarbright.github.io/tree/master/p5js/project-display');
+  Logger.newline();
+  Logger.icon('🚀', 'Happy building!', '\x1b[36m');
+  Logger.newline();
 }

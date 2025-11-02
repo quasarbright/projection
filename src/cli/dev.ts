@@ -4,6 +4,7 @@ import * as chokidar from 'chokidar';
 import * as browserSync from 'browser-sync';
 import { Generator, GeneratorOptions } from '../generator';
 import { ProjectionError } from '../utils/errors';
+import { Logger } from '../utils/logger';
 
 /**
  * Options for the dev command
@@ -27,7 +28,9 @@ export async function dev(options: DevOptions = {}): Promise<void> {
   const shouldOpen = !options.noOpen;
   const cwd = process.cwd();
 
-  console.log('\n🚀 Starting development server...\n');
+  Logger.newline();
+  Logger.header('🚀 Starting development server');
+  Logger.newline();
 
   try {
     // Prepare generator options
@@ -42,13 +45,15 @@ export async function dev(options: DevOptions = {}): Promise<void> {
     const outputDir = generator.getOutputDir();
 
     // Perform initial build
-    console.log('📦 Performing initial build...\n');
+    Logger.step('Performing initial build...');
+    Logger.newline();
     await generator.generate();
-    console.log('');
 
     // Check if dist directory exists after build
     if (!fs.existsSync(outputDir)) {
-      console.error(`\n❌ Error: Output directory '${outputDir}' was not created.\n`);
+      Logger.newline();
+      Logger.error(`Output directory '${outputDir}' was not created.`);
+      Logger.newline();
       process.exit(1);
     }
 
@@ -65,15 +70,20 @@ export async function dev(options: DevOptions = {}): Promise<void> {
       logLevel: 'silent'
     }, (err: Error | null) => {
       if (err) {
-        console.error(`\n❌ Failed to start dev server: ${err.message}\n`);
+        Logger.newline();
+        Logger.error(`Failed to start dev server: ${err.message}`);
+        Logger.newline();
         process.exit(1);
       }
 
-      console.log(`\n✨ Development server running!`);
-      console.log(`📁 Serving: ${outputDir}`);
-      console.log(`🌐 Local: http://localhost:${port}`);
-      console.log(`👀 Watching for changes...\n`);
-      console.log(`💡 Press Ctrl+C to stop\n`);
+      Logger.newline();
+      Logger.icon('✨', 'Development server running!', '\x1b[32m');
+      Logger.keyValue('Serving', outputDir);
+      Logger.keyValue('Local', `http://localhost:${port}`);
+      Logger.icon('👀', 'Watching for changes...', '\x1b[36m');
+      Logger.newline();
+      Logger.dim('💡 Press Ctrl+C to stop');
+      Logger.newline();
     });
 
     // Set up file watcher
@@ -91,7 +101,8 @@ export async function dev(options: DevOptions = {}): Promise<void> {
     const existingPaths = watchPaths.filter(p => fs.existsSync(p));
 
     if (existingPaths.length === 0) {
-      console.log('⚠️  Warning: No files to watch. Make sure you have projects.yaml or config files.\n');
+      Logger.warn('No files to watch. Make sure you have projects.yaml or config files.');
+      Logger.newline();
     }
 
     const watcher = chokidar.watch(existingPaths, {
@@ -116,35 +127,42 @@ export async function dev(options: DevOptions = {}): Promise<void> {
       isRebuilding = true;
 
       try {
-        console.log('🔄 Change detected, rebuilding...');
+        Logger.icon('🔄', 'Change detected, rebuilding...', '\x1b[33m');
         
         // Recreate generator to pick up config changes
         generator = await Generator.create(generatorOptions);
         await generator.generate();
         
-        console.log('✓ Rebuild complete\n');
+        Logger.success('Rebuild complete');
+        Logger.newline();
         
         // Reload browser
         bs.reload();
       } catch (error) {
         if (error instanceof ProjectionError) {
-          console.error(`\n❌ Rebuild failed: ${error.message}`);
+          Logger.newline();
+          Logger.error(`Rebuild failed: ${error.message}`);
           
           if (error.details) {
             if (error.details.errors && Array.isArray(error.details.errors)) {
-              console.error('Errors:');
+              Logger.error('Errors:');
               error.details.errors.forEach((err: string) => {
-                console.error(`  - ${err}`);
+                Logger.dim(`  • ${err}`);
               });
             } else if (error.details.message) {
-              console.error(`${error.details.message}`);
+              Logger.dim(error.details.message);
             }
           }
-          console.error('\n👀 Watching for changes...\n');
+          Logger.newline();
+          Logger.icon('👀', 'Watching for changes...', '\x1b[36m');
+          Logger.newline();
         } else {
-          console.error(`\n❌ Unexpected error during rebuild:`);
-          console.error((error as Error).message);
-          console.error('\n👀 Watching for changes...\n');
+          Logger.newline();
+          Logger.error('Unexpected error during rebuild:');
+          Logger.dim((error as Error).message);
+          Logger.newline();
+          Logger.icon('👀', 'Watching for changes...', '\x1b[36m');
+          Logger.newline();
         }
       } finally {
         isRebuilding = false;
@@ -160,32 +178,37 @@ export async function dev(options: DevOptions = {}): Promise<void> {
     // Watch for file changes
     watcher.on('change', (filePath) => {
       const relativePath = path.relative(cwd, filePath);
-      console.log(`📝 Changed: ${relativePath}`);
+      Logger.icon('📝', `Changed: ${relativePath}`, '\x1b[33m');
       rebuild();
     });
 
     watcher.on('add', (filePath) => {
       const relativePath = path.relative(cwd, filePath);
-      console.log(`➕ Added: ${relativePath}`);
+      Logger.icon('➕', `Added: ${relativePath}`, '\x1b[32m');
       rebuild();
     });
 
     watcher.on('unlink', (filePath) => {
       const relativePath = path.relative(cwd, filePath);
-      console.log(`➖ Removed: ${relativePath}`);
+      Logger.icon('➖', `Removed: ${relativePath}`, '\x1b[31m');
       rebuild();
     });
 
     watcher.on('error', (error) => {
-      console.error(`\n❌ Watcher error: ${error.message}\n`);
+      Logger.newline();
+      Logger.error(`Watcher error: ${error.message}`);
+      Logger.newline();
     });
 
     // Handle graceful shutdown
     const shutdown = () => {
-      console.log('\n\n👋 Shutting down development server...');
+      Logger.newline();
+      Logger.newline();
+      Logger.icon('👋', 'Shutting down development server...', '\x1b[33m');
       watcher.close();
       bs.exit();
-      console.log('✓ Server stopped\n');
+      Logger.success('Server stopped');
+      Logger.newline();
       process.exit(0);
     };
 
@@ -194,25 +217,31 @@ export async function dev(options: DevOptions = {}): Promise<void> {
 
   } catch (error) {
     if (error instanceof ProjectionError) {
-      console.error(`\n❌ Failed to start dev server: ${error.message}\n`);
+      Logger.newline();
+      Logger.error(`Failed to start dev server: ${error.message}`);
+      Logger.newline();
       
       if (error.details) {
         if (error.details.errors && Array.isArray(error.details.errors)) {
-          console.error('Errors:');
+          Logger.error('Errors:');
           error.details.errors.forEach((err: string) => {
-            console.error(`  - ${err}`);
+            Logger.dim(`  • ${err}`);
           });
-          console.error('');
+          Logger.newline();
         } else if (error.details.message) {
-          console.error(`${error.details.message}\n`);
+          Logger.dim(error.details.message);
+          Logger.newline();
         }
       }
       
       process.exit(1);
     } else {
-      console.error(`\n❌ Unexpected error:\n`);
-      console.error((error as Error).message);
-      console.error('\nPlease report this issue if it persists.\n');
+      Logger.newline();
+      Logger.error('Unexpected error:');
+      Logger.dim((error as Error).message);
+      Logger.newline();
+      Logger.dim('Please report this issue if it persists.');
+      Logger.newline();
       process.exit(1);
     }
   }

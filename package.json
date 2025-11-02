@@ -1,6 +1,6 @@
 {
   "name": "projection",
-  "version": "1.0.0",
+  "version": "2.0.0",
   "description": "A static site generator that creates a beautiful, interactive gallery to showcase your coding projects. Features search, filtering, dark theme, and responsive design.",
   "main": "lib/index.js",
   "types": "lib/index.d.ts",
@@ -43,7 +43,8 @@
     "lib/",
     "bin/",
     "README.md",
-    "LICENSE"
+    "LICENSE",
+    "CHANGELOG.md"
   ],
   "devDependencies": {
     "@types/browser-sync": "^2.29.1",
