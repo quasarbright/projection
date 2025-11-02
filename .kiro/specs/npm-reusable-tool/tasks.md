@@ -145,7 +145,7 @@
   - Display server URL in console
   - _Requirements: 8.4_
 
-- [ ] 13. Implement CLI dev command with file watching
+- [x] 13. Implement CLI dev command with file watching
   - Create src/cli/dev.ts with dev command implementation
   - Perform initial build using Generator
   - Set up file watcher using chokidar for projects.yaml, config files, custom styles/, scripts/

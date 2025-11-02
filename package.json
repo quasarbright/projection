@@ -28,8 +28,8 @@
     "responsive"
   ],
   "dependencies": {
-    "js-yaml": "^4.1.0",
-    "chokidar": "^3.5.3"
+    "chokidar": "^3.5.3",
+    "js-yaml": "^4.1.0"
   },
   "repository": {
     "type": "git",
@@ -45,14 +45,15 @@
     "LICENSE"
   ],
   "devDependencies": {
+    "@types/browser-sync": "^2.29.1",
+    "@types/jest": "^29.5.11",
+    "@types/js-yaml": "^4.0.9",
+    "@types/node": "^20.10.6",
     "browser-sync": "^3.0.4",
     "concurrently": "^9.2.1",
-    "typescript": "^5.3.3",
-    "@types/node": "^20.10.6",
-    "@types/js-yaml": "^4.0.9",
-    "ts-node": "^10.9.2",
     "jest": "^29.7.0",
     "ts-jest": "^29.1.1",
-    "@types/jest": "^29.5.11"
+    "ts-node": "^10.9.2",
+    "typescript": "^5.3.3"
   }
 }
