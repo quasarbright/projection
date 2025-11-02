@@ -35,6 +35,9 @@ export class AssetCopier {
 
     // Copy static assets (favicon, etc.)
     await this.copyStaticAssets();
+
+    // Copy user asset directories (images, screenshots, etc.)
+    await this.copyUserAssetDirectories();
   }
 
   /**
@@ -147,6 +150,34 @@ export class AssetCopier {
           this.copyFile(sourcePath, destPath);
         }
       }
+    }
+  }
+
+  /**
+   * Copy user asset directories (images, screenshots, etc.)
+   * This copies any directories in the project root that might contain assets
+   * referenced in project data (thumbnails, etc.)
+   */
+  private async copyUserAssetDirectories(): Promise<void> {
+    // Common directory names that might contain assets
+    const assetDirNames = ['images', 'screenshots', 'img', 'photos', 'media', 'assets'];
+    
+    for (const dirName of assetDirNames) {
+      const sourceDir = path.join(this.cwd, dirName);
+      
+      // Skip if directory doesn't exist or if it's one we already handled
+      if (!fs.existsSync(sourceDir)) {
+        continue;
+      }
+      
+      const stat = fs.statSync(sourceDir);
+      if (!stat.isDirectory()) {
+        continue;
+      }
+      
+      // Copy the entire directory to output
+      const destDir = path.join(this.outputDir, dirName);
+      this.copyDirectory(sourceDir, destDir);
     }
   }
 
