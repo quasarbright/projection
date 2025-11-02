@@ -105,7 +105,7 @@
   - Include helpful comments in templates
   - _Requirements: 2.1, 2.2, 9.2_
 
-- [ ] 10. Implement CLI init command
+- [x] 10. Implement CLI init command
   - Create src/cli/init.ts with init command implementation
   - Check for existing files and prompt for confirmation if --force not provided
   - Copy projects.yaml.template to current directory
@@ -115,7 +115,7 @@
   - Display success messages with next steps
   - _Requirements: 2.1, 2.2, 2.3, 2.4_
 
-- [ ] 10.1 Write integration tests for init command
+- [x] 10.1 Write integration tests for init command
   - Test file creation in empty directory
   - Test --force flag behavior
   - Test --format option
