@@ -4,6 +4,9 @@
   "description": "A static site generator that creates a beautiful, interactive gallery to showcase your coding projects. Features search, filtering, dark theme, and responsive design.",
   "main": "lib/index.js",
   "types": "lib/index.d.ts",
+  "bin": {
+    "projection": "bin/projection.js"
+  },
   "author": "Mike Delmonaco",
   "license": "MIT",
   "scripts": {
@@ -41,6 +44,7 @@
   },
   "files": [
     "lib/",
+    "bin/",
     "README.md",
     "LICENSE"
   ],

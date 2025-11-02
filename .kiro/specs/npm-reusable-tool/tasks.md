@@ -155,7 +155,7 @@
   - Display dev server URL and watching status
   - _Requirements: 8.1, 8.2, 8.3, 8.4_
 
-- [ ] 14. Create CLI orchestrator and entry point
+- [x] 14. Create CLI orchestrator and entry point
   - Create src/cli/index.ts with CLI class
   - Parse command-line arguments (command and options)
   - Route to appropriate command handler (init, build, dev, serve)
