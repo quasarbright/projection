@@ -33,9 +33,9 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/quasarbright/quasarbright.github.io/tree/master/p5js/project-display"
+    "url": "https://github.com/quasarbright/projection"
   },
-  "homepage": "https://quasarbright.github.io/p5js/project-display/",
+  "homepage": "https://quasarbright.github.io/projection/",
   "engines": {
     "node": ">=14.0.0"
   },
