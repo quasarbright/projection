@@ -72,7 +72,7 @@
   - Test path resolution (relative, absolute, URLs)
   - _Requirements: 5.1, 5.2, 5.3, 5.4, 6.2_
 
-- [ ] 6. Implement asset management system
+- [x] 6. Implement asset management system
   - Create src/generator/asset-copier.ts with AssetCopier class
   - Implement template resolution (user custom vs bundled)
   - Implement asset copying for styles, scripts, and static assets
