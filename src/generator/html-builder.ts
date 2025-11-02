@@ -278,7 +278,17 @@ export class HTMLBuilder {
   </footer>
 
   <script>
-    window.PROJECTS_DATA = ${JSON.stringify({ projects, config: mergedConfig }, null, 2)};
+    window.PROJECTS_DATA = ${JSON.stringify({ 
+      projects: sortedProjects, 
+      config: {
+        title: mergedConfig.title,
+        description: mergedConfig.description,
+        baseUrl: mergedConfig.baseUrl,
+        itemsPerPage: mergedConfig.itemsPerPage,
+        dynamicBackgrounds: mergedConfig.dynamicBackgrounds,
+        defaultScreenshot: mergedConfig.defaultScreenshot
+      }
+    }, null, 2)};
   </script>
   <script src="scripts/search.js"></script>
   <script src="scripts/filter.js"></script>

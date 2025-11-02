@@ -187,7 +187,7 @@
   - Include link to GitHub repository
   - _Requirements: 9.1, 9.2, 9.3, 9.4_
 
-- [ ] 17. Test backward compatibility with existing setup
+- [x] 17. Test backward compatibility with existing setup
   - Use the existing projects.yaml in project root as test data
   - Run projection build in project root directory
   - Verify generated HTML matches output from archive/generator.js
