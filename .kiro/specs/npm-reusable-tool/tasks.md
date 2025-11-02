@@ -41,7 +41,7 @@
   - Test config validation errors
   - _Requirements: 3.1, 3.2, 3.3, 3.4_
 
-- [ ] 4. Implement project data validation
+- [x] 4. Implement project data validation
   - Create src/generator/validator.ts with Validator class
   - Implement required field validation (id, title, pageLink, creationDate)
   - Implement project ID format validation (URL slug pattern)
@@ -50,7 +50,7 @@
   - Return structured validation errors instead of process.exit
   - _Requirements: 4.2, 4.3_
 
-- [ ] 4.1 Write unit tests for project validation
+- [x] 4.1 Write unit tests for project validation
   - Test required field validation
   - Test project ID slug format validation
   - Test date format validation
