@@ -1,0 +1,73 @@
+# Projection Configuration and Project Data
+# This file contains both your site configuration and project data
+
+config:
+  # Site title displayed in the browser tab and header
+  title: "My Projects"
+  
+  # Site description for SEO and social sharing
+  description: "A showcase of my coding projects"
+  
+  # Base URL for your site (used for absolute paths)
+  # Examples: "https://username.github.io/" or "./" for relative paths
+  baseUrl: "./"
+  
+  # Number of items to display per page (for future pagination feature)
+  itemsPerPage: 20
+  
+  # Optional: URLs to dynamic visual webpages
+  # These will be displayed as iframes in the background
+  dynamicBackgrounds: []
+    # - https://quasarbright.github.io/p5js/random-walk
+    # - https://quasarbright.github.io/p5js/voronoi?background
+    # - https://quasarbright.github.io/p5js/majority-automaton-gpu?background
+  
+  # Optional: Default screenshot to use when a project has no thumbnailLink
+  # defaultScreenshot: "https://example.com/default-screenshot.png"
+
+# Your projects array
+projects:
+  # Example project with all available fields
+  - id: "example-project"
+    # Required: Unique identifier (must be lowercase, alphanumeric, and hyphens only)
+    # Used for URLs and internal references
+    
+    title: "Example Project"
+    # Required: Display name of the project
+    
+    description: "This is an example project demonstrating all available fields. Replace this with your own projects!"
+    # Required: Brief description of what the project does
+    
+    creationDate: "2024-01-15"
+    # Required: Date in YYYY-MM-DD format
+    
+    tags:
+      - "web"
+      - "javascript"
+      - "example"
+    # Required: Array of tags for filtering and categorization
+    
+    pageLink: "https://example.com/project"
+    # Required: Primary link to the project (live demo, GitHub, etc.)
+    
+    sourceLink: "https://github.com/username/example-project"
+    # Optional: Link to source code repository
+    
+    thumbnailLink: "./images/example-thumbnail.png"
+    # Optional: Path to project screenshot/thumbnail
+    # Can be relative (./images/...), absolute (/images/...), or full URL
+    
+    featured: true
+    # Optional: Set to true to highlight this project (defaults to false)
+
+  # Minimal project example (only required fields)
+  - id: "minimal-project"
+    title: "Minimal Project"
+    description: "A minimal project with only required fields."
+    creationDate: "2024-02-20"
+    tags:
+      - "example"
+    pageLink: "https://example.com/minimal"
+
+  # Add your own projects below!
+  # Copy one of the examples above and modify it with your project details

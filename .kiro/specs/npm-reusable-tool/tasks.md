@@ -77,7 +77,7 @@
   - Implement template resolution (user custom vs bundled)
   - Implement asset copying for styles, scripts, and static assets
   - Support user customization by checking for local styles/ and scripts/ directories
-  - Copy bundled templates from lib/templates/default/ as fallback
+  - Copy bundled templates from lib/templates/default/ as fallback (lib/ is the compiled output)
   - _Requirements: 1.2, 5.1, 5.2, 5.3, 7.1, 7.2, 7.3_
 
 - [x] 7. Create main generator orchestrator
@@ -90,16 +90,16 @@
   - _Requirements: 6.1, 6.2, 6.3, 6.4_
 
 - [x] 8. Bundle default template assets
-  - Create lib/templates/default/ directory structure
-  - Move existing styles/ directory to lib/templates/default/styles/
-  - Move existing scripts/ directory to lib/templates/default/scripts/
-  - Move existing assets/ directory to lib/templates/default/assets/
+  - Create src/templates/default/ directory structure
+  - Move existing styles/ directory to src/templates/default/styles/
+  - Move existing scripts/ directory to src/templates/default/scripts/
+  - Move existing assets/ directory to src/templates/default/assets/
   - Remove now-empty original directories from project root
-  - Update package.json files field to include lib/templates/
+  - Update package.json files field to include lib/templates/ (compiled output)
   - _Requirements: 1.2, 7.2, 7.3_
 
-- [ ] 9. Create init command templates
-  - Create lib/templates/init/ directory
+- [x] 9. Create init command templates
+  - Create src/templates/init/ directory
   - Create projects.yaml.template with sample project data
   - Create projection.config.js.template with example configuration
   - Include helpful comments in templates

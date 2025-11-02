@@ -49,7 +49,7 @@ This design transforms the existing static site generator into a reusable npm pa
 projection/                      # npm package root
 ├── bin/
 │   └── projection.js           # CLI entry point (#!/usr/bin/env node)
-├── src/                        # TypeScript source files
+├── src/                        # TypeScript source files (version controlled)
 │   ├── cli/
 │   │   ├── init.ts            # Init command implementation
 │   │   ├── build.ts           # Build command implementation
@@ -62,29 +62,34 @@ projection/                      # npm package root
 │   │   ├── validator.ts       # Project data validation
 │   │   ├── html-builder.ts    # HTML generation functions
 │   │   └── asset-copier.ts    # Asset management
+│   ├── templates/             # Template source files (version controlled)
+│   │   ├── default/
+│   │   │   ├── styles/        # Bundled CSS files
+│   │   │   │   ├── main.css
+│   │   │   │   ├── cards.css
+│   │   │   │   └── modal.css
+│   │   │   ├── scripts/       # Bundled JS files
+│   │   │   │   ├── search.js
+│   │   │   │   ├── filter.js
+│   │   │   │   ├── modal.js
+│   │   │   │   └── dynamic-background.js
+│   │   │   └── assets/
+│   │   │       └── favicon.ico
+│   │   └── init/
+│   │       ├── projects.yaml.template    # Sample projects file
+│   │       └── projection.config.js.template
 │   ├── types/
 │   │   ├── project.ts         # Project type definitions
 │   │   └── config.ts          # Config type definitions
 │   └── utils/
 │       ├── errors.ts          # Custom error classes
 │       └── logger.ts          # Logging utilities
-├── lib/                        # Compiled JavaScript output
-│   └── templates/
-│       ├── default/
-│       │   ├── styles/        # Bundled CSS files
-│       │   │   ├── main.css
-│       │   │   ├── cards.css
-│       │   │   └── modal.css
-│       │   ├── scripts/       # Bundled JS files
-│       │   │   ├── search.js
-│       │   │   ├── filter.js
-│       │   │   ├── modal.js
-│       │   │   └── dynamic-background.js
-│       │   └── assets/
-│       │       └── favicon.ico
-│       └── init/
-│           ├── projects.yaml.template    # Sample projects file
-│           └── projection.config.js.template
+├── lib/                        # Compiled JavaScript output (gitignored, npm published)
+│   ├── cli/                   # Compiled CLI files
+│   ├── generator/             # Compiled generator files
+│   ├── templates/             # Copied template files
+│   ├── types/                 # Compiled type definitions
+│   └── utils/                 # Compiled utilities
 ├── tests/                      # Jest test files
 │   ├── unit/
 │   │   ├── config.test.ts
@@ -99,6 +104,13 @@ projection/                      # npm package root
 ├── README.md
 └── LICENSE
 ```
+
+**Note on Directory Structure:**
+- `src/` contains all source TypeScript files and template assets (version controlled)
+- `lib/` is the compiled output directory (gitignored, but included in npm package)
+- TypeScript compilation copies template files from `src/templates/` to `lib/templates/`
+- The build process (via `tsc`) generates `lib/` from `src/` before publishing to npm
+- Users never interact with `lib/` directly - it's the compiled package they install
 
 ## Components and Interfaces
 

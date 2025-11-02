@@ -1,0 +1,40 @@
+// Projection Configuration File
+// This is an alternative to embedding config in projects.yaml
+// If both exist, this file takes precedence
+
+module.exports = {
+  // Site title displayed in the browser tab and header
+  title: "My Projects",
+
+  // Site description for SEO and social sharing
+  description: "A showcase of my coding projects",
+
+  // Base URL for your site
+  // Use "./" for relative paths (recommended for most cases)
+  // Use "https://username.github.io/" for absolute paths on GitHub Pages
+  baseUrl: "./",
+
+  // Number of items to display per page (for future pagination feature)
+  itemsPerPage: 20,
+
+  // Optional: Array of URLs to interactive backgrounds
+  // These will be displayed as iframes behind your content
+  // Great for p5.js sketches, WebGL demos, or other visual effects
+  dynamicBackgrounds: [
+    // "https://example.com/background1",
+    // "https://example.com/background2",
+  ],
+
+  // Optional: Default screenshot to use when a project has no thumbnailLink
+  // Useful for maintaining consistent appearance across all projects
+  // defaultScreenshot: "https://example.com/default-screenshot.png",
+
+  // Optional: Custom paths for template overrides
+  // If you want to customize the CSS or JavaScript, create these directories
+  // and add your custom files. They will be used instead of the defaults.
+  // customStyles: "./styles",
+  // customScripts: "./scripts",
+
+  // Optional: Custom output directory (defaults to "dist")
+  // output: "./build",
+};
