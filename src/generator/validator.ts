@@ -1,3 +1,5 @@
+import * as fs from 'fs';
+import * as path from 'path';
 import { Project } from '../types/project';
 import { isValidProjectId } from '../types/project';
 import { ProjectionError, ErrorCodes } from '../utils/errors';
@@ -17,25 +19,48 @@ export interface ValidationError {
 }
 
 /**
- * Result of validation containing all errors found
+ * Validation warning for a specific project
+ */
+export interface ValidationWarning {
+  /** Project ID (if available) */
+  projectId?: string;
+  /** Index of the project in the array */
+  projectIndex: number;
+  /** Field that has a warning */
+  field: string;
+  /** Warning message */
+  message: string;
+}
+
+/**
+ * Result of validation containing all errors and warnings found
  */
 export interface ValidationResult {
   /** Whether validation passed */
   valid: boolean;
   /** Array of validation errors */
   errors: ValidationError[];
+  /** Array of validation warnings */
+  warnings: ValidationWarning[];
 }
 
 /**
  * Validates project data according to requirements
  */
 export class Validator {
+  private cwd: string;
+
+  constructor(cwd: string = process.cwd()) {
+    this.cwd = cwd;
+  }
+
   /**
    * Validates an array of projects
    * @param projects - Array of projects to validate
    * @throws ProjectionError if validation fails
+   * @returns Array of warnings (non-fatal issues)
    */
-  validate(projects: Project[]): void {
+  validate(projects: Project[]): ValidationWarning[] {
     const result = this.validateProjects(projects);
     
     if (!result.valid) {
@@ -45,15 +70,18 @@ export class Validator {
         { errors: result.errors }
       );
     }
+
+    return result.warnings;
   }
 
   /**
    * Validates projects and returns detailed results
    * @param projects - Array of projects to validate
-   * @returns ValidationResult with all errors found
+   * @returns ValidationResult with all errors and warnings found
    */
   validateProjects(projects: Project[]): ValidationResult {
     const errors: ValidationError[] = [];
+    const warnings: ValidationWarning[] = [];
 
     if (!Array.isArray(projects)) {
       return {
@@ -62,7 +90,8 @@ export class Validator {
           projectIndex: -1,
           field: 'projects',
           message: 'Projects must be an array'
-        }]
+        }],
+        warnings: []
       };
     }
 
@@ -73,7 +102,8 @@ export class Validator {
           projectIndex: -1,
           field: 'projects',
           message: 'Projects array cannot be empty'
-        }]
+        }],
+        warnings: []
       };
     }
 
@@ -105,11 +135,15 @@ export class Validator {
       if (project.creationDate) {
         errors.push(...this.validateDateFormat(project.creationDate, project.id, index));
       }
+
+      // Check for missing local asset files (warnings only)
+      warnings.push(...this.checkLocalAssets(project, index));
     });
 
     return {
       valid: errors.length === 0,
-      errors
+      errors,
+      warnings
     };
   }
 
@@ -194,5 +228,69 @@ export class Validator {
     }
 
     return errors;
+  }
+
+  /**
+   * Checks if local asset files exist (generates warnings, not errors)
+   */
+  private checkLocalAssets(project: Project, index: number): ValidationWarning[] {
+    const warnings: ValidationWarning[] = [];
+
+    // Check thumbnailLink if it's a local path
+    if (project.thumbnailLink) {
+      warnings.push(...this.checkLocalFile(
+        project.thumbnailLink,
+        'thumbnailLink',
+        project.id,
+        index
+      ));
+    }
+
+    return warnings;
+  }
+
+  /**
+   * Checks if a file path is local and if it exists
+   */
+  private checkLocalFile(
+    filePath: string,
+    field: string,
+    projectId: string | undefined,
+    index: number
+  ): ValidationWarning[] {
+    const warnings: ValidationWarning[] = [];
+
+    // Skip if it's an absolute URL
+    if (filePath.startsWith('http://') || filePath.startsWith('https://')) {
+      return warnings;
+    }
+
+    // Skip if it's a domain-absolute path (starts with /)
+    if (filePath.startsWith('/')) {
+      return warnings;
+    }
+
+    // It's a local relative path - check if it exists
+    let resolvedPath: string;
+
+    if (filePath.startsWith('./')) {
+      resolvedPath = path.join(this.cwd, filePath.substring(2));
+    } else if (filePath.startsWith('../')) {
+      resolvedPath = path.join(this.cwd, filePath);
+    } else {
+      // Path without prefix - treat as relative to cwd
+      resolvedPath = path.join(this.cwd, filePath);
+    }
+
+    if (!fs.existsSync(resolvedPath)) {
+      warnings.push({
+        projectId,
+        projectIndex: index,
+        field,
+        message: `Local file not found: "${filePath}" (resolved to: ${resolvedPath})`
+      });
+    }
+
+    return warnings;
   }
 }

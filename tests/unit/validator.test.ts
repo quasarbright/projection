@@ -6,7 +6,7 @@ describe('Validator', () => {
   let validator: Validator;
 
   beforeEach(() => {
-    validator = new Validator();
+    validator = new Validator(process.cwd());
   });
 
   const createValidProject = (overrides: Partial<Project> = {}): Project => ({
@@ -493,6 +493,101 @@ describe('Validator', () => {
         expect(error).toHaveProperty('projectIndex');
         expect(typeof error.projectIndex).toBe('number');
       });
+    });
+  });
+
+  describe('Local asset file warnings', () => {
+    it('should not warn for absolute HTTP URLs', () => {
+      const projects = [createValidProject({
+        thumbnailLink: 'http://example.com/image.png'
+      })];
+
+      const result = validator.validateProjects(projects);
+
+      expect(result.valid).toBe(true);
+      expect(result.warnings).toHaveLength(0);
+    });
+
+    it('should not warn for absolute HTTPS URLs', () => {
+      const projects = [createValidProject({
+        thumbnailLink: 'https://example.com/image.png'
+      })];
+
+      const result = validator.validateProjects(projects);
+
+      expect(result.valid).toBe(true);
+      expect(result.warnings).toHaveLength(0);
+    });
+
+    it('should not warn for domain-absolute paths', () => {
+      const projects = [createValidProject({
+        thumbnailLink: '/images/project.png'
+      })];
+
+      const result = validator.validateProjects(projects);
+
+      expect(result.valid).toBe(true);
+      expect(result.warnings).toHaveLength(0);
+    });
+
+    it('should warn for missing local file with ./ prefix', () => {
+      const projects = [createValidProject({
+        thumbnailLink: './non-existent-image.png'
+      })];
+
+      const result = validator.validateProjects(projects);
+
+      expect(result.valid).toBe(true);
+      expect(result.warnings).toHaveLength(1);
+      expect(result.warnings[0].field).toBe('thumbnailLink');
+      expect(result.warnings[0].message).toContain('Local file not found');
+      expect(result.warnings[0].message).toContain('./non-existent-image.png');
+    });
+
+    it('should warn for missing local file with ../ prefix', () => {
+      const projects = [createValidProject({
+        thumbnailLink: '../non-existent-image.png'
+      })];
+
+      const result = validator.validateProjects(projects);
+
+      expect(result.valid).toBe(true);
+      expect(result.warnings).toHaveLength(1);
+      expect(result.warnings[0].field).toBe('thumbnailLink');
+      expect(result.warnings[0].message).toContain('Local file not found');
+    });
+
+    it('should warn for missing local file without prefix', () => {
+      const projects = [createValidProject({
+        thumbnailLink: 'images/non-existent.png'
+      })];
+
+      const result = validator.validateProjects(projects);
+
+      expect(result.valid).toBe(true);
+      expect(result.warnings).toHaveLength(1);
+      expect(result.warnings[0].field).toBe('thumbnailLink');
+    });
+
+    it('should not warn when thumbnailLink is not provided', () => {
+      const projects = [createValidProject()];
+
+      const result = validator.validateProjects(projects);
+
+      expect(result.valid).toBe(true);
+      expect(result.warnings).toHaveLength(0);
+    });
+
+    it('should include projectId in warnings', () => {
+      const projects = [createValidProject({
+        id: 'my-project',
+        thumbnailLink: './missing.png'
+      })];
+
+      const result = validator.validateProjects(projects);
+
+      expect(result.warnings[0].projectId).toBe('my-project');
+      expect(result.warnings[0].projectIndex).toBe(0);
     });
   });
 });

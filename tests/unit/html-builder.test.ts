@@ -534,17 +534,20 @@ describe('HTMLBuilder', () => {
       expect(html).toContain('"title": "Test Project"');
     });
 
-    it('should merge embedded config with builder config', () => {
+    it('should merge embedded config with builder config, with builder config taking precedence', () => {
       const projectsData: ProjectsData = {
         projects: [createValidProject()],
         config: {
-          title: 'Overridden Title'
+          title: 'Embedded Title',
+          description: 'Embedded Description'
         }
       };
       const html = htmlBuilder.generateHTML(projectsData);
       
-      expect(html).toContain('<title>Overridden Title</title>');
-      expect(html).toContain('<h1>Overridden Title</h1>');
+      // Builder config (from constructor) should take precedence
+      expect(html).toContain('<title>Test Portfolio</title>');
+      expect(html).toContain('<h1>Test Portfolio</h1>');
+      expect(html).toContain('<meta name="description" content="A test portfolio site">');
     });
 
     it('should include no-results section', () => {

@@ -202,7 +202,8 @@ export class HTMLBuilder {
    */
   generateHTML(projectsData: ProjectsData): string {
     const { projects, config } = projectsData;
-    const mergedConfig = { ...this.config, ...config };
+    // Constructor config takes precedence over embedded config
+    const mergedConfig = { ...config, ...this.config };
 
     // Sort projects by date (newest first)
     const sortedProjects = [...projects].sort((a, b) => {

@@ -121,7 +121,7 @@
   - Test --format option
   - _Requirements: 2.1, 2.2, 2.3_
 
-- [ ] 11. Implement CLI build command
+- [x] 11. Implement CLI build command
   - Create src/cli/build.ts with build command implementation
   - Parse command-line options (--config, --output, --clean)
   - Load configuration using ConfigLoader
@@ -130,7 +130,7 @@
   - Display build success message with output location
   - _Requirements: 6.1, 6.2, 6.3, 6.4_
 
-- [ ] 11.1 Write integration tests for build command
+- [x] 11.1 Write integration tests for build command
   - Test successful build with sample data
   - Test build with custom config path
   - Test build with custom output directory

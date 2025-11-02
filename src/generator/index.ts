@@ -43,7 +43,7 @@ export class Generator {
       : path.join(cwd, config.output || 'dist');
     
     this.configLoader = new ConfigLoader(cwd);
-    this.validator = new Validator();
+    this.validator = new Validator(cwd);
     this.htmlBuilder = new HTMLBuilder(config);
     this.assetCopier = new AssetCopier(cwd, this.outputDir);
   }
@@ -82,8 +82,18 @@ export class Generator {
 
       // 2. Validate projects
       console.log('✓ Validating project data...');
-      this.validator.validate(projectsData.projects);
+      const warnings = this.validator.validate(projectsData.projects);
       console.log('✓ Validation passed');
+
+      // Display warnings if any
+      if (warnings.length > 0) {
+        console.log(`\n⚠️  Found ${warnings.length} warning(s):`);
+        warnings.forEach(warning => {
+          const projectInfo = warning.projectId ? `[${warning.projectId}]` : `[Project ${warning.projectIndex}]`;
+          console.log(`   ${projectInfo} ${warning.field}: ${warning.message}`);
+        });
+        console.log('');
+      }
 
       // 3. Clean output directory if requested
       if (this.outputDir && fs.existsSync(this.outputDir)) {
