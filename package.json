@@ -7,7 +7,8 @@
   "author": "Mike Delmonaco",
   "license": "MIT",
   "scripts": {
-    "build": "tsc",
+    "build": "tsc && npm run copy-templates",
+    "copy-templates": "mkdir -p lib/templates && cp -r src/templates/* lib/templates/",
     "serve": "npx http-server dist -p 8080 -o",
     "start": "npm run build && npm run serve",
     "clean": "rm -rf dist node_modules lib",
@@ -38,6 +39,11 @@
   "engines": {
     "node": ">=14.0.0"
   },
+  "files": [
+    "lib/",
+    "README.md",
+    "LICENSE"
+  ],
   "devDependencies": {
     "browser-sync": "^3.0.4",
     "concurrently": "^9.2.1",

@@ -89,7 +89,7 @@
   - Add progress logging and error handling
   - _Requirements: 6.1, 6.2, 6.3, 6.4_
 
-- [ ] 8. Bundle default template assets
+- [x] 8. Bundle default template assets
   - Create lib/templates/default/ directory structure
   - Move existing styles/ directory to lib/templates/default/styles/
   - Move existing scripts/ directory to lib/templates/default/scripts/
