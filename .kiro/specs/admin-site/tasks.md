@@ -1,5 +1,7 @@
 # Implementation Plan
 
+**Note:** All tasks should include comprehensive unit and/or integration tests. Tests should focus on core functionality and include edge cases where appropriate.
+
 - [x] 1. Set up admin server foundation
   - Create Express server with TypeScript
   - Set up basic routing structure
@@ -18,14 +20,14 @@
   - Import and reuse existing types from `src/types/`
   - _Requirements: 1.1_
 
-- [ ] 2. Implement file management with comment preservation
+- [x] 2. Implement file management with comment preservation
   - Install `yaml` npm package for comment-preserving YAML operations
   - Create FileManager class that uses yaml Document API
   - Implement read/write operations that preserve comments
   - Add format detection (YAML vs JSON)
   - _Requirements: 7.1, 7.2, 7.3, 7.4, 7.5_
 
-- [ ] 2.1 Create YAML file manager
+- [x] 2.1 Create YAML file manager
   - Write `src/admin/server/yaml-file-manager.ts` using yaml package
   - Implement readProjects() using parseDocument
   - Implement updateProject() that modifies Document nodes
@@ -33,13 +35,13 @@
   - Implement deleteProject() that removes from Document
   - _Requirements: 7.2, 7.5_
 
-- [ ] 2.2 Create JSON file manager
+- [x] 2.2 Create JSON file manager
   - Write `src/admin/server/json-file-manager.ts` for JSON format
   - Implement standard parse/stringify with pretty-printing
   - Use 2-space indentation for readability
   - _Requirements: 7.3_
 
-- [ ] 2.3 Create unified file manager interface
+- [x] 2.3 Create unified file manager interface
   - Write `src/admin/server/file-manager.ts` that delegates to YAML or JSON manager
   - Implement format detection based on file extension
   - Add file backup functionality before modifications
