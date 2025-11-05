@@ -31,3 +31,6 @@ archive/
 # Environment
 .env
 .env.local
+
+# Backups (created by admin interface)
+.backup/

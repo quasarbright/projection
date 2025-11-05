@@ -162,7 +162,7 @@ class AdminServer {
 - Write projects data file while preserving format AND comments
 - Detect file format
 - Handle file watching for external changes
-- Backup files before modifications
+- Backup files before modifications (stored in `.backup/` directory)
 
 **Key Methods:**
 ```typescript

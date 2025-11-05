@@ -116,10 +116,13 @@ describe('FileManager', () => {
       await manager.readProjects();
       await manager.updateProject('test-project', sampleProject);
 
-      // Check that backup file was created
-      const files = fs.readdirSync(tempDir);
-      const backupFiles = files.filter(f => f.includes('.backup-'));
-      expect(backupFiles.length).toBeGreaterThan(0);
+      // Check that backup directory and file were created
+      const backupDir = path.join(tempDir, '.backup');
+      expect(fs.existsSync(backupDir)).toBe(true);
+      
+      const backupFiles = fs.readdirSync(backupDir);
+      const backupFile = backupFiles.find(f => f.includes('.backup-'));
+      expect(backupFile).toBeDefined();
     });
 
     it('should create backup before adding project', async () => {
@@ -130,8 +133,10 @@ describe('FileManager', () => {
       await manager.readProjects();
       await manager.addProject(sampleProject);
 
-      const files = fs.readdirSync(tempDir);
-      const backupFiles = files.filter(f => f.includes('.backup-'));
+      const backupDir = path.join(tempDir, '.backup');
+      expect(fs.existsSync(backupDir)).toBe(true);
+      
+      const backupFiles = fs.readdirSync(backupDir);
       expect(backupFiles.length).toBeGreaterThan(0);
     });
 
@@ -150,8 +155,10 @@ describe('FileManager', () => {
       await manager.readProjects();
       await manager.deleteProject('test-project');
 
-      const files = fs.readdirSync(tempDir);
-      const backupFiles = files.filter(f => f.includes('.backup-'));
+      const backupDir = path.join(tempDir, '.backup');
+      expect(fs.existsSync(backupDir)).toBe(true);
+      
+      const backupFiles = fs.readdirSync(backupDir);
       expect(backupFiles.length).toBeGreaterThan(0);
     });
 
@@ -170,12 +177,13 @@ describe('FileManager', () => {
       await manager.readProjects();
       await manager.updateProject('test-project', sampleProject);
 
-      const files = fs.readdirSync(tempDir);
-      const backupFile = files.find(f => f.includes('.backup-'));
+      const backupDir = path.join(tempDir, '.backup');
+      const backupFiles = fs.readdirSync(backupDir);
+      const backupFile = backupFiles.find(f => f.includes('.backup-'));
       expect(backupFile).toBeDefined();
 
       const backupContent = fs.readFileSync(
-        path.join(tempDir, backupFile!),
+        path.join(backupDir, backupFile!),
         'utf-8'
       );
       expect(backupContent).toBe(originalContent);
@@ -189,8 +197,23 @@ describe('FileManager', () => {
       await manager.readProjects();
       const backupPath = await manager.createBackup();
 
-      expect(backupPath).toContain('.backup-');
-      expect(backupPath).toMatch(/\.backup-\d{4}-\d{2}-\d{2}T\d{2}-\d{2}-\d{2}/);
+      expect(backupPath).toContain('.backup');
+      expect(backupPath).toMatch(/\.backup[\/\\]projects\.backup-\d{4}-\d{2}-\d{2}T\d{2}-\d{2}-\d{2}/);
+    });
+
+    it('should create .backup directory if it does not exist', async () => {
+      const yamlContent = `projects: []`;
+      fs.writeFileSync(yamlFilePath, yamlContent);
+      const manager = new FileManager(yamlFilePath);
+
+      await manager.readProjects();
+      
+      const backupDir = path.join(tempDir, '.backup');
+      expect(fs.existsSync(backupDir)).toBe(false);
+      
+      await manager.createBackup();
+      
+      expect(fs.existsSync(backupDir)).toBe(true);
     });
   });
 

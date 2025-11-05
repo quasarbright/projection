@@ -99,7 +99,13 @@ export class FileManager {
     const basename = path.basename(this.filePath, ext);
     const dirname = path.dirname(this.filePath);
     
-    const backupPath = path.join(dirname, `${basename}.backup-${timestamp}${ext}`);
+    // Create .backup directory if it doesn't exist
+    const backupDir = path.join(dirname, '.backup');
+    if (!fs.existsSync(backupDir)) {
+      await fs.promises.mkdir(backupDir, { recursive: true });
+    }
+    
+    const backupPath = path.join(backupDir, `${basename}.backup-${timestamp}${ext}`);
     
     try {
       await fs.promises.copyFile(this.filePath, backupPath);
