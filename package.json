@@ -29,6 +29,8 @@
   ],
   "dependencies": {
     "chokidar": "^3.5.3",
+    "cors": "^2.8.5",
+    "express": "^5.1.0",
     "js-yaml": "^4.1.0"
   },
   "repository": {
@@ -48,6 +50,8 @@
   ],
   "devDependencies": {
     "@types/browser-sync": "^2.29.1",
+    "@types/cors": "^2.8.19",
+    "@types/express": "^5.0.5",
     "@types/jest": "^29.5.11",
     "@types/js-yaml": "^4.0.9",
     "@types/node": "^20.10.6",
