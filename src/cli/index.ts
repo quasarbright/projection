@@ -2,6 +2,7 @@ import { init } from './init';
 import { build } from './build';
 import { dev } from './dev';
 import { serve } from './serve';
+import { admin } from './admin';
 
 /**
  * CLI class that orchestrates command routing and argument parsing
@@ -16,7 +17,8 @@ export class CLI {
       ['init', init as (options?: any) => Promise<void>],
       ['build', build as (options?: any) => Promise<void>],
       ['dev', dev as (options?: any) => Promise<void>],
-      ['serve', serve as (options?: any) => Promise<void>]
+      ['serve', serve as (options?: any) => Promise<void>],
+      ['admin', admin as (options?: any) => Promise<void>]
     ]);
   }
 
@@ -121,6 +123,7 @@ COMMANDS:
   build             Generate the static site from project data
   dev               Start development server with live reload
   serve             Serve the generated site with a local HTTP server
+  admin             Start admin interface for managing projects
 
 OPTIONS:
   -h, --help        Show this help message
@@ -149,6 +152,12 @@ COMMAND OPTIONS:
     --open          Open browser automatically
     --dir <path>    Directory to serve (default: dist)
 
+  projection admin [options]
+    --port <number> Server port (default: 3000)
+    --no-open       Don't open browser automatically
+    --projects <path> Path to projects file
+    --config <path> Path to config file
+
 EXAMPLES:
   # Initialize a new project
   projection init
@@ -161,6 +170,12 @@ EXAMPLES:
 
   # Serve the generated site
   projection serve --open
+
+  # Start admin interface
+  projection admin
+
+  # Start admin on custom port
+  projection admin --port 3001
 
 DOCUMENTATION:
   https://github.com/quasarbright/projection

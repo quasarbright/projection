@@ -109,7 +109,7 @@
   - Write tests for preview generation with complete and partial project data
   - _Requirements: 8.1, 8.2, 8.3_
 
-- [ ] 4. Add CLI command for admin server
+- [x] 4. Add CLI command for admin server
   - Create new `projection admin` command
   - Parse command-line options (port, auto-open)
   - Start admin server and open browser
@@ -117,7 +117,7 @@
   - Write tests for CLI command parsing and server startup
   - _Requirements: 1.1, 1.2, 1.4, 1.5_
 
-- [ ] 4.1 Create admin CLI command file
+- [x] 4.1 Create admin CLI command file
   - Write `src/cli/admin.ts` with command implementation
   - Add port option with default 3000
   - Add auto-open browser option
@@ -125,7 +125,7 @@
   - Write tests for option parsing and server initialization
   - _Requirements: 1.1, 1.2, 1.4_
 
-- [ ] 4.2 Register admin command in CLI
+- [x] 4.2 Register admin command in CLI
   - Update `src/cli/index.ts` to include admin command
   - Add command help text and examples
   - Write tests for command registration

@@ -17,10 +17,15 @@ jest.mock('../../src/cli/serve', () => ({
   serve: jest.fn().mockResolvedValue(undefined)
 }));
 
+jest.mock('../../src/cli/admin', () => ({
+  admin: jest.fn().mockResolvedValue(undefined)
+}));
+
 import { init } from '../../src/cli/init';
 import { build } from '../../src/cli/build';
 import { dev } from '../../src/cli/dev';
 import { serve } from '../../src/cli/serve';
+import { admin } from '../../src/cli/admin';
 
 describe('CLI', () => {
   let cli: CLI;
@@ -73,6 +78,13 @@ describe('CLI', () => {
 
       expect(serve).toHaveBeenCalledTimes(1);
       expect(serve).toHaveBeenCalledWith({});
+    });
+
+    it('should route to admin command', async () => {
+      await cli.run(['admin']);
+
+      expect(admin).toHaveBeenCalledTimes(1);
+      expect(admin).toHaveBeenCalledWith({});
     });
   });
 
@@ -129,6 +141,32 @@ describe('CLI', () => {
         clean: true
       });
     });
+
+    it('should parse admin command port option', async () => {
+      await cli.run(['admin', '--port', '3001']);
+
+      expect(admin).toHaveBeenCalledWith({
+        port: '3001'
+      });
+    });
+
+    it('should parse admin command no-open flag', async () => {
+      await cli.run(['admin', '--no-open']);
+
+      expect(admin).toHaveBeenCalledWith({
+        noOpen: true
+      });
+    });
+
+    it('should parse admin command with multiple options', async () => {
+      await cli.run(['admin', '--port', '3001', '--projects', 'data/projects.yaml', '--config', 'custom.config.js']);
+
+      expect(admin).toHaveBeenCalledWith({
+        port: '3001',
+        projects: 'data/projects.yaml',
+        config: 'custom.config.js'
+      });
+    });
   });
 
   describe('Help display', () => {
@@ -144,6 +182,7 @@ describe('CLI', () => {
       expect(output).toContain('build');
       expect(output).toContain('dev');
       expect(output).toContain('serve');
+      expect(output).toContain('admin');
     });
 
     it('should show help with -h flag', async () => {

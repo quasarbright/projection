@@ -9,6 +9,7 @@ import { HTMLBuilder } from './html-builder';
 import { AssetCopier } from './asset-copier';
 import { ProjectionError, ErrorCodes } from '../utils/errors';
 import { Logger } from '../utils/logger';
+import { ProjectFileFinder } from '../utils/project-file-finder';
 
 /**
  * Options for the Generator
@@ -138,32 +139,22 @@ export class Generator {
    * Load project data from projects.yaml or projects.json
    */
   async loadProjectData(): Promise<ProjectsData> {
-    // Try to find projects file in order of preference
-    const possiblePaths = [
-      path.join(this.cwd, 'projects.yaml'),
-      path.join(this.cwd, 'projects.yml'),
-      path.join(this.cwd, 'projects.json')
-    ];
+    // Use shared utility to find projects file
+    const projectFileResult = ProjectFileFinder.find(this.cwd);
 
-    let projectsPath: string | null = null;
-    for (const p of possiblePaths) {
-      if (fs.existsSync(p)) {
-        projectsPath = p;
-        break;
-      }
-    }
-
-    if (!projectsPath) {
+    if (!projectFileResult) {
       throw new ProjectionError(
         'Projects file not found',
         ErrorCodes.FILE_NOT_FOUND,
         {
-          message: 'Could not find projects.yaml, projects.yml, or projects.json in the current directory',
-          searchedPaths: possiblePaths,
+          message: `Could not find ${ProjectFileFinder.getSupportedFileNames().join(', ')} in the current directory`,
+          searchedPaths: ProjectFileFinder.getPossiblePaths(this.cwd),
           cwd: this.cwd
         }
       );
     }
+
+    const projectsPath = projectFileResult.path;
 
     try {
       const content = fs.readFileSync(projectsPath, 'utf-8');
