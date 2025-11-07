@@ -170,7 +170,7 @@
   - Write tests for App component rendering
   - _Requirements: 2.1_
 
-- [ ] 6. Implement ProjectList component
+- [x] 6. Implement ProjectList component
   - Display all projects in a table or card grid
   - Add sorting controls (by date, name, featured)
   - Add filtering controls (by tags, search)
@@ -179,7 +179,7 @@
   - Write tests for rendering, sorting, filtering, and user interactions
   - _Requirements: 2.1, 2.2, 2.3, 2.4, 2.5_
 
-- [ ] 6.1 Create ProjectList component
+- [x] 6.1 Create ProjectList component
   - Write `src/admin/client/src/components/ProjectList.tsx`
   - Display projects in a responsive table/grid
   - Show key fields: title, date, tags, featured status
@@ -187,14 +187,14 @@
   - Write tests for component rendering and button interactions
   - _Requirements: 2.1, 2.2, 2.3_
 
-- [ ] 6.2 Add sorting functionality
+- [x] 6.2 Add sorting functionality
   - Implement sort dropdown with options (date, name, featured)
   - Add ascending/descending toggle
   - Update project list when sort changes
   - Write tests for sorting logic and UI updates
   - _Requirements: 2.4_
 
-- [ ] 6.3 Add filtering functionality
+- [x] 6.3 Add filtering functionality
   - Implement search input for title/description
   - Add tag filter buttons
   - Show filtered project count

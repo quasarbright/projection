@@ -90,10 +90,12 @@ describe('App Component', () => {
     render(<App />);
 
     await waitFor(() => {
-      expect(screen.getByText('Projects loaded: 2')).toBeInTheDocument();
+      expect(screen.getByText('Showing 2 of 2 projects')).toBeInTheDocument();
     });
 
     expect(screen.queryByText(/loading projects/i)).not.toBeInTheDocument();
+    expect(screen.getByText('Project 1')).toBeInTheDocument();
+    expect(screen.getByText('Project 2')).toBeInTheDocument();
   });
 
   it('should display error message when fetch fails', async () => {
@@ -125,7 +127,7 @@ describe('App Component', () => {
     render(<App />);
 
     await waitFor(() => {
-      expect(screen.getByText('Projects loaded: 2')).toBeInTheDocument();
+      expect(screen.getByText('Showing 2 of 2 projects')).toBeInTheDocument();
     });
 
     const newProjectButton = screen.getByRole('button', { name: /new project/i });
@@ -148,7 +150,7 @@ describe('App Component', () => {
       expect(screen.getByText('0 projects')).toBeInTheDocument();
     });
 
-    expect(screen.getByText('Projects loaded: 0')).toBeInTheDocument();
+    expect(screen.getByText(/no projects found/i)).toBeInTheDocument();
   });
 
   it('should wrap content with ProjectProvider', async () => {
@@ -162,7 +164,7 @@ describe('App Component', () => {
 
     // If provider is working, we should see the loaded projects
     await waitFor(() => {
-      expect(screen.getByText('Projects loaded: 2')).toBeInTheDocument();
+      expect(screen.getByText('Showing 2 of 2 projects')).toBeInTheDocument();
     });
 
     // Verify API was called (proving context is working)
