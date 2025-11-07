@@ -1,0 +1,118 @@
+.app {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+.app-header {
+  background-color: #16213e;
+  padding: 1rem 2rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 2px solid #4a9eff;
+}
+
+.app-header h1 {
+  font-size: 1.5rem;
+  color: #e0e0e0;
+  margin: 0;
+}
+
+.btn-primary {
+  background-color: #4a9eff;
+  color: #ffffff;
+  border: none;
+  padding: 0.5rem 1rem;
+  border-radius: 4px;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.btn-primary:hover {
+  background-color: #3a8eef;
+}
+
+.btn-primary:active {
+  background-color: #2a7edf;
+}
+
+.app-main {
+  flex: 1;
+  padding: 2rem;
+  overflow-y: auto;
+}
+
+.loading {
+  text-align: center;
+  padding: 2rem;
+  font-size: 1.2rem;
+  color: #4a9eff;
+}
+
+.error {
+  background-color: #f44336;
+  color: #ffffff;
+  padding: 1rem;
+  border-radius: 4px;
+  margin-bottom: 1rem;
+}
+
+.error p {
+  margin: 0;
+}
+
+.content {
+  max-width: 1400px;
+  margin: 0 auto;
+}
+
+.app-footer {
+  background-color: #16213e;
+  padding: 1rem 2rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-top: 1px solid #2a3f5f;
+  font-size: 0.9rem;
+  color: #a0a0a0;
+}
+
+.app-footer a {
+  color: #4a9eff;
+  text-decoration: none;
+  transition: color 0.2s;
+}
+
+.app-footer a:hover {
+  color: #3a8eef;
+  text-decoration: underline;
+}
+
+/* Responsive design */
+@media (max-width: 768px) {
+  .app-header {
+    flex-direction: column;
+    gap: 1rem;
+    align-items: stretch;
+  }
+
+  .app-header h1 {
+    text-align: center;
+  }
+
+  .btn-primary {
+    width: 100%;
+  }
+
+  .app-main {
+    padding: 1rem;
+  }
+
+  .app-footer {
+    flex-direction: column;
+    gap: 0.5rem;
+    text-align: center;
+  }
+}
