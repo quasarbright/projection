@@ -281,7 +281,7 @@
   - Write tests for debouncing and error handling
   - _Requirements: 8.3_
 
-- [ ] 10. Implement ConfirmDialog component
+- [x] 10. Implement ConfirmDialog component
   - Create reusable confirmation dialog
   - Use for delete confirmation
   - Show project title in confirmation message
@@ -289,7 +289,7 @@
   - Write tests for dialog display and user interactions
   - _Requirements: 5.1, 5.2, 5.3, 5.4, 5.5_
 
-- [ ] 10.1 Create ConfirmDialog component
+- [x] 10.1 Create ConfirmDialog component
   - Write `src/admin/client/src/components/ConfirmDialog.tsx`
   - Display modal overlay with confirmation message
   - Add "Confirm" and "Cancel" buttons
@@ -297,7 +297,7 @@
   - Write tests for dialog rendering and button actions
   - _Requirements: 5.1, 5.4_
 
-- [ ] 10.2 Integrate with delete action
+- [x] 10.2 Integrate with delete action
   - Show ConfirmDialog when delete button clicked
   - Display project title in confirmation message
   - Call delete API on confirmation

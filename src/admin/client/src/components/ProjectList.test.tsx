@@ -84,7 +84,7 @@ describe('ProjectList', () => {
     expect(onEdit).toHaveBeenCalledWith(mockProjects[1]); // Project 2 is first due to sorting
   });
 
-  it('should call onDelete when Delete button is clicked', () => {
+  it('should show confirmation dialog when Delete button is clicked', () => {
     const onEdit = vi.fn();
     const onDelete = vi.fn();
 
@@ -94,8 +94,79 @@ describe('ProjectList', () => {
     const deleteButtons = screen.getAllByText('Delete');
     fireEvent.click(deleteButtons[1]);
 
+    // Confirmation dialog should appear
+    expect(screen.getByRole('dialog')).toBeInTheDocument();
+    expect(screen.getByText('Delete Project')).toBeInTheDocument();
+    expect(screen.getByText(/Are you sure you want to delete "Test Project 1"/)).toBeInTheDocument();
+    
+    // onDelete should not be called yet
+    expect(onDelete).not.toHaveBeenCalled();
+  });
+
+  it('should call onDelete when delete is confirmed', () => {
+    const onEdit = vi.fn();
+    const onDelete = vi.fn();
+
+    render(<ProjectList projects={mockProjects} onEdit={onEdit} onDelete={onDelete} />);
+
+    // Click delete button for Project 1
+    const deleteButton = screen.getByLabelText('Delete Test Project 1');
+    fireEvent.click(deleteButton);
+
+    // Confirm deletion - get all buttons and find the one in the dialog
+    const allButtons = screen.getAllByRole('button');
+    const confirmButton = allButtons.find(btn => 
+      btn.textContent === 'Delete' && btn.classList.contains('btn-danger') && btn.type === 'button'
+    );
+    if (confirmButton) {
+      fireEvent.click(confirmButton);
+    }
+
     expect(onDelete).toHaveBeenCalledTimes(1);
-    expect(onDelete).toHaveBeenCalledWith('test-project-1'); // Project 1 is second due to sorting
+    expect(onDelete).toHaveBeenCalledWith('test-project-1');
+  });
+
+  it('should not call onDelete when delete is cancelled', () => {
+    const onEdit = vi.fn();
+    const onDelete = vi.fn();
+
+    render(<ProjectList projects={mockProjects} onEdit={onEdit} onDelete={onDelete} />);
+
+    // Click delete button
+    const deleteButtons = screen.getAllByText('Delete');
+    fireEvent.click(deleteButtons[0]);
+
+    // Cancel deletion
+    const cancelButton = screen.getByRole('button', { name: /cancel/i });
+    fireEvent.click(cancelButton);
+
+    expect(onDelete).not.toHaveBeenCalled();
+    
+    // Dialog should be closed
+    expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
+  });
+
+  it('should close confirmation dialog after confirming delete', () => {
+    const onEdit = vi.fn();
+    const onDelete = vi.fn();
+
+    render(<ProjectList projects={mockProjects} onEdit={onEdit} onDelete={onDelete} />);
+
+    // Click delete button for Project 2
+    const deleteButton = screen.getByLabelText('Delete Test Project 2');
+    fireEvent.click(deleteButton);
+
+    // Confirm deletion - get all buttons and find the one in the dialog
+    const allButtons = screen.getAllByRole('button');
+    const confirmButton = allButtons.find(btn => 
+      btn.textContent === 'Delete' && btn.classList.contains('btn-danger') && btn.type === 'button'
+    );
+    if (confirmButton) {
+      fireEvent.click(confirmButton);
+    }
+
+    // Dialog should be closed
+    expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
   });
 
   it('should render Edit button with correct aria-label', () => {

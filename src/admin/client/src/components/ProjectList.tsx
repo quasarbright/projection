@@ -1,5 +1,6 @@
 import React, { useState, useMemo } from 'react';
 import type { Project } from '../../../../types';
+import { ConfirmDialog } from './ConfirmDialog';
 import './ProjectList.css';
 
 type SortField = 'date' | 'name' | 'featured';
@@ -16,6 +17,15 @@ export function ProjectList({ projects, onEdit, onDelete }: ProjectListProps) {
   const [sortOrder, setSortOrder] = useState<SortOrder>('desc');
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedTags, setSelectedTags] = useState<string[]>([]);
+  const [deleteConfirmation, setDeleteConfirmation] = useState<{
+    isOpen: boolean;
+    projectId: string;
+    projectTitle: string;
+  }>({
+    isOpen: false,
+    projectId: '',
+    projectTitle: '',
+  });
 
   const availableTags = useMemo(() => {
     const tagSet = new Set<string>();
@@ -87,6 +97,31 @@ export function ProjectList({ projects, onEdit, onDelete }: ProjectListProps) {
   const handleClearFilters = () => {
     setSearchQuery('');
     setSelectedTags([]);
+  };
+
+  const handleDeleteClick = (project: Project) => {
+    setDeleteConfirmation({
+      isOpen: true,
+      projectId: project.id,
+      projectTitle: project.title,
+    });
+  };
+
+  const handleDeleteConfirm = () => {
+    onDelete(deleteConfirmation.projectId);
+    setDeleteConfirmation({
+      isOpen: false,
+      projectId: '',
+      projectTitle: '',
+    });
+  };
+
+  const handleDeleteCancel = () => {
+    setDeleteConfirmation({
+      isOpen: false,
+      projectId: '',
+      projectTitle: '',
+    });
   };
 
   if (projects.length === 0) {
@@ -204,7 +239,7 @@ export function ProjectList({ projects, onEdit, onDelete }: ProjectListProps) {
               </button>
               <button
                 className="btn-danger"
-                onClick={() => onDelete(project.id)}
+                onClick={() => handleDeleteClick(project)}
                 aria-label={`Delete ${project.title}`}
               >
                 Delete
@@ -214,6 +249,17 @@ export function ProjectList({ projects, onEdit, onDelete }: ProjectListProps) {
         ))}
         </div>
       )}
+
+      <ConfirmDialog
+        isOpen={deleteConfirmation.isOpen}
+        title="Delete Project"
+        message={`Are you sure you want to delete "${deleteConfirmation.projectTitle}"? This action cannot be undone.`}
+        confirmLabel="Delete"
+        cancelLabel="Cancel"
+        variant="danger"
+        onConfirm={handleDeleteConfirm}
+        onCancel={handleDeleteCancel}
+      />
     </div>
   );
 }
