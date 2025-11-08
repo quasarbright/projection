@@ -2,50 +2,55 @@ import { useState } from 'react';
 import { ProjectProvider, useProjects } from './context/ProjectContext';
 import { ProjectList } from './components/ProjectList';
 import { ProjectForm } from './components/ProjectForm';
+import { ErrorBoundary } from './components/ErrorBoundary';
+import { ToastProvider, useToast } from './components/ToastContainer';
+import { LoadingSpinner } from './components/LoadingSpinner';
 import type { Project } from '../../../types';
 import './styles/App.css';
 
 function AppContent() {
   const { projects, config, loading, error, createProject, updateProject, deleteProject, tags } = useProjects();
+  const { showSuccess, showError } = useToast();
   const [showNewProjectForm, setShowNewProjectForm] = useState(false);
   const [editingProject, setEditingProject] = useState<Project | null>(null);
-  const [successMessage, setSuccessMessage] = useState<string | null>(null);
 
   const handleNewProject = () => {
     setShowNewProjectForm(true);
     setEditingProject(null);
-    setSuccessMessage(null);
   };
 
   const handleEditProject = (project: Project) => {
     setEditingProject(project);
     setShowNewProjectForm(false);
-    setSuccessMessage(null);
   };
 
   const handleDeleteProject = async (projectId: string) => {
     if (window.confirm('Are you sure you want to delete this project?')) {
       try {
         await deleteProject(projectId);
-        setSuccessMessage('Project deleted successfully');
-        setTimeout(() => setSuccessMessage(null), 3000);
+        showSuccess('Project deleted successfully');
       } catch (err) {
         console.error('Failed to delete project:', err);
+        showError('Failed to delete project');
       }
     }
   };
 
   const handleSaveProject = async (project: Project) => {
-    if (editingProject) {
-      await updateProject(editingProject.id, project);
-      setSuccessMessage('Project updated successfully');
-    } else {
-      await createProject(project);
-      setSuccessMessage('Project created successfully');
+    try {
+      if (editingProject) {
+        await updateProject(editingProject.id, project);
+        showSuccess('Project updated successfully');
+      } else {
+        await createProject(project);
+        showSuccess('Project created successfully');
+      }
+      setEditingProject(null);
+      setShowNewProjectForm(false);
+    } catch (err) {
+      console.error('Failed to save project:', err);
+      showError('Failed to save project');
     }
-    setEditingProject(null);
-    setShowNewProjectForm(false);
-    setTimeout(() => setSuccessMessage(null), 3000);
   };
 
   const handleCancelForm = () => {
@@ -69,15 +74,10 @@ function AppContent() {
       </header>
 
       <main className="app-main">
-        {loading && <div className="loading">Loading projects...</div>}
+        {loading && <LoadingSpinner size="large" message="Loading projects..." />}
         {error && (
           <div className="error">
             <p>Error: {error.message}</p>
-          </div>
-        )}
-        {successMessage && (
-          <div className="success-message">
-            <p>{successMessage}</p>
           </div>
         )}
         {!loading && !error && (
@@ -115,9 +115,13 @@ function AppContent() {
 
 function App() {
   return (
-    <ProjectProvider>
-      <AppContent />
-    </ProjectProvider>
+    <ErrorBoundary>
+      <ToastProvider>
+        <ProjectProvider>
+          <AppContent />
+        </ProjectProvider>
+      </ToastProvider>
+    </ErrorBoundary>
   );
 }
 

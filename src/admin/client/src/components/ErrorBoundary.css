@@ -1,0 +1,41 @@
+.error-boundary {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+  background: #1a1a2e;
+  padding: 20px;
+}
+
+.error-boundary-content {
+  max-width: 600px;
+  text-align: center;
+  background: #16213e;
+  padding: 40px;
+  border-radius: 8px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+}
+
+.error-boundary-content h1 {
+  color: #f44336;
+  margin-bottom: 20px;
+  font-size: 2rem;
+}
+
+.error-message {
+  color: #e0e0e0;
+  margin-bottom: 30px;
+  font-size: 1.1rem;
+  line-height: 1.6;
+}
+
+.error-actions {
+  display: flex;
+  gap: 15px;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+.error-actions button {
+  min-width: 120px;
+}

@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState, useCallback } from 'react';
 import type { Project } from '../../../../types';
 import { generatePreview } from '../services/api';
+import { LoadingSpinner } from './LoadingSpinner';
 import './PreviewPane.css';
 
 interface PreviewPaneProps {
@@ -105,6 +106,10 @@ export function PreviewPane({ project, debounceMs = 500 }: PreviewPaneProps) {
         ) : !project.title && !project.description ? (
           <div className="preview-placeholder">
             <p>Fill in project details to see a preview</p>
+          </div>
+        ) : isLoading ? (
+          <div className="preview-loading">
+            <LoadingSpinner size="medium" message="Generating preview..." />
           </div>
         ) : (
           <iframe
