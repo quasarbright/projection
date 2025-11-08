@@ -63,6 +63,30 @@
   margin: 0;
 }
 
+.success-message {
+  background-color: #4caf50;
+  color: #ffffff;
+  padding: 1rem;
+  border-radius: 4px;
+  margin-bottom: 1rem;
+  animation: slideIn 0.3s ease-out;
+}
+
+.success-message p {
+  margin: 0;
+}
+
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
 .content {
   max-width: 1400px;
   margin: 0 auto;

@@ -116,7 +116,7 @@ describe('App Component', () => {
     expect(screen.queryByText(/loading projects/i)).not.toBeInTheDocument();
   });
 
-  it('should handle New Project button click', async () => {
+  it('should show ProjectForm when New Project button is clicked', async () => {
     mockedApi.getProjects.mockResolvedValue({
       projects: mockProjects,
       config: mockConfig,
@@ -133,8 +133,99 @@ describe('App Component', () => {
     const newProjectButton = screen.getByRole('button', { name: /new project/i });
     await user.click(newProjectButton);
 
-    // Button should be clickable (form will be added in later tasks)
-    expect(newProjectButton).toBeInTheDocument();
+    // Form should be displayed
+    await waitFor(() => {
+      expect(screen.getByText('Create New Project')).toBeInTheDocument();
+    });
+
+    // Project list should be hidden
+    expect(screen.queryByText('Showing 2 of 2 projects')).not.toBeInTheDocument();
+  });
+
+  it('should hide New Project button when form is shown', async () => {
+    mockedApi.getProjects.mockResolvedValue({
+      projects: mockProjects,
+      config: mockConfig,
+    });
+    mockedApi.getTags.mockResolvedValue({ tags: [] });
+
+    const user = userEvent.setup();
+    render(<App />);
+
+    await waitFor(() => {
+      expect(screen.getByRole('button', { name: /new project/i })).toBeInTheDocument();
+    });
+
+    const newProjectButton = screen.getByRole('button', { name: /new project/i });
+    await user.click(newProjectButton);
+
+    await waitFor(() => {
+      expect(screen.queryByRole('button', { name: /new project/i })).not.toBeInTheDocument();
+    });
+  });
+
+  it('should show ProjectForm in edit mode when edit is clicked', async () => {
+    mockedApi.getProjects.mockResolvedValue({
+      projects: mockProjects,
+      config: mockConfig,
+    });
+    mockedApi.getTags.mockResolvedValue({ tags: [] });
+
+    const user = userEvent.setup();
+    render(<App />);
+
+    await waitFor(() => {
+      expect(screen.getByText('Showing 2 of 2 projects')).toBeInTheDocument();
+    });
+
+    // Click edit on first project (sorted by date desc, so project-2 is first)
+    const editButtons = screen.getAllByRole('button', { name: /edit/i });
+    await user.click(editButtons[0]);
+
+    // Form should be displayed in edit mode
+    await waitFor(() => {
+      expect(screen.getByText('Edit Project')).toBeInTheDocument();
+    });
+
+    // Form should be pre-filled with project data (ID is disabled in edit mode)
+    // First project in sorted order is project-2 (2024-01-02 > 2024-01-01)
+    const idInput = screen.getByLabelText(/Project ID/i) as HTMLInputElement;
+    expect(idInput.value).toBe('project-2');
+    expect(idInput.disabled).toBe(true);
+    expect(screen.getByDisplayValue('Project 2')).toBeInTheDocument();
+  });
+
+  it('should return to project list when form is cancelled', async () => {
+    mockedApi.getProjects.mockResolvedValue({
+      projects: mockProjects,
+      config: mockConfig,
+    });
+    mockedApi.getTags.mockResolvedValue({ tags: [] });
+
+    const user = userEvent.setup();
+    render(<App />);
+
+    await waitFor(() => {
+      expect(screen.getByText('Showing 2 of 2 projects')).toBeInTheDocument();
+    });
+
+    // Open form
+    const newProjectButton = screen.getByRole('button', { name: /new project/i });
+    await user.click(newProjectButton);
+
+    await waitFor(() => {
+      expect(screen.getByText('Create New Project')).toBeInTheDocument();
+    });
+
+    // Cancel form
+    const cancelButton = screen.getByRole('button', { name: /cancel/i });
+    await user.click(cancelButton);
+
+    // Should return to project list
+    await waitFor(() => {
+      expect(screen.getByText('Showing 2 of 2 projects')).toBeInTheDocument();
+    });
+    expect(screen.queryByText('Create New Project')).not.toBeInTheDocument();
   });
 
   it('should display zero projects when no projects exist', async () => {
