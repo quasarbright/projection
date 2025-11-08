@@ -13,6 +13,9 @@ This document specifies the requirements for an admin site feature for the Proje
 - **Dev Server**: The local development server that serves the portfolio site with hot reloading
 - **Admin Server**: The local server that hosts the admin interface
 - **Portfolio Site**: The generated static website that displays projects to end users
+- **Site Configuration**: The config section in the Projects Data File containing global settings like title, description, baseUrl, and dynamic backgrounds
+- **Dynamic Background**: An interactive iframe-based animated background that displays behind the portfolio content
+- **Settings Modal**: A modal dialog in the Admin Site for editing Site Configuration properties
 
 ## Requirements
 
@@ -150,3 +153,50 @@ This document specifies the requirements for an admin site feature for the Proje
 6. WHEN the user removes a thumbnail, THE Projection System SHALL delete the image file from the screenshots directory and clear the thumbnailLink field
 7. WHEN the user views the project form, THE Admin Site SHALL display a preview of the current thumbnail image if one exists
 8. THE Admin Site SHALL validate that uploaded image files do not exceed 5 megabytes in size
+
+### Requirement 12
+
+**User Story:** As a portfolio owner, I want to access site configuration settings from the admin interface, so that I can manage all portfolio settings in one place
+
+#### Acceptance Criteria
+
+1. WHEN the user clicks a "Settings" button in the admin header, THE Admin Site SHALL open a modal dialog displaying the site configuration form
+2. THE Admin Site SHALL display input fields for all configuration properties including title, description, baseUrl, itemsPerPage, defaultScreenshot, customStyles, customScripts, and output directory
+3. WHEN the user modifies configuration values and saves, THE Projection System SHALL update the config section in the Projects Data File
+4. WHEN the user cancels the settings dialog, THE Admin Site SHALL close the modal without saving changes
+5. WHEN configuration is successfully updated, THE Admin Site SHALL display a success notification
+
+### Requirement 13
+
+**User Story:** As a portfolio owner, I want to manage dynamic background URLs through the admin interface, so that I can control which animated backgrounds appear on my portfolio site
+
+#### Acceptance Criteria
+
+1. WHEN the user opens the settings modal, THE Admin Site SHALL display a section for managing dynamic backgrounds
+2. THE Admin Site SHALL display the current list of dynamic background URLs with options to add, remove, or reorder entries
+3. WHEN the user adds a new background URL, THE Admin Site SHALL validate that the URL is properly formatted
+4. WHEN the user removes a background URL, THE Admin Site SHALL update the dynamicBackgrounds array in the config
+5. WHEN the user reorders background URLs using drag-and-drop, THE Admin Site SHALL update the order in the dynamicBackgrounds array
+
+### Requirement 14
+
+**User Story:** As a portfolio owner, I want to preview dynamic backgrounds before adding them, so that I can verify they work correctly with my portfolio
+
+#### Acceptance Criteria
+
+1. WHEN the user enters a dynamic background URL in the settings modal, THE Admin Site SHALL display a live preview of the background in an iframe
+2. THE Admin Site SHALL load the background URL with the "?background=true" query parameter appended
+3. WHEN the background iframe loads successfully, THE Admin Site SHALL display a success indicator
+4. WHEN the background iframe fails to load, THE Admin Site SHALL display an error indicator and allow the user to still save the URL
+
+### Requirement 15
+
+**User Story:** As a portfolio owner, I want to see all my dynamic backgrounds at once, so that I can quickly review and manage my background collection
+
+#### Acceptance Criteria
+
+1. WHEN the user views the dynamic backgrounds section in settings, THE Admin Site SHALL display preview cards for each background URL in a grid layout
+2. THE Admin Site SHALL show a live iframe preview for each background URL
+3. WHEN a background preview is clicked, THE Admin Site SHALL expand it to a larger preview in a modal
+4. THE Admin Site SHALL indicate which backgrounds are loading correctly versus which have errors
+5. THE Admin Site SHALL provide delete and reorder controls for each background in the list

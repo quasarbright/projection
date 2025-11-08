@@ -454,3 +454,119 @@
   - Display upload errors inline
   - Show success feedback after upload
   - _Requirements: 11.1, 11.7_
+
+
+- [ ] 15. Implement configuration management
+  - Add API endpoints for config operations
+  - Create SettingsModal component with tabs
+  - Create ConfigForm for general settings
+  - Create AdvancedConfigForm for advanced settings
+  - Add validation for config fields
+  - _Requirements: 12.1, 12.2, 12.3, 12.4, 12.5_
+
+- [ ] 15.1 Add config API endpoints
+  - Implement GET /api/config endpoint (already exists from task 3.6)
+  - Implement PUT /api/config endpoint to update entire config
+  - Validate required fields (title, description, baseUrl)
+  - Validate baseUrl format (URL or relative path)
+  - Validate itemsPerPage is positive integer
+  - Use FileManager to update config section in projects data file
+  - Return updated config or validation errors
+  - _Requirements: 12.1, 12.2, 12.3_
+
+- [ ] 15.2 Create SettingsModal component
+  - Write `src/admin/client/src/components/SettingsModal.tsx`
+  - Create modal overlay with backdrop
+  - Add tabbed interface (General, Dynamic Backgrounds, Advanced)
+  - Add Save and Cancel buttons in footer
+  - Handle tab switching
+  - Track dirty state to warn on unsaved changes
+  - Close modal on cancel or successful save
+  - _Requirements: 12.1, 12.4_
+
+- [ ] 15.3 Create ConfigForm component
+  - Write `src/admin/client/src/components/ConfigForm.tsx`
+  - Add input fields for title, description, baseUrl, itemsPerPage, defaultScreenshot
+  - Implement field validation (required fields, URL format, number validation)
+  - Display inline error messages
+  - Update parent state on field changes
+  - _Requirements: 12.2_
+
+- [ ] 15.4 Create AdvancedConfigForm component
+  - Write `src/admin/client/src/components/AdvancedConfigForm.tsx`
+  - Add input fields for customStyles, customScripts, output directory
+  - Update parent state on field changes
+  - _Requirements: 12.2_
+
+- [ ] 15.5 Integrate SettingsModal with App
+  - Add "Settings" button to app header
+  - Show SettingsModal when button clicked
+  - Pass current config to modal
+  - Call PUT /api/config on save
+  - Show success toast after save
+  - Show error toast on failure
+  - Refresh config in context after successful save
+  - _Requirements: 12.1, 12.5_
+
+- [ ] 16. Implement dynamic backgrounds management
+  - Create DynamicBackgroundManager component
+  - Create BackgroundPreviewCard component
+  - Create BackgroundPreviewModal component
+  - Implement add/remove/reorder functionality
+  - Add live iframe previews with status indicators
+  - _Requirements: 13.1, 13.2, 13.3, 13.4, 13.5, 14.1, 14.2, 14.3, 14.4, 15.1, 15.2, 15.3, 15.4, 15.5_
+
+- [ ] 16.1 Create DynamicBackgroundManager component
+  - Write `src/admin/client/src/components/DynamicBackgroundManager.tsx`
+  - Add input field for new background URL
+  - Add "Add" button to add URL to list
+  - Display current backgrounds in grid layout (2-3 columns)
+  - Implement URL validation (format, duplicates)
+  - Show inline error for invalid URLs
+  - Update parent config state when backgrounds change
+  - _Requirements: 13.1, 13.2, 13.3_
+
+- [ ] 16.2 Create BackgroundPreviewCard component
+  - Write `src/admin/client/src/components/BackgroundPreviewCard.tsx`
+  - Display iframe preview (250x200px) with URL appended with "?background=true"
+  - Add iframe sandbox attributes for security
+  - Track loading state (loading, loaded, error)
+  - Show status indicator (✓ for loaded, ⚠️ for error)
+  - Display truncated URL with full URL on hover
+  - Add delete button to remove background
+  - Add expand button to open preview modal
+  - Add drag handle for reordering
+  - _Requirements: 13.2, 14.1, 14.2, 14.4, 15.1, 15.2, 15.4_
+
+- [ ] 16.3 Implement drag-and-drop reordering
+  - Add drag event handlers to BackgroundPreviewCard
+  - Implement HTML5 drag-and-drop API
+  - Update backgrounds array order during drag
+  - Show visual feedback during drag (opacity, border)
+  - Update parent state with new order
+  - _Requirements: 13.5, 15.3_
+
+- [ ] 16.4 Create BackgroundPreviewModal component
+  - Write `src/admin/client/src/components/BackgroundPreviewModal.tsx`
+  - Display modal overlay with large iframe preview (800x600px)
+  - Show full URL above preview
+  - Add close button
+  - Close on backdrop click or X button
+  - Use same iframe security settings as preview card
+  - _Requirements: 15.3_
+
+- [ ] 16.5 Integrate DynamicBackgroundManager with SettingsModal
+  - Add DynamicBackgroundManager to "Dynamic Backgrounds" tab
+  - Pass dynamicBackgrounds array from config
+  - Update config state when backgrounds change
+  - Save updated backgrounds array with config on save
+  - _Requirements: 13.1, 13.2_
+
+- [ ] 16.6 Add styling for background components
+  - Style preview cards with grid layout
+  - Add responsive breakpoints (1 column on mobile, 2-3 on desktop)
+  - Style iframe previews with loading states
+  - Add drag-and-drop visual feedback
+  - Style preview modal with backdrop
+  - Add animations for smooth interactions
+  - _Requirements: 15.1, 15.2, 15.4_

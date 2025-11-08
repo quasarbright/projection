@@ -1125,3 +1125,523 @@ Add ImageUpload component to ProjectForm:
    - Save to cloud storage
    - Sync across devices
    - Backup to cloud
+
+
+## Configuration Management
+
+### Overview
+
+The admin site will provide a settings modal for managing all site configuration properties, including general settings and dynamic backgrounds. This centralizes configuration management and eliminates the need to manually edit the config section in the projects data file.
+
+### Settings Modal Architecture
+
+```
+┌─────────────────────────────────────────────────────┐
+│  Settings                                      [X]  │
+├─────────────────────────────────────────────────────┤
+│  [General] [Dynamic Backgrounds] [Advanced]        │
+├─────────────────────────────────────────────────────┤
+│                                                     │
+│  (Tab content area)                                 │
+│                                                     │
+│                                                     │
+│                                                     │
+│                                                     │
+│                                                     │
+│                                                     │
+│                          [Cancel]  [Save Changes]  │
+└─────────────────────────────────────────────────────┘
+```
+
+### API Endpoints
+
+#### GET /api/config
+
+Get the current site configuration.
+
+**Response:**
+```typescript
+interface GetConfigResponse {
+  config: Config
+}
+```
+
+#### PUT /api/config
+
+Update the entire site configuration.
+
+**Request:**
+```typescript
+interface UpdateConfigRequest {
+  config: Config
+}
+```
+
+**Response:**
+```typescript
+interface UpdateConfigResponse {
+  success: boolean
+  config: Config
+  errors?: ValidationError[]
+}
+```
+
+**Validation:**
+- Required fields: title, description, baseUrl
+- baseUrl must be a valid URL or relative path
+- itemsPerPage must be a positive integer
+- dynamicBackgrounds must be an array of valid URLs
+
+### Components
+
+#### SettingsModal Component
+
+**Responsibilities:**
+- Display modal dialog overlay
+- Manage tab navigation
+- Handle save/cancel actions
+- Show loading and error states
+
+**Props:**
+```typescript
+interface SettingsModalProps {
+  isOpen: boolean
+  onClose: () => void
+  config: Config
+  onSave: (config: Config) => Promise<void>
+}
+```
+
+**State:**
+```typescript
+interface SettingsModalState {
+  activeTab: 'general' | 'backgrounds' | 'advanced'
+  formData: Config
+  isDirty: boolean
+  isSaving: boolean
+  errors: Record<string, string>
+}
+```
+
+#### ConfigForm Component
+
+**Responsibilities:**
+- Render general configuration fields
+- Validate input
+- Show field errors
+
+**Fields:**
+- Title (text input, required)
+- Description (textarea, required)
+- Base URL (text input, required)
+- Items Per Page (number input, optional)
+- Default Screenshot (text input, optional)
+
+**Props:**
+```typescript
+interface ConfigFormProps {
+  config: Config
+  onChange: (config: Partial<Config>) => void
+  errors: Record<string, string>
+}
+```
+
+#### AdvancedConfigForm Component
+
+**Responsibilities:**
+- Render advanced configuration fields
+- Handle file path inputs
+
+**Fields:**
+- Custom Styles (text input, optional)
+- Custom Scripts (text input, optional)
+- Output Directory (text input, optional)
+
+**Props:**
+```typescript
+interface AdvancedConfigFormProps {
+  config: Config
+  onChange: (config: Partial<Config>) => void
+}
+```
+
+## Dynamic Backgrounds Management
+
+### Overview
+
+The dynamic backgrounds section allows users to manage the array of background URLs that will be randomly selected for the portfolio site. Each background is displayed with a live preview to verify it works correctly.
+
+### UI Layout
+
+```
+┌─────────────────────────────────────────────────────┐
+│  Dynamic Backgrounds                                │
+├─────────────────────────────────────────────────────┤
+│                                                     │
+│  Add Background URL:                                │
+│  [https://example.com/background    ] [Add]        │
+│                                                     │
+│  Current Backgrounds (3):                           │
+│  ┌─────────────────────────────────────────────┐   │
+│  │ ┌─────────────┐  ┌─────────────┐           │   │
+│  │ │   Preview   │  │   Preview   │  ...      │   │
+│  │ │   [iframe]  │  │   [iframe]  │           │   │
+│  │ │             │  │             │           │   │
+│  │ │ ✓ Loaded    │  │ ⚠️ Error    │           │   │
+│  │ │ example.com │  │ test.com    │           │   │
+│  │ │ [🔍] [🗑️] [☰]│  │ [🔍] [🗑️] [☰]│           │   │
+│  │ └─────────────┘  └─────────────┘           │   │
+│  └─────────────────────────────────────────────┘   │
+│                                                     │
+└─────────────────────────────────────────────────────┘
+```
+
+### Components
+
+#### DynamicBackgroundManager Component
+
+**Responsibilities:**
+- Display list of background URLs
+- Handle add/remove/reorder operations
+- Manage preview states
+- Show expanded preview modal
+
+**Props:**
+```typescript
+interface DynamicBackgroundManagerProps {
+  backgrounds: string[]
+  onChange: (backgrounds: string[]) => void
+}
+```
+
+**State:**
+```typescript
+interface DynamicBackgroundManagerState {
+  newBackgroundUrl: string
+  expandedPreview: string | null
+  loadingStates: Map<string, 'loading' | 'loaded' | 'error'>
+}
+```
+
+**Methods:**
+```typescript
+class DynamicBackgroundManager {
+  handleAddBackground(): void
+  handleRemoveBackground(url: string): void
+  handleReorderBackgrounds(fromIndex: number, toIndex: number): void
+  handleExpandPreview(url: string): void
+  validateUrl(url: string): boolean
+}
+```
+
+#### BackgroundPreviewCard Component
+
+**Responsibilities:**
+- Display iframe preview of background
+- Show loading/error states
+- Provide delete and expand actions
+- Handle drag-and-drop for reordering
+
+**Props:**
+```typescript
+interface BackgroundPreviewCardProps {
+  url: string
+  index: number
+  onDelete: () => void
+  onExpand: () => void
+  onDragStart: (index: number) => void
+  onDragOver: (index: number) => void
+  onDrop: (index: number) => void
+}
+```
+
+**Preview Implementation:**
+```typescript
+const BackgroundPreviewCard: React.FC<BackgroundPreviewCardProps> = ({ url, ... }) => {
+  const [loadState, setLoadState] = useState<'loading' | 'loaded' | 'error'>('loading');
+  const iframeRef = useRef<HTMLIFrameElement>(null);
+  
+  // Append ?background=true to URL
+  const previewUrl = url.includes('?') 
+    ? `${url}&background=true` 
+    : `${url}?background=true`;
+  
+  return (
+    <div className="background-preview-card" draggable>
+      <div className="preview-container">
+        <iframe
+          ref={iframeRef}
+          src={previewUrl}
+          onLoad={() => setLoadState('loaded')}
+          onError={() => setLoadState('error')}
+          sandbox="allow-scripts allow-same-origin"
+          title={`Background preview: ${url}`}
+        />
+        {loadState === 'loading' && <LoadingSpinner />}
+        {loadState === 'error' && <ErrorIcon />}
+      </div>
+      
+      <div className="card-info">
+        <div className="status">
+          {loadState === 'loaded' && <CheckIcon />}
+          {loadState === 'error' && <WarningIcon />}
+        </div>
+        <div className="url" title={url}>
+          {truncateUrl(url)}
+        </div>
+      </div>
+      
+      <div className="card-actions">
+        <button onClick={onExpand} title="Expand preview">
+          🔍
+        </button>
+        <button onClick={onDelete} title="Delete">
+          🗑️
+        </button>
+        <div className="drag-handle" title="Drag to reorder">
+          ☰
+        </div>
+      </div>
+    </div>
+  );
+};
+```
+
+#### BackgroundPreviewModal Component
+
+**Responsibilities:**
+- Display large preview of selected background
+- Show full URL
+- Provide close action
+
+**Props:**
+```typescript
+interface BackgroundPreviewModalProps {
+  url: string | null
+  onClose: () => void
+}
+```
+
+**Layout:**
+```
+┌─────────────────────────────────────────────────────┐
+│  Background Preview                            [X]  │
+├─────────────────────────────────────────────────────┤
+│                                                     │
+│  URL: https://example.com/background                │
+│                                                     │
+│  ┌───────────────────────────────────────────────┐ │
+│  │                                               │ │
+│  │                                               │ │
+│  │           [Large iframe preview]              │ │
+│  │                                               │ │
+│  │                                               │ │
+│  │                                               │ │
+│  └───────────────────────────────────────────────┘ │
+│                                                     │
+│                                      [Close]        │
+└─────────────────────────────────────────────────────┘
+```
+
+### Drag and Drop Implementation
+
+Use HTML5 drag-and-drop API for reordering:
+
+```typescript
+const DynamicBackgroundManager: React.FC<Props> = ({ backgrounds, onChange }) => {
+  const [draggedIndex, setDraggedIndex] = useState<number | null>(null);
+  
+  const handleDragStart = (index: number) => {
+    setDraggedIndex(index);
+  };
+  
+  const handleDragOver = (e: React.DragEvent, index: number) => {
+    e.preventDefault();
+    if (draggedIndex === null || draggedIndex === index) return;
+    
+    // Reorder array
+    const newBackgrounds = [...backgrounds];
+    const [removed] = newBackgrounds.splice(draggedIndex, 1);
+    newBackgrounds.splice(index, 0, removed);
+    
+    onChange(newBackgrounds);
+    setDraggedIndex(index);
+  };
+  
+  const handleDragEnd = () => {
+    setDraggedIndex(null);
+  };
+  
+  return (
+    <div className="background-grid">
+      {backgrounds.map((url, index) => (
+        <BackgroundPreviewCard
+          key={url}
+          url={url}
+          index={index}
+          onDragStart={() => handleDragStart(index)}
+          onDragOver={(e) => handleDragOver(e, index)}
+          onDragEnd={handleDragEnd}
+          {...otherProps}
+        />
+      ))}
+    </div>
+  );
+};
+```
+
+### URL Validation
+
+Validate background URLs before adding:
+
+```typescript
+function validateBackgroundUrl(url: string): { valid: boolean; error?: string } {
+  // Check if empty
+  if (!url.trim()) {
+    return { valid: false, error: 'URL cannot be empty' };
+  }
+  
+  // Check if valid URL format
+  try {
+    new URL(url);
+  } catch {
+    return { valid: false, error: 'Invalid URL format' };
+  }
+  
+  // Check if already exists
+  if (backgrounds.includes(url)) {
+    return { valid: false, error: 'This background already exists' };
+  }
+  
+  return { valid: true };
+}
+```
+
+### Preview Security
+
+Use iframe sandbox attributes for security:
+
+```typescript
+<iframe
+  src={previewUrl}
+  sandbox="allow-scripts allow-same-origin"
+  // Allows scripts to run (needed for p5.js, etc.)
+  // Allows same-origin access (needed for some backgrounds)
+  // Blocks: forms, popups, top navigation, etc.
+/>
+```
+
+### Error Handling
+
+**Failed to Load Background:**
+- Show error icon on preview card
+- Display error message on hover
+- Allow user to still save the URL (might work on actual site)
+- Provide option to test URL in new tab
+
+**Invalid URL Format:**
+- Show inline error message
+- Prevent adding to list
+- Suggest correct format
+
+**Network Errors:**
+- Show toast notification
+- Provide retry option
+- Don't lose unsaved changes
+
+### Styling
+
+**Preview Card Dimensions:**
+- Width: 250px
+- Height: 200px
+- Iframe: 250px × 150px (preview area)
+- Info/actions: 50px (below preview)
+
+**Grid Layout:**
+- 2-3 columns depending on screen width
+- Gap: 20px
+- Responsive: 1 column on mobile
+
+**Expanded Preview:**
+- Modal overlay with backdrop
+- Iframe: 800px × 600px
+- Centered on screen
+- Close on backdrop click or X button
+
+### Performance Considerations
+
+**Lazy Loading:**
+- Only load iframes when visible (use Intersection Observer)
+- Unload iframes when scrolled out of view
+- Limit number of simultaneously loaded previews
+
+**Debouncing:**
+- Debounce reorder operations during drag
+- Batch state updates
+
+**Memory Management:**
+- Clean up iframe references on unmount
+- Remove event listeners
+
+### Testing Strategy
+
+**Component Tests:**
+- Render background manager
+- Add new background URL
+- Remove background
+- Reorder backgrounds via drag-and-drop
+- Expand preview modal
+- Validate URL format
+- Handle load errors
+
+**Integration Tests:**
+- Save config with backgrounds
+- Load config with backgrounds
+- Preview backgrounds in iframe
+- Handle network errors
+
+**Manual Testing:**
+- Test with various background URLs
+- Verify iframe security (no popups, etc.)
+- Test drag-and-drop on different browsers
+- Test responsive layout
+- Verify preview accuracy
+
+## Future Enhancements
+
+1. **Image Optimization**
+   - Automatically resize large images
+   - Generate multiple sizes for responsive images
+   - Convert to WebP for better compression
+
+2. **Bulk Operations**
+   - Import projects from CSV
+   - Export projects to CSV
+   - Bulk tag editing
+
+3. **Project Templates**
+   - Save project templates
+   - Quick-create from template
+
+4. **Analytics**
+   - Track project views
+   - Show popular projects
+   - Tag usage statistics
+
+5. **Collaboration**
+   - Multi-user support
+   - Change history
+   - Conflict resolution
+
+6. **Cloud Integration**
+   - Save to cloud storage
+   - Sync across devices
+   - Backup to cloud
+
+7. **Background Enhancements**
+   - Background metadata (name, description)
+   - Enable/disable without deleting
+   - Background categories/tags
+   - Bulk import from file
+   - Screenshot capture for thumbnails
+   - Performance metrics (load time)
