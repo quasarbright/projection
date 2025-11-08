@@ -16,5 +16,5 @@
     "moduleResolution": "node"
   },
   "include": ["src/**/*"],
-  "exclude": ["node_modules", "lib", "tests", "archive"]
+  "exclude": ["node_modules", "lib", "tests", "archive", "src/admin/client"]
 }

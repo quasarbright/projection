@@ -21,12 +21,14 @@ export class AdminServer {
   private server: any;
   private fileManager: FileManager;
   private configLoader: ConfigLoader;
+  private connections: Set<any>;
 
   constructor(config: AdminServerConfig) {
     this.config = config;
     this.app = express();
     this.fileManager = new FileManager(config.projectsFilePath);
     this.configLoader = new ConfigLoader(path.dirname(config.projectsFilePath));
+    this.connections = new Set();
     this.setupMiddleware();
     this.setupRoutes();
   }
@@ -47,7 +49,7 @@ export class AdminServer {
     this.app.use(express.urlencoded({ extended: true }));
 
     // Serve static files from the admin client build directory
-    const clientBuildPath = path.join(__dirname, '../client/dist');
+    const clientBuildPath = path.join(__dirname, '../client');
     this.app.use(express.static(clientBuildPath));
   }
 
@@ -360,7 +362,7 @@ export class AdminServer {
     // Fallback route for client-side routing (SPA)
     // Use a regex pattern to match all paths that don't start with /api
     this.app.get(/^(?!\/api).*$/, (req: Request, res: Response) => {
-      const indexPath = path.join(__dirname, '../client/dist/index.html');
+      const indexPath = path.join(__dirname, '../client/index.html');
       res.sendFile(indexPath, (err) => {
         if (err) {
           res.status(404).send('Admin client not found. Please build the admin client first.');
@@ -378,6 +380,14 @@ export class AdminServer {
         this.server = this.app.listen(this.config.port, () => {
           console.log(`Admin server running at http://localhost:${this.config.port}`);
           resolve();
+        });
+
+        // Track connections for graceful shutdown
+        this.server.on('connection', (conn: any) => {
+          this.connections.add(conn);
+          conn.on('close', () => {
+            this.connections.delete(conn);
+          });
         });
 
         // Handle port already in use error
@@ -406,6 +416,12 @@ export class AdminServer {
         resolve();
         return;
       }
+
+      // Close all active connections
+      for (const conn of this.connections) {
+        conn.destroy();
+      }
+      this.connections.clear();
 
       this.server.close((err: Error | undefined) => {
         if (err) {

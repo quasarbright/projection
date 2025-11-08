@@ -36,7 +36,7 @@ const mockAxiosInstance = mockAxios.create() as any;
 describe('API Client', () => {
   beforeEach(() => {
     vi.clearAllMocks();
-    mockAxios.isAxiosError.mockReturnValue(false);
+    (mockAxios.isAxiosError as any).mockReturnValue(false);
   });
 
   afterEach(() => {
@@ -85,7 +85,7 @@ describe('API Client', () => {
       };
 
       mockAxiosInstance.get.mockRejectedValue(mockError);
-      mockAxios.isAxiosError.mockReturnValue(true);
+      (mockAxios.isAxiosError as any).mockReturnValue(true);
 
       await expect(getProjects()).rejects.toMatchObject({
         message: 'Failed to fetch projects',
@@ -146,7 +146,7 @@ describe('API Client', () => {
       };
 
       mockAxiosInstance.post.mockRejectedValue(mockError);
-      mockAxios.isAxiosError.mockReturnValue(true);
+      (mockAxios.isAxiosError as any).mockReturnValue(true);
 
       await expect(createProject(invalidProject)).rejects.toMatchObject({
         message: 'Validation failed',
@@ -204,7 +204,7 @@ describe('API Client', () => {
       };
 
       mockAxiosInstance.put.mockRejectedValue(mockError);
-      mockAxios.isAxiosError.mockReturnValue(true);
+      (mockAxios.isAxiosError as any).mockReturnValue(true);
 
       await expect(updateProject('nonexistent', project)).rejects.toMatchObject({
         message: 'Project not found',
@@ -241,7 +241,7 @@ describe('API Client', () => {
       };
 
       mockAxiosInstance.delete.mockRejectedValue(mockError);
-      mockAxios.isAxiosError.mockReturnValue(true);
+      (mockAxios.isAxiosError as any).mockReturnValue(true);
 
       await expect(deleteProject('nonexistent')).rejects.toMatchObject({
         message: 'Project not found',

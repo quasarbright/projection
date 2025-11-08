@@ -1,8 +1,8 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { ProjectProvider, useProjects } from './context/ProjectContext';
 import { ProjectList } from './components/ProjectList';
 import { ProjectForm } from './components/ProjectForm';
-import type { Project } from '../../types';
+import type { Project } from '../../../types';
 import './styles/App.css';
 
 function AppContent() {

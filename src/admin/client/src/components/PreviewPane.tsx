@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState, useCallback } from 'react';
+import { useEffect, useRef, useState, useCallback } from 'react';
 import type { Project } from '../../../../types';
 import { generatePreview } from '../services/api';
 import './PreviewPane.css';
@@ -6,10 +6,9 @@ import './PreviewPane.css';
 interface PreviewPaneProps {
   project: Partial<Project>;
   debounceMs?: number;
-  onUpdate?: (project: Partial<Project>) => void;
 }
 
-export function PreviewPane({ project, debounceMs = 500, onUpdate }: PreviewPaneProps) {
+export function PreviewPane({ project, debounceMs = 500 }: PreviewPaneProps) {
   const iframeRef = useRef<HTMLIFrameElement>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);

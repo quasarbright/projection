@@ -116,7 +116,7 @@ describe('ProjectList', () => {
     // Confirm deletion - get all buttons and find the one in the dialog
     const allButtons = screen.getAllByRole('button');
     const confirmButton = allButtons.find(btn => 
-      btn.textContent === 'Delete' && btn.classList.contains('btn-danger') && btn.type === 'button'
+      btn.textContent === 'Delete' && btn.classList.contains('btn-danger') && (btn as HTMLButtonElement).type === 'button'
     );
     if (confirmButton) {
       fireEvent.click(confirmButton);
@@ -159,7 +159,7 @@ describe('ProjectList', () => {
     // Confirm deletion - get all buttons and find the one in the dialog
     const allButtons = screen.getAllByRole('button');
     const confirmButton = allButtons.find(btn => 
-      btn.textContent === 'Delete' && btn.classList.contains('btn-danger') && btn.type === 'button'
+      btn.textContent === 'Delete' && btn.classList.contains('btn-danger') && (btn as HTMLButtonElement).type === 'button'
     );
     if (confirmButton) {
       fireEvent.click(confirmButton);

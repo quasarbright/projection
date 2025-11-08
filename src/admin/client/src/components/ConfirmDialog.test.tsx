@@ -245,7 +245,7 @@ describe('ConfirmDialog', () => {
     const onConfirm = vi.fn();
     const onCancel = vi.fn();
 
-    const { container } = render(
+    render(
       <ConfirmDialog
         isOpen={true}
         title="Confirm Action"

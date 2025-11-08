@@ -1,4 +1,4 @@
-import type { Project, ProjectsData, Config } from '../../../../types';
+import type { Project, Config } from '../../../../types';
 
 export interface GetProjectsResponse {
   projects: Project[];
