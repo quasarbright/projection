@@ -1,7 +1,8 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import type { Project } from '../../../../types';
 import { PROJECT_ID_PATTERN } from '../../../../types/project';
 import type { ValidationError } from '../types/api';
+import { TagManager } from './TagManager';
 import './ProjectForm.css';
 
 interface ProjectFormProps {
@@ -167,6 +168,29 @@ export function ProjectForm({
     }));
 
     // Clear API errors when user starts typing
+    if (apiErrors.length > 0) {
+      setApiErrors([]);
+    }
+  };
+
+  // Handle tags change
+  const handleTagsChange = (tags: string[]) => {
+    setFormData((prev) => ({
+      ...prev,
+      tags,
+    }));
+
+    // Mark tags as touched
+    setTouched((prev) => ({ ...prev, tags: true }));
+
+    // Validate tags
+    const error = validateField('tags', tags);
+    setErrors((prev) => ({
+      ...prev,
+      tags: error,
+    }));
+
+    // Clear API errors
     if (apiErrors.length > 0) {
       setApiErrors([]);
     }
@@ -447,13 +471,14 @@ export function ProjectForm({
           <span className="field-hint">Featured projects are highlighted on the portfolio</span>
         </div>
 
-        {/* Tags will be handled by TagManager component in task 8 */}
         <div className="form-group">
           <label className="form-label required">Tags</label>
-          <div className="tags-placeholder">
-            <p>Tag management will be implemented in the next task</p>
-            <p className="field-hint">Current tags: {formData.tags.join(', ') || 'None'}</p>
-          </div>
+          <TagManager
+            selectedTags={formData.tags}
+            availableTags={existingTags}
+            onChange={handleTagsChange}
+            disabled={isSubmitting}
+          />
           {showError('tags') && (
             <span className="error-message" role="alert">
               {errors.tags}

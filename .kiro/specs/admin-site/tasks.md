@@ -235,7 +235,7 @@
   - Write tests for successful submission and error handling
   - _Requirements: 3.3, 3.4, 3.5, 4.3, 4.4, 4.5_
 
-- [ ] 8. Implement TagManager component
+- [x] 8. Implement TagManager component
   - Create tag input with autocomplete
   - Display selected tags as removable chips
   - Show suggestions from existing tags
@@ -243,7 +243,7 @@
   - Write tests for tag selection, autocomplete, and chip removal
   - _Requirements: 9.1, 9.2, 9.3, 9.4_
 
-- [ ] 8.1 Create TagManager component
+- [x] 8.1 Create TagManager component
   - Write `src/admin/client/src/components/TagManager.tsx`
   - Implement tag input with autocomplete dropdown
   - Display selected tags as chips with remove buttons
@@ -251,7 +251,7 @@
   - Write tests for component rendering and tag operations
   - _Requirements: 9.1, 9.2, 9.3_
 
-- [ ] 8.2 Add tag autocomplete
+- [x] 8.2 Add tag autocomplete
   - Filter available tags based on input
   - Show dropdown with matching suggestions
   - Allow selecting from suggestions or typing new tag
