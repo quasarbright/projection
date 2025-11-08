@@ -839,12 +839,268 @@ The admin server will use the `yaml` package for comment-preserving operations, 
    - Enable CORS only for development
    - Restrict origins in production builds
 
+## Image Upload Implementation
+
+### Overview
+
+The admin site will support uploading thumbnail images for projects. Images will be stored in a `screenshots/` directory at the project root, with filenames based on the project ID. The system will handle image validation, storage, and cleanup.
+
+### Storage Strategy
+
+**Directory Structure:**
+```
+project-root/
+├── screenshots/
+│   ├── project-1.png
+│   ├── project-2.jpg
+│   └── project-3.webp
+├── projects.yaml
+└── projection.config.js
+```
+
+**Filename Convention:**
+- Format: `<project-id>.<extension>`
+- Example: `my-portfolio.png`, `web-app.jpg`
+- Extension preserved from uploaded file
+- Old files automatically replaced when uploading new images
+
+**Path Storage:**
+- Store relative path in `thumbnailLink` field
+- Format: `screenshots/<project-id>.<extension>`
+- Example: `screenshots/my-portfolio.png`
+- Relative paths work correctly when site is generated
+
+### API Endpoints
+
+#### POST /api/projects/:id/thumbnail
+
+Upload a thumbnail image for a project.
+
+**Request:**
+- Content-Type: `multipart/form-data`
+- Body: Form data with `thumbnail` field containing image file
+
+**Response:**
+```typescript
+interface UploadThumbnailResponse {
+  success: boolean
+  thumbnailLink: string  // Relative path: "screenshots/project-id.ext"
+  error?: string
+}
+```
+
+**Validation:**
+- File size: Maximum 5 MB
+- File type: PNG, JPG, JPEG, GIF, WebP
+- Project must exist
+
+**Process:**
+1. Validate file size and type
+2. Determine target filename: `<project-id>.<extension>`
+3. Delete existing thumbnail if present (any extension)
+4. Save new file to `screenshots/` directory
+5. Update project's `thumbnailLink` field
+6. Return relative path
+
+#### DELETE /api/projects/:id/thumbnail
+
+Remove a thumbnail image for a project.
+
+**Response:**
+```typescript
+interface DeleteThumbnailResponse {
+  success: boolean
+  error?: string
+}
+```
+
+**Process:**
+1. Find thumbnail file for project (check all supported extensions)
+2. Delete file from filesystem
+3. Clear project's `thumbnailLink` field
+4. Return success status
+
+### Backend Implementation
+
+#### Image Manager Class
+
+```typescript
+class ImageManager {
+  private screenshotsDir: string;
+  private supportedExtensions = ['.png', '.jpg', '.jpeg', '.gif', '.webp'];
+  private maxFileSize = 5 * 1024 * 1024; // 5 MB
+  
+  constructor(projectRoot: string) {
+    this.screenshotsDir = path.join(projectRoot, 'screenshots');
+  }
+  
+  async ensureScreenshotsDir(): Promise<void> {
+    // Create screenshots directory if it doesn't exist
+  }
+  
+  async saveImage(projectId: string, file: Express.Multer.File): Promise<string> {
+    // Validate file size and type
+    // Delete existing thumbnail
+    // Save new file
+    // Return relative path
+  }
+  
+  async deleteImage(projectId: string): Promise<void> {
+    // Find and delete thumbnail file
+  }
+  
+  async findExistingThumbnail(projectId: string): Promise<string | null> {
+    // Check for existing thumbnail with any supported extension
+  }
+  
+  validateFile(file: Express.Multer.File): void {
+    // Validate size and type, throw error if invalid
+  }
+  
+  getRelativePath(projectId: string, extension: string): string {
+    // Return "screenshots/<project-id>.<ext>"
+  }
+}
+```
+
+#### Multer Configuration
+
+Use `multer` for handling multipart/form-data uploads:
+
+```typescript
+import multer from 'multer';
+
+const upload = multer({
+  storage: multer.memoryStorage(), // Store in memory temporarily
+  limits: {
+    fileSize: 5 * 1024 * 1024 // 5 MB
+  },
+  fileFilter: (req, file, cb) => {
+    const allowedMimes = [
+      'image/png',
+      'image/jpeg',
+      'image/gif',
+      'image/webp'
+    ];
+    if (allowedMimes.includes(file.mimetype)) {
+      cb(null, true);
+    } else {
+      cb(new Error('Invalid file type'));
+    }
+  }
+});
+```
+
+### Frontend Implementation
+
+#### ImageUpload Component
+
+```typescript
+interface ImageUploadProps {
+  projectId: string;
+  currentThumbnail?: string;
+  onChange: (thumbnailLink: string | null) => void;
+}
+
+const ImageUpload: React.FC<ImageUploadProps> = ({
+  projectId,
+  currentThumbnail,
+  onChange
+}) => {
+  // File input handling
+  // Preview display
+  // Upload progress
+  // Delete functionality
+};
+```
+
+**Features:**
+- Drag-and-drop support
+- Click to browse files
+- Image preview before upload
+- Upload progress indicator
+- Delete button for existing thumbnails
+- File size and type validation
+
+**UI Layout:**
+```
+┌─────────────────────────────────┐
+│  Thumbnail                      │
+│  ┌───────────────────────────┐  │
+│  │                           │  │
+│  │   [Image Preview]         │  │
+│  │   or                      │  │
+│  │   [Drop image here]       │  │
+│  │   [or click to browse]    │  │
+│  │                           │  │
+│  └───────────────────────────┘  │
+│  [Upload] [Remove]              │
+│  Max 5MB • PNG, JPG, GIF, WebP  │
+└─────────────────────────────────┘
+```
+
+#### Integration with ProjectForm
+
+Add ImageUpload component to ProjectForm:
+
+```typescript
+<ProjectForm>
+  {/* Existing fields */}
+  <ImageUpload
+    projectId={project.id}
+    currentThumbnail={project.thumbnailLink}
+    onChange={(thumbnailLink) => {
+      setProject({ ...project, thumbnailLink });
+    }}
+  />
+</ProjectForm>
+```
+
+### Error Handling
+
+**File Too Large:**
+- Show error message: "Image must be smaller than 5 MB"
+- Prevent upload
+
+**Invalid File Type:**
+- Show error message: "Please upload a PNG, JPG, GIF, or WebP image"
+- Prevent upload
+
+**Upload Failed:**
+- Show error toast with retry option
+- Keep existing thumbnail if present
+
+**Delete Failed:**
+- Show error toast
+- Keep thumbnail in UI
+
+### Testing Strategy
+
+**Backend Tests:**
+- Upload valid image file
+- Reject oversized files
+- Reject invalid file types
+- Replace existing thumbnail
+- Delete thumbnail
+- Handle missing screenshots directory
+- Handle file system errors
+
+**Frontend Tests:**
+- Render upload component
+- Handle file selection
+- Show image preview
+- Display upload progress
+- Handle upload success
+- Handle upload errors
+- Delete thumbnail
+- Validate file before upload
+
 ## Future Enhancements
 
-1. **Image Upload**
-   - Allow uploading thumbnail images
-   - Store in assets directory
-   - Generate thumbnails automatically
+1. **Image Optimization**
+   - Automatically resize large images
+   - Generate multiple sizes for responsive images
+   - Convert to WebP for better compression
 
 2. **Bulk Operations**
    - Import projects from CSV

@@ -135,3 +135,18 @@ This document specifies the requirements for an admin site feature for the Proje
 3. THE Admin Site SHALL use responsive design patterns for forms, tables, and navigation
 4. WHEN the user rotates their device, THE Admin Site SHALL adapt the layout to the new orientation
 5. THE Admin Site SHALL provide touch-friendly controls on mobile devices
+
+### Requirement 11
+
+**User Story:** As a portfolio owner, I want to upload thumbnail images for my projects, so that I can visually showcase my work without manually managing file paths
+
+#### Acceptance Criteria
+
+1. WHEN the user is creating or editing a project, THE Admin Site SHALL provide a file upload control for thumbnail images
+2. WHEN the user selects an image file, THE Admin Site SHALL validate that the file is a supported image format (PNG, JPG, JPEG, GIF, WebP)
+3. WHEN the user uploads a valid image, THE Projection System SHALL save the image to the screenshots directory with the filename pattern "<project-id>.<extension>"
+4. WHEN an image is successfully uploaded, THE Projection System SHALL update the project's thumbnailLink field with the relative path "screenshots/<project-id>.<extension>"
+5. WHEN a project already has a thumbnail and the user uploads a new image, THE Projection System SHALL replace the existing thumbnail file
+6. WHEN the user removes a thumbnail, THE Projection System SHALL delete the image file from the screenshots directory and clear the thumbnailLink field
+7. WHEN the user views the project form, THE Admin Site SHALL display a preview of the current thumbnail image if one exists
+8. THE Admin Site SHALL validate that uploaded image files do not exceed 5 megabytes in size
