@@ -186,7 +186,7 @@
 
 .project-list-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  grid-template-columns: 1fr;
   gap: 1.5rem;
   padding: 1rem 0;
 }
@@ -315,7 +315,7 @@
 }
 
 /* Responsive design */
-@media (max-width: 768px) {
+@media (max-width: 767px) {
   .project-list-controls {
     flex-direction: column;
     gap: 1rem;
@@ -330,10 +330,13 @@
 
   .search-input {
     width: 100%;
+    min-height: 44px;
+    font-size: 16px; /* Prevents zoom on iOS */
   }
 
   .clear-filters-btn {
     width: 100%;
+    min-height: 44px;
   }
 
   .sort-controls {
@@ -348,6 +351,13 @@
   .sort-select {
     flex: 1;
     min-width: 150px;
+    min-height: 44px;
+    font-size: 16px; /* Prevents zoom on iOS */
+  }
+  
+  .sort-order-btn {
+    min-height: 44px;
+    min-width: 44px;
   }
 
   .tag-filters {
@@ -361,6 +371,11 @@
 
   .tag-filter-buttons {
     width: 100%;
+  }
+  
+  .tag-filter-btn {
+    min-height: 44px;
+    padding: 0.6rem 1rem;
   }
 
   .project-list-grid {
@@ -383,16 +398,17 @@
   .btn-secondary,
   .btn-danger {
     width: 100%;
+    min-height: 44px;
   }
 }
 
-@media (min-width: 769px) and (max-width: 1024px) {
+@media (min-width: 768px) and (max-width: 1023px) {
   .project-list-grid {
     grid-template-columns: repeat(2, 1fr);
   }
 }
 
-@media (min-width: 1025px) {
+@media (min-width: 1024px) {
   .project-list-grid {
     grid-template-columns: repeat(3, 1fr);
   }

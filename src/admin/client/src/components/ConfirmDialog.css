@@ -152,7 +152,7 @@
 }
 
 /* Responsive design */
-@media (max-width: 768px) {
+@media (max-width: 767px) {
   .confirm-dialog {
     width: 95%;
     max-width: none;
@@ -170,5 +170,6 @@
 
   .confirm-dialog-footer button {
     width: 100%;
+    min-height: 44px;
   }
 }

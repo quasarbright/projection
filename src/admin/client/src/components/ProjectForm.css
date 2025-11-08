@@ -169,7 +169,7 @@
 }
 
 /* Responsive design */
-@media (max-width: 768px) {
+@media (max-width: 767px) {
   .project-form-container {
     padding: 0;
   }
@@ -191,11 +191,18 @@
 
   .project-form-actions button {
     width: 100%;
+    min-height: 44px;
   }
 
   .form-input,
   .form-textarea {
     font-size: 16px; /* Prevents zoom on iOS */
+    min-height: 44px;
+  }
+  
+  .form-checkbox {
+    min-width: 24px;
+    min-height: 24px;
   }
 }
 
