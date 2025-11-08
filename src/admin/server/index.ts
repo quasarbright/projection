@@ -5,8 +5,10 @@
 import express, { Express, Request, Response } from 'express';
 import cors from 'cors';
 import path from 'path';
+import multer from 'multer';
 import { AdminServerConfig } from './types';
 import { FileManager } from './file-manager';
+import { ImageManager } from './image-manager';
 import { ConfigLoader } from '../../generator/config';
 import { Validator } from '../../generator/validator';
 import { HTMLBuilder } from '../../generator/html-builder';
@@ -20,15 +22,35 @@ export class AdminServer {
   private config: AdminServerConfig;
   private server: any;
   private fileManager: FileManager;
+  private imageManager: ImageManager;
   private configLoader: ConfigLoader;
   private connections: Set<any>;
+  private upload: multer.Multer;
 
   constructor(config: AdminServerConfig) {
     this.config = config;
     this.app = express();
     this.fileManager = new FileManager(config.projectsFilePath);
+    this.imageManager = new ImageManager(path.dirname(config.projectsFilePath));
     this.configLoader = new ConfigLoader(path.dirname(config.projectsFilePath));
     this.connections = new Set();
+    
+    // Configure multer for file uploads
+    this.upload = multer({
+      storage: multer.memoryStorage(),
+      limits: {
+        fileSize: ImageManager.getMaxFileSize()
+      },
+      fileFilter: (req, file, cb) => {
+        const allowedMimes = ImageManager.getSupportedMimeTypes();
+        if (allowedMimes.includes(file.mimetype)) {
+          cb(null, true);
+        } else {
+          cb(new Error('Invalid file type. Supported types: PNG, JPG, JPEG, GIF, WebP'));
+        }
+      }
+    });
+    
     this.setupMiddleware();
     this.setupRoutes();
   }
@@ -47,6 +69,10 @@ export class AdminServer {
 
     // Parse URL-encoded request bodies
     this.app.use(express.urlencoded({ extended: true }));
+
+    // Serve screenshots directory for thumbnail images
+    const screenshotsPath = path.join(path.dirname(this.config.projectsFilePath), 'screenshots');
+    this.app.use('/screenshots', express.static(screenshotsPath));
 
     // Serve static files from the admin client build directory
     const clientBuildPath = path.join(__dirname, '../client');
@@ -354,6 +380,162 @@ export class AdminServer {
         console.error('Error generating preview:', error);
         res.status(500).json({
           error: 'Failed to generate preview',
+          message: error.message
+        });
+      }
+    });
+
+    // POST /api/projects/:id/thumbnail - Upload thumbnail image
+    this.app.post('/api/projects/:id/thumbnail', this.upload.single('thumbnail'), async (req: Request, res: Response) => {
+      try {
+        const projectId = req.params.id;
+        const file = req.file;
+        const isEditMode = req.query.edit === 'true'; // Check if editing existing project
+
+        if (!file) {
+          res.status(400).json({
+            success: false,
+            error: 'No file uploaded',
+            message: 'Request must include a file in the "thumbnail" field'
+          });
+          return;
+        }
+
+        let thumbnailLink: string;
+
+        if (isEditMode) {
+          // For edit mode, save as temporary file
+          thumbnailLink = await this.imageManager.saveTempImage(projectId, {
+            buffer: file.buffer,
+            mimetype: file.mimetype,
+            size: file.size
+          });
+        } else {
+          // For new projects, save directly
+          thumbnailLink = await this.imageManager.saveImage(projectId, {
+            buffer: file.buffer,
+            mimetype: file.mimetype,
+            size: file.size
+          });
+
+          // If project exists, update its thumbnailLink
+          try {
+            const projectsData = await this.fileManager.readProjects();
+            const project = projectsData.projects.find(p => p.id === projectId);
+
+            if (project) {
+              const updatedProject = { ...project, thumbnailLink };
+              await this.fileManager.updateProject(projectId, updatedProject);
+            }
+          } catch (error) {
+            // Ignore errors reading/updating project - the image is saved regardless
+            console.log('Note: Image saved but project not updated (may not exist yet)');
+          }
+        }
+
+        res.json({
+          success: true,
+          thumbnailLink,
+          isTemp: isEditMode
+        });
+      } catch (error: any) {
+        console.error('Error uploading thumbnail:', error);
+        res.status(500).json({
+          success: false,
+          error: 'Failed to upload thumbnail',
+          message: error.message
+        });
+      }
+    });
+
+    // DELETE /api/projects/:id/thumbnail - Delete thumbnail image
+    this.app.delete('/api/projects/:id/thumbnail', async (req: Request, res: Response) => {
+      try {
+        const projectId = req.params.id;
+        const isTemp = req.query.temp === 'true';
+
+        if (isTemp) {
+          // Delete temp file
+          await this.imageManager.deleteTempImage(projectId);
+        } else {
+          // Delete the image file
+          await this.imageManager.deleteImage(projectId);
+
+          // If project exists, clear its thumbnailLink
+          try {
+            const projectsData = await this.fileManager.readProjects();
+            const project = projectsData.projects.find(p => p.id === projectId);
+
+            if (project) {
+              const updatedProject = { ...project, thumbnailLink: undefined };
+              await this.fileManager.updateProject(projectId, updatedProject);
+            }
+          } catch (error) {
+            // Ignore errors reading/updating project
+            console.log('Note: Image deleted but project not updated (may not exist)');
+          }
+        }
+
+        res.json({
+          success: true
+        });
+      } catch (error: any) {
+        console.error('Error deleting thumbnail:', error);
+        res.status(500).json({
+          success: false,
+          error: 'Failed to delete thumbnail',
+          message: error.message
+        });
+      }
+    });
+
+    // POST /api/projects/:id/thumbnail/commit - Commit temporary thumbnail
+    this.app.post('/api/projects/:id/thumbnail/commit', async (req: Request, res: Response) => {
+      try {
+        const projectId = req.params.id;
+
+        // Commit the temp file (rename to final)
+        const thumbnailLink = await this.imageManager.commitTempImage(projectId);
+
+        if (!thumbnailLink) {
+          res.status(404).json({
+            success: false,
+            error: 'No temporary thumbnail found',
+            message: `No temporary thumbnail found for project: ${projectId}`
+          });
+          return;
+        }
+
+        res.json({
+          success: true,
+          thumbnailLink
+        });
+      } catch (error: any) {
+        console.error('Error committing thumbnail:', error);
+        res.status(500).json({
+          success: false,
+          error: 'Failed to commit thumbnail',
+          message: error.message
+        });
+      }
+    });
+
+    // POST /api/projects/:id/thumbnail/cancel - Cancel temporary thumbnail
+    this.app.post('/api/projects/:id/thumbnail/cancel', async (req: Request, res: Response) => {
+      try {
+        const projectId = req.params.id;
+
+        // Delete the temp file
+        await this.imageManager.deleteTempImage(projectId);
+
+        res.json({
+          success: true
+        });
+      } catch (error: any) {
+        console.error('Error canceling thumbnail:', error);
+        res.status(500).json({
+          success: false,
+          error: 'Failed to cancel thumbnail',
           message: error.message
         });
       }

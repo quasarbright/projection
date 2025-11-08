@@ -123,3 +123,77 @@ export async function generatePreview(project: Partial<Project>): Promise<string
     return handleApiError(error);
   }
 }
+
+/**
+ * Upload a thumbnail image for a project
+ */
+export async function uploadThumbnail(
+  projectId: string,
+  file: File,
+  isEditMode: boolean = false
+): Promise<{ success: boolean; thumbnailLink: string; isTemp?: boolean }> {
+  try {
+    const formData = new FormData();
+    formData.append('thumbnail', file);
+    
+    const url = isEditMode
+      ? `${API_BASE_URL}/projects/${projectId}/thumbnail?edit=true`
+      : `${API_BASE_URL}/projects/${projectId}/thumbnail`;
+    
+    const response = await axios.post<{ success: boolean; thumbnailLink: string; isTemp?: boolean }>(
+      url,
+      formData,
+      {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+        },
+      }
+    );
+    return response.data;
+  } catch (error) {
+    return handleApiError(error);
+  }
+}
+
+/**
+ * Delete a thumbnail image for a project
+ */
+export async function deleteThumbnail(projectId: string, isTemp: boolean = false): Promise<{ success: boolean }> {
+  try {
+    const url = isTemp
+      ? `/projects/${projectId}/thumbnail?temp=true`
+      : `/projects/${projectId}/thumbnail`;
+    const response = await apiClient.delete<{ success: boolean }>(url);
+    return response.data;
+  } catch (error) {
+    return handleApiError(error);
+  }
+}
+
+/**
+ * Commit a temporary thumbnail (make it permanent)
+ */
+export async function commitThumbnail(projectId: string): Promise<{ success: boolean; thumbnailLink: string }> {
+  try {
+    const response = await apiClient.post<{ success: boolean; thumbnailLink: string }>(
+      `/projects/${projectId}/thumbnail/commit`
+    );
+    return response.data;
+  } catch (error) {
+    return handleApiError(error);
+  }
+}
+
+/**
+ * Cancel a temporary thumbnail (delete it)
+ */
+export async function cancelThumbnail(projectId: string): Promise<{ success: boolean }> {
+  try {
+    const response = await apiClient.post<{ success: boolean }>(
+      `/projects/${projectId}/thumbnail/cancel`
+    );
+    return response.data;
+  } catch (error) {
+    return handleApiError(error);
+  }
+}

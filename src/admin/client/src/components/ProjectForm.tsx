@@ -3,6 +3,8 @@ import type { Project } from '../../../../types';
 import { PROJECT_ID_PATTERN } from '../../../../types/project';
 import type { ValidationError } from '../types/api';
 import { TagManager } from './TagManager';
+import { ImageUpload } from './ImageUpload';
+import { commitThumbnail, cancelThumbnail } from '../services/api';
 import './ProjectForm.css';
 
 interface ProjectFormProps {
@@ -50,6 +52,7 @@ export function ProjectForm({
   const [touched, setTouched] = useState<Record<string, boolean>>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [apiErrors, setApiErrors] = useState<ValidationError[]>([]);
+  const [uploadSuccess, setUploadSuccess] = useState(false);
 
   // Validate individual field
   const validateField = (name: keyof Project, value: any): string | undefined => {
@@ -196,6 +199,23 @@ export function ProjectForm({
     }
   };
 
+  // Handle thumbnail change
+  const handleThumbnailChange = (thumbnailLink: string | null) => {
+    setFormData((prev) => ({
+      ...prev,
+      thumbnailLink: thumbnailLink || '',
+    }));
+
+    // Show success feedback
+    setUploadSuccess(true);
+    setTimeout(() => setUploadSuccess(false), 3000);
+
+    // Clear API errors
+    if (apiErrors.length > 0) {
+      setApiErrors([]);
+    }
+  };
+
   // Handle field blur
   const handleBlur = (e: React.FocusEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name } = e.target;
@@ -229,6 +249,17 @@ export function ProjectForm({
     setApiErrors([]);
 
     try {
+      // If editing and thumbnail was uploaded as temp, commit it
+      if (isEditMode && formData.thumbnailLink && formData.thumbnailLink.includes('.temp')) {
+        try {
+          const result = await commitThumbnail(formData.id);
+          formData.thumbnailLink = result.thumbnailLink;
+        } catch (err) {
+          console.error('Failed to commit thumbnail:', err);
+          // Continue with save anyway
+        }
+      }
+
       await onSave(formData);
       // Success - parent component will handle navigation
     } catch (error: any) {
@@ -239,6 +270,20 @@ export function ProjectForm({
     } finally {
       setIsSubmitting(false);
     }
+  };
+
+  // Handle cancel
+  const handleCancel = async () => {
+    // If editing and thumbnail was uploaded as temp, cancel it
+    if (isEditMode && formData.thumbnailLink && formData.thumbnailLink.includes('.temp')) {
+      try {
+        await cancelThumbnail(formData.id);
+      } catch (err) {
+        console.error('Failed to cancel thumbnail:', err);
+        // Continue with cancel anyway
+      }
+    }
+    onCancel();
   };
 
   // Show error for a field
@@ -254,7 +299,7 @@ export function ProjectForm({
           <button
             type="button"
             className="btn-secondary"
-            onClick={onCancel}
+            onClick={handleCancel}
             disabled={isSubmitting}
           >
             Cancel
@@ -432,28 +477,22 @@ export function ProjectForm({
         </div>
 
         <div className="form-group">
-          <label htmlFor="thumbnailLink" className="form-label">
-            Thumbnail Link (Optional)
-          </label>
-          <input
-            type="text"
-            id="thumbnailLink"
-            name="thumbnailLink"
-            value={formData.thumbnailLink}
-            onChange={handleChange}
-            onBlur={handleBlur}
-            disabled={isSubmitting}
-            className={`form-input ${showError('thumbnailLink') ? 'error' : ''}`}
-            placeholder="https://example.com/image.png or /assets/image.png"
-            aria-describedby={showError('thumbnailLink') ? 'thumbnailLink-error' : undefined}
-            aria-invalid={showError('thumbnailLink')}
+          <ImageUpload
+            projectId={formData.id}
+            currentThumbnail={formData.thumbnailLink}
+            onChange={handleThumbnailChange}
+            isEditMode={isEditMode}
           />
-          {showError('thumbnailLink') && (
-            <span id="thumbnailLink-error" className="error-message" role="alert">
-              {errors.thumbnailLink}
-            </span>
+          {uploadSuccess && (
+            <div className="upload-success">
+              ✓ Thumbnail updated successfully
+            </div>
           )}
-          <span className="field-hint">Can be a URL or relative path</span>
+          {!formData.id && (
+            <div className="field-hint">
+              Image will be saved with the project ID you enter above (or a generated ID if empty)
+            </div>
+          )}
         </div>
 
         <div className="form-group">

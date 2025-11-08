@@ -402,7 +402,7 @@
   - Write tests for package scripts
   - _Requirements: 1.1_
 
-- [ ] 14. Implement image upload functionality
+- [x] 14. Implement image upload functionality
   - Add multer dependency for file uploads
   - Create ImageManager class for file operations
   - Add API endpoints for upload and delete
@@ -410,7 +410,7 @@
   - Integrate with ProjectForm
   - _Requirements: 11.1, 11.2, 11.3, 11.4, 11.5, 11.6, 11.7, 11.8_
 
-- [ ] 14.1 Create ImageManager utility
+- [x] 14.1 Create ImageManager utility
   - Write `src/admin/server/image-manager.ts`
   - Implement ensureScreenshotsDir() to create directory if needed
   - Implement saveImage() to validate, delete old, and save new image
@@ -419,7 +419,7 @@
   - Implement validateFile() for size and type checking
   - _Requirements: 11.2, 11.3, 11.4, 11.5, 11.6, 11.8_
 
-- [ ] 14.2 Add image upload API endpoint
+- [x] 14.2 Add image upload API endpoint
   - Install multer package for multipart/form-data handling
   - Configure multer with memory storage and file filters
   - Implement POST /api/projects/:id/thumbnail endpoint
@@ -429,14 +429,14 @@
   - Return success response with new thumbnailLink
   - _Requirements: 11.1, 11.2, 11.3, 11.4, 11.5, 11.8_
 
-- [ ] 14.3 Add image delete API endpoint
+- [x] 14.3 Add image delete API endpoint
   - Implement DELETE /api/projects/:id/thumbnail endpoint
   - Use ImageManager to find and delete thumbnail file
   - Clear project's thumbnailLink field
   - Return success response
   - _Requirements: 11.6_
 
-- [ ] 14.4 Create ImageUpload React component
+- [x] 14.4 Create ImageUpload React component
   - Write `src/admin/client/src/components/ImageUpload.tsx`
   - Add file input with drag-and-drop support
   - Display current thumbnail preview if exists
@@ -447,7 +447,7 @@
   - Call delete API when remove clicked
   - _Requirements: 11.1, 11.2, 11.6, 11.7, 11.8_
 
-- [ ] 14.5 Integrate ImageUpload with ProjectForm
+- [x] 14.5 Integrate ImageUpload with ProjectForm
   - Add ImageUpload component to ProjectForm
   - Pass project ID and current thumbnailLink
   - Update project state when thumbnail changes

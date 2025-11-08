@@ -25,14 +25,12 @@ function AppContent() {
   };
 
   const handleDeleteProject = async (projectId: string) => {
-    if (window.confirm('Are you sure you want to delete this project?')) {
-      try {
-        await deleteProject(projectId);
-        showSuccess('Project deleted successfully');
-      } catch (err) {
-        console.error('Failed to delete project:', err);
-        showError('Failed to delete project');
-      }
+    try {
+      await deleteProject(projectId);
+      showSuccess('Project deleted successfully');
+    } catch (err) {
+      console.error('Failed to delete project:', err);
+      showError('Failed to delete project');
     }
   };
 
