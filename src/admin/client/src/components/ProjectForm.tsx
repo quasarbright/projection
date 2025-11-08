@@ -99,9 +99,7 @@ export function ProjectForm({
         break;
 
       case 'tags':
-        if (!Array.isArray(value) || value.length === 0) {
-          return 'At least one tag is required';
-        }
+        // Tags are optional - no validation needed
         break;
 
       case 'pageLink':
@@ -511,7 +509,7 @@ export function ProjectForm({
         </div>
 
         <div className="form-group">
-          <label className="form-label required">Tags</label>
+          <label className="form-label">Tags (Optional)</label>
           <TagManager
             selectedTags={formData.tags}
             availableTags={existingTags}

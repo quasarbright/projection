@@ -432,7 +432,7 @@ interface Project {
   title: string;                 // Required: display name
   description: string;           // Required: project description
   creationDate: string;          // Required: ISO date string
-  tags: string[];               // Required: categorization tags
+  tags: string[];               // Optional: categorization tags
   pageLink: string;             // Required: primary link
   sourceLink?: string;          // Optional: source code link
   thumbnailLink?: string;       // Optional: screenshot path
