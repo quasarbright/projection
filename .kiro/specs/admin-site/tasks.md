@@ -258,7 +258,7 @@
   - Write tests for autocomplete filtering and selection
   - _Requirements: 9.3_
 
-- [ ] 9. Implement PreviewPane component
+- [x] 9. Implement PreviewPane component
   - Display live preview of project card
   - Use iframe to load server-rendered preview
   - Update preview when form data changes
@@ -266,7 +266,7 @@
   - Write tests for preview rendering and updates
   - _Requirements: 8.1, 8.2, 8.3, 8.4_
 
-- [ ] 9.1 Create PreviewPane component
+- [x] 9.1 Create PreviewPane component
   - Write `src/admin/client/src/components/PreviewPane.tsx`
   - Create iframe that loads from /api/preview endpoint
   - POST current project data to preview endpoint
@@ -274,7 +274,7 @@
   - Write tests for iframe rendering and loading states
   - _Requirements: 8.1, 8.2_
 
-- [ ] 9.2 Add real-time preview updates
+- [x] 9.2 Add real-time preview updates
   - Debounce form changes to avoid excessive API calls
   - Update iframe content when project data changes
   - Handle preview errors gracefully
