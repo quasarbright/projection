@@ -346,6 +346,188 @@ describe('HTMLBuilder', () => {
     });
   });
 
+  describe('admin mode', () => {
+    describe('constructor with adminMode option', () => {
+      it('should create HTMLBuilder with adminMode disabled by default', () => {
+        const builder = new HTMLBuilder(config);
+        const projectsData: ProjectsData = {
+          projects: [createValidProject()],
+          config: {}
+        };
+        const html = builder.generateHTML(projectsData);
+        
+        expect(html).not.toContain('admin-controls');
+        expect(html).not.toContain('admin-create');
+        expect(html).not.toContain('admin-action');
+      });
+
+      it('should create HTMLBuilder with adminMode enabled when specified', () => {
+        const builder = new HTMLBuilder(config, { adminMode: true });
+        const projectsData: ProjectsData = {
+          projects: [createValidProject()],
+          config: {}
+        };
+        const html = builder.generateHTML(projectsData);
+        
+        expect(html).toContain('admin-controls');
+        expect(html).toContain('admin-create');
+      });
+
+      it('should create HTMLBuilder with adminMode explicitly disabled', () => {
+        const builder = new HTMLBuilder(config, { adminMode: false });
+        const projectsData: ProjectsData = {
+          projects: [createValidProject()],
+          config: {}
+        };
+        const html = builder.generateHTML(projectsData);
+        
+        expect(html).not.toContain('admin-controls');
+        expect(html).not.toContain('admin-create');
+      });
+    });
+
+    describe('generateProjectCard with admin mode', () => {
+      it('should include admin controls when adminMode is true', () => {
+        const builder = new HTMLBuilder(config, { adminMode: true });
+        const project = createValidProject();
+        const html = builder.generateProjectCard(project);
+        
+        expect(html).toContain('class="admin-controls"');
+        expect(html).toContain('class="admin-btn admin-edit"');
+        expect(html).toContain('class="admin-btn admin-delete"');
+        expect(html).toContain('data-project-id="test-project"');
+        expect(html).toContain('Edit');
+        expect(html).toContain('Delete');
+      });
+
+      it('should not include admin controls when adminMode is false', () => {
+        const builder = new HTMLBuilder(config, { adminMode: false });
+        const project = createValidProject();
+        const html = builder.generateProjectCard(project);
+        
+        expect(html).not.toContain('admin-controls');
+        expect(html).not.toContain('admin-edit');
+        expect(html).not.toContain('admin-delete');
+      });
+
+      it('should include SVG icons in admin controls', () => {
+        const builder = new HTMLBuilder(config, { adminMode: true });
+        const project = createValidProject();
+        const html = builder.generateProjectCard(project);
+        
+        expect(html).toContain('<svg');
+        expect(html).toContain('viewBox="0 0 24 24"');
+      });
+    });
+
+    describe('generateHTML with admin mode', () => {
+      it('should include admin styles when adminMode is true', () => {
+        const builder = new HTMLBuilder(config, { adminMode: true });
+        const projectsData: ProjectsData = {
+          projects: [createValidProject()],
+          config: {}
+        };
+        const html = builder.generateHTML(projectsData);
+        
+        expect(html).toContain('<style>');
+        expect(html).toContain('.admin-controls');
+        expect(html).toContain('.admin-btn');
+        expect(html).toContain('rgba(255, 255, 255, 0.95)');
+      });
+
+      it('should not include admin styles when adminMode is false', () => {
+        const builder = new HTMLBuilder(config, { adminMode: false });
+        const projectsData: ProjectsData = {
+          projects: [createValidProject()],
+          config: {}
+        };
+        const html = builder.generateHTML(projectsData);
+        
+        expect(html).not.toContain('.admin-controls');
+        expect(html).not.toContain('.admin-btn');
+      });
+
+      it('should include admin script when adminMode is true', () => {
+        const builder = new HTMLBuilder(config, { adminMode: true });
+        const projectsData: ProjectsData = {
+          projects: [createValidProject()],
+          config: {}
+        };
+        const html = builder.generateHTML(projectsData);
+        
+        expect(html).toContain('window.parent.postMessage');
+        expect(html).toContain('admin-action');
+        expect(html).toContain("type: 'admin-action'");
+      });
+
+      it('should not include admin script when adminMode is false', () => {
+        const builder = new HTMLBuilder(config, { adminMode: false });
+        const projectsData: ProjectsData = {
+          projects: [createValidProject()],
+          config: {}
+        };
+        const html = builder.generateHTML(projectsData);
+        
+        expect(html).not.toContain('admin-action');
+        expect(html).not.toContain('window.parent.postMessage');
+      });
+
+      it('should include create button in header when adminMode is true', () => {
+        const builder = new HTMLBuilder(config, { adminMode: true });
+        const projectsData: ProjectsData = {
+          projects: [createValidProject()],
+          config: {}
+        };
+        const html = builder.generateHTML(projectsData);
+        
+        expect(html).toContain('class="admin-btn admin-create"');
+        expect(html).toContain('id="admin-create-btn"');
+        expect(html).toContain('Create New Project');
+      });
+
+      it('should not include create button when adminMode is false', () => {
+        const builder = new HTMLBuilder(config, { adminMode: false });
+        const projectsData: ProjectsData = {
+          projects: [createValidProject()],
+          config: {}
+        };
+        const html = builder.generateHTML(projectsData);
+        
+        expect(html).not.toContain('admin-create');
+        expect(html).not.toContain('Create New Project');
+      });
+
+      it('should include postMessage handlers for edit, delete, and create actions', () => {
+        const builder = new HTMLBuilder(config, { adminMode: true });
+        const projectsData: ProjectsData = {
+          projects: [createValidProject()],
+          config: {}
+        };
+        const html = builder.generateHTML(projectsData);
+        
+        expect(html).toContain("action: 'edit'");
+        expect(html).toContain("action: 'delete'");
+        expect(html).toContain("action: 'create'");
+        expect(html).toContain('window.location.origin');
+      });
+
+      it('should generate valid HTML structure with admin controls', () => {
+        const builder = new HTMLBuilder(config, { adminMode: true });
+        const projectsData: ProjectsData = {
+          projects: [createValidProject()],
+          config: {}
+        };
+        const html = builder.generateHTML(projectsData);
+        
+        expect(html).toContain('<!DOCTYPE html>');
+        expect(html).toContain('<html lang="en">');
+        expect(html).toContain('</html>');
+        expect(html).toContain('</head>');
+        expect(html).toContain('</body>');
+      });
+    });
+  });
+
   describe('generateHTML', () => {
     it('should generate complete HTML document', () => {
       const projectsData: ProjectsData = {
