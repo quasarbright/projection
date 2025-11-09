@@ -77,7 +77,7 @@ describe('ProjectForm', () => {
       expect(screen.getByLabelText(/Creation Date/i)).toBeInTheDocument();
       expect(screen.getByLabelText(/Page Link/i)).toBeInTheDocument();
       expect(screen.getByLabelText(/Source Link/i)).toBeInTheDocument();
-      expect(screen.getByLabelText(/Thumbnail Link/i)).toBeInTheDocument();
+      expect(screen.getByText(/^Thumbnail$/i)).toBeInTheDocument(); // ImageUpload component label
       expect(screen.getByLabelText(/Featured Project/i)).toBeInTheDocument();
     });
 

@@ -12,6 +12,7 @@ interface ProjectFormProps {
   onSave: (project: Project) => Promise<void>;
   onCancel: () => void;
   existingTags: string[];
+  tagCounts?: Record<string, number>;
   existingProjectIds?: string[];
 }
 
@@ -31,6 +32,7 @@ export function ProjectForm({
   onSave,
   onCancel,
   existingTags,
+  tagCounts = {},
   existingProjectIds = [],
 }: ProjectFormProps) {
   const isEditMode = !!project;
@@ -513,6 +515,7 @@ export function ProjectForm({
           <TagManager
             selectedTags={formData.tags}
             availableTags={existingTags}
+            tagCounts={tagCounts}
             onChange={handleTagsChange}
             disabled={isSubmitting}
           />

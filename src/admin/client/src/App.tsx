@@ -59,6 +59,10 @@ function AppContent() {
   const showForm = showNewProjectForm || editingProject !== null;
   const existingProjectIds = projects.map((p) => p.id);
   const existingTags = tags.map((t) => t.name);
+  const tagCounts = tags.reduce((acc, tag) => {
+    acc[tag.name] = tag.count;
+    return acc;
+  }, {} as Record<string, number>);
 
   return (
     <div className="app">
@@ -86,6 +90,7 @@ function AppContent() {
                 onSave={handleSaveProject}
                 onCancel={handleCancelForm}
                 existingTags={existingTags}
+                tagCounts={tagCounts}
                 existingProjectIds={existingProjectIds}
               />
             ) : (

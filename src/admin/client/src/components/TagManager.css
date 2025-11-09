@@ -96,30 +96,64 @@
   left: 0;
   right: 0;
   margin-top: 4px;
-  max-height: 200px;
+  max-height: 280px;
   overflow-y: auto;
   background-color: #2d3748;
   border: 1px solid #4a5568;
-  border-radius: 4px;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+  border-radius: 6px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
   z-index: 1000;
+  padding: 4px 0;
 }
 
 .tag-suggestion {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
   padding: 8px 12px;
   cursor: pointer;
   color: #e0e0e0;
   font-size: 14px;
-  transition: background-color 0.2s;
+  transition: background-color 0.15s ease;
+  gap: 12px;
 }
 
 .tag-suggestion:hover,
 .tag-suggestion.highlighted {
-  background-color: #4a5568;
+  background-color: #4a9eff;
+  color: #ffffff;
 }
 
 .tag-suggestion:active {
-  background-color: #4a9eff;
+  background-color: #3a8eef;
+}
+
+.tag-suggestion-name {
+  flex: 1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.tag-suggestion-count {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 24px;
+  height: 20px;
+  padding: 0 6px;
+  background-color: rgba(255, 255, 255, 0.15);
+  border-radius: 10px;
+  font-size: 12px;
+  font-weight: 600;
+  color: #e0e0e0;
+  flex-shrink: 0;
+}
+
+.tag-suggestion:hover .tag-suggestion-count,
+.tag-suggestion.highlighted .tag-suggestion-count {
+  background-color: rgba(255, 255, 255, 0.25);
+  color: #ffffff;
 }
 
 .tag-manager-hint {

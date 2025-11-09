@@ -61,7 +61,7 @@ describe('TagManager', () => {
         />
       );
 
-      expect(screen.getByText(/Press Enter to add a tag/i)).toBeInTheDocument();
+      expect(screen.getByText(/Click to see all tags/i)).toBeInTheDocument();
     });
 
     it('should not show placeholder when tags are selected', () => {
@@ -193,7 +193,27 @@ describe('TagManager', () => {
   });
 
   describe('Autocomplete', () => {
-    it('should show suggestions when typing', async () => {
+    it('should show all suggestions when focused with empty input', async () => {
+      const user = userEvent.setup();
+      render(
+        <TagManager
+          selectedTags={[]}
+          availableTags={availableTags}
+          onChange={mockOnChange}
+        />
+      );
+
+      const input = screen.getByLabelText(/Add tags/i);
+      await user.click(input);
+
+      await waitFor(() => {
+        expect(screen.getByText('nodejs')).toBeInTheDocument();
+        expect(screen.getByText('javascript')).toBeInTheDocument();
+        expect(screen.getByText('python')).toBeInTheDocument();
+      });
+    });
+
+    it('should show filtered suggestions when typing', async () => {
       const user = userEvent.setup();
       render(
         <TagManager
@@ -241,14 +261,24 @@ describe('TagManager', () => {
       );
 
       const input = screen.getByLabelText(/Add tags/i);
-      await user.type(input, 'react');
+      await user.click(input);
 
       await waitFor(() => {
-        expect(screen.queryByRole('listbox')).not.toBeInTheDocument();
+        const listbox = screen.getByRole('listbox');
+        expect(listbox).toBeInTheDocument();
+        
+        // Check that selected tags don't appear in the suggestions dropdown
+        const suggestions = screen.getAllByRole('option');
+        const suggestionTexts = suggestions.map(s => s.textContent);
+        expect(suggestionTexts).not.toContain('react');
+        expect(suggestionTexts).not.toContain('typescript');
+        
+        // But unselected tags should appear
+        expect(screen.getByText('nodejs')).toBeInTheDocument();
       });
     });
 
-    it('should prioritize tags that start with input', async () => {
+    it('should prioritize tags by similarity when typing', async () => {
       const user = userEvent.setup();
       const tags = ['javascript', 'java', 'typescript'];
       render(
@@ -256,6 +286,7 @@ describe('TagManager', () => {
           selectedTags={[]}
           availableTags={tags}
           onChange={mockOnChange}
+          tagCounts={{ java: 5, javascript: 3, typescript: 1 }}
         />
       );
 
@@ -264,8 +295,54 @@ describe('TagManager', () => {
 
       await waitFor(() => {
         const suggestions = screen.getAllByRole('option');
+        // "java" should come first (exact match/starts with)
         expect(suggestions[0]).toHaveTextContent('java');
+        // "javascript" should come second (starts with)
         expect(suggestions[1]).toHaveTextContent('javascript');
+      });
+    });
+
+    it('should show tag usage counts in suggestions', async () => {
+      const user = userEvent.setup();
+      render(
+        <TagManager
+          selectedTags={[]}
+          availableTags={availableTags}
+          onChange={mockOnChange}
+          tagCounts={{ react: 10, typescript: 5, nodejs: 3 }}
+        />
+      );
+
+      const input = screen.getByLabelText(/Add tags/i);
+      await user.click(input);
+
+      await waitFor(() => {
+        expect(screen.getByText('10')).toBeInTheDocument();
+        expect(screen.getByText('5')).toBeInTheDocument();
+        expect(screen.getByText('3')).toBeInTheDocument();
+      });
+    });
+
+    it('should sort by popularity when no search query', async () => {
+      const user = userEvent.setup();
+      render(
+        <TagManager
+          selectedTags={[]}
+          availableTags={['rust', 'python', 'nodejs']}
+          onChange={mockOnChange}
+          tagCounts={{ rust: 1, python: 10, nodejs: 5 }}
+        />
+      );
+
+      const input = screen.getByLabelText(/Add tags/i);
+      await user.click(input);
+
+      await waitFor(() => {
+        const suggestions = screen.getAllByRole('option');
+        // Should be sorted by count: python (10), nodejs (5), rust (1)
+        expect(suggestions[0]).toHaveTextContent('python');
+        expect(suggestions[1]).toHaveTextContent('nodejs');
+        expect(suggestions[2]).toHaveTextContent('rust');
       });
     });
 
@@ -381,7 +458,7 @@ describe('TagManager', () => {
       });
     });
 
-    it('should hide suggestions when input is empty', async () => {
+    it('should show all tags when input is cleared while focused', async () => {
       const user = userEvent.setup();
       render(
         <TagManager
@@ -401,7 +478,10 @@ describe('TagManager', () => {
       await user.clear(input);
 
       await waitFor(() => {
-        expect(screen.queryByRole('listbox')).not.toBeInTheDocument();
+        // Should show all tags when input is empty but still focused
+        expect(screen.getByRole('listbox')).toBeInTheDocument();
+        expect(screen.getByText('javascript')).toBeInTheDocument();
+        expect(screen.getByText('python')).toBeInTheDocument();
       });
     });
   });

@@ -4,54 +4,94 @@ import './TagManager.css';
 interface TagManagerProps {
   selectedTags: string[];
   availableTags: string[];
+  tagCounts?: Record<string, number>; // Tag usage counts for popularity sorting
   onChange: (tags: string[]) => void;
   disabled?: boolean;
+}
+
+interface TagSuggestion {
+  name: string;
+  count: number;
+  similarity: number;
 }
 
 export function TagManager({
   selectedTags,
   availableTags,
+  tagCounts = {},
   onChange,
   disabled = false,
 }: TagManagerProps) {
   const [inputValue, setInputValue] = useState('');
   const [showSuggestions, setShowSuggestions] = useState(false);
-  const [filteredSuggestions, setFilteredSuggestions] = useState<string[]>([]);
   const [highlightedIndex, setHighlightedIndex] = useState(-1);
   const inputRef = useRef<HTMLInputElement>(null);
   const suggestionsRef = useRef<HTMLDivElement>(null);
 
-  // Filter suggestions based on input
-  useEffect(() => {
-    if (inputValue.trim() === '') {
-      setFilteredSuggestions([]);
-      setShowSuggestions(false);
-      return;
+  // Calculate similarity score (0-1, higher is better)
+  const calculateSimilarity = (tag: string, query: string): number => {
+    const tagLower = tag.toLowerCase();
+    const queryLower = query.toLowerCase();
+    
+    // Exact match
+    if (tagLower === queryLower) return 1.0;
+    
+    // Starts with query
+    if (tagLower.startsWith(queryLower)) return 0.9;
+    
+    // Contains query at word boundary
+    if (tagLower.includes(' ' + queryLower) || tagLower.includes('-' + queryLower)) {
+      return 0.8;
+    }
+    
+    // Contains query anywhere
+    if (tagLower.includes(queryLower)) return 0.7;
+    
+    // Calculate Levenshtein-like similarity for fuzzy matching
+    const maxLen = Math.max(tagLower.length, queryLower.length);
+    let matches = 0;
+    for (let i = 0; i < queryLower.length; i++) {
+      if (tagLower.includes(queryLower[i])) matches++;
+    }
+    return (matches / maxLen) * 0.5;
+  };
+
+  // Compute filtered suggestions (memoized calculation, not in useEffect)
+  const getFilteredSuggestions = (): TagSuggestion[] => {
+    const input = inputValue.trim();
+    
+    // When input is empty, show all available tags sorted by popularity
+    if (input === '') {
+      return availableTags
+        .filter((tag) => !selectedTags.includes(tag))
+        .map((tag) => ({
+          name: tag,
+          count: tagCounts[tag] || 0,
+          similarity: 1.0,
+        }))
+        .sort((a, b) => b.count - a.count); // Sort by popularity
     }
 
-    const input = inputValue.toLowerCase().trim();
-    const suggestions = availableTags
-      .filter((tag) => {
-        // Don't suggest already selected tags
-        if (selectedTags.includes(tag)) {
-          return false;
-        }
-        // Match tags that start with or contain the input
-        return tag.toLowerCase().includes(input);
-      })
+    // When typing, filter and sort by similarity + popularity
+    return availableTags
+      .filter((tag) => !selectedTags.includes(tag))
+      .map((tag) => ({
+        name: tag,
+        count: tagCounts[tag] || 0,
+        similarity: calculateSimilarity(tag, input),
+      }))
+      .filter((item) => item.similarity > 0.3) // Only show reasonably similar tags
       .sort((a, b) => {
-        // Prioritize tags that start with the input
-        const aStarts = a.toLowerCase().startsWith(input);
-        const bStarts = b.toLowerCase().startsWith(input);
-        if (aStarts && !bStarts) return -1;
-        if (!aStarts && bStarts) return 1;
-        return a.localeCompare(b);
+        // Primary sort: similarity (higher first)
+        const simDiff = b.similarity - a.similarity;
+        if (Math.abs(simDiff) > 0.1) return simDiff;
+        
+        // Secondary sort: popularity (higher first)
+        return b.count - a.count;
       });
+  };
 
-    setFilteredSuggestions(suggestions);
-    setShowSuggestions(suggestions.length > 0);
-    setHighlightedIndex(-1);
-  }, [inputValue, availableTags, selectedTags]);
+  const filteredSuggestions = getFilteredSuggestions();
 
   // Handle click outside to close suggestions
   useEffect(() => {
@@ -90,7 +130,15 @@ export function TagManager({
   };
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setInputValue(e.target.value);
+    const newValue = e.target.value;
+    setInputValue(newValue);
+    
+    // Show suggestions when typing (will be computed on next render)
+    if (newValue.trim() !== '') {
+      setShowSuggestions(true);
+    }
+    
+    setHighlightedIndex(-1);
   };
 
   const handleInputKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
@@ -98,7 +146,7 @@ export function TagManager({
       e.preventDefault();
       if (highlightedIndex >= 0 && highlightedIndex < filteredSuggestions.length) {
         // Select highlighted suggestion
-        addTag(filteredSuggestions[highlightedIndex]);
+        addTag(filteredSuggestions[highlightedIndex].name);
       } else if (inputValue.trim() !== '') {
         // Add new tag
         addTag(inputValue);
@@ -124,12 +172,14 @@ export function TagManager({
     }
   };
 
-  const handleSuggestionClick = (tag: string) => {
-    addTag(tag);
+  const handleSuggestionClick = (tagName: string) => {
+    addTag(tagName);
   };
 
   const handleInputFocus = () => {
-    if (inputValue.trim() !== '' && filteredSuggestions.length > 0) {
+    // Show suggestions on focus (GitHub-style)
+    // Only show if we have suggestions to display
+    if (filteredSuggestions.length > 0) {
       setShowSuggestions(true);
     }
   };
@@ -171,7 +221,7 @@ export function TagManager({
         />
       </div>
 
-      {/* Autocomplete suggestions */}
+      {/* Autocomplete suggestions - GitHub style */}
       {showSuggestions && filteredSuggestions.length > 0 && (
         <div
           ref={suggestionsRef}
@@ -179,24 +229,34 @@ export function TagManager({
           className="tag-suggestions"
           role="listbox"
         >
-          {filteredSuggestions.map((tag, index) => (
+          {filteredSuggestions.map((suggestion, index) => (
             <div
-              key={tag}
+              key={suggestion.name}
               className={`tag-suggestion ${index === highlightedIndex ? 'highlighted' : ''}`}
-              onClick={() => handleSuggestionClick(tag)}
+              onClick={() => handleSuggestionClick(suggestion.name)}
               role="option"
               aria-selected={index === highlightedIndex}
             >
-              {tag}
+              <span className="tag-suggestion-name">{suggestion.name}</span>
+              {suggestion.count > 0 && (
+                <span className="tag-suggestion-count">{suggestion.count}</span>
+              )}
             </div>
           ))}
         </div>
       )}
 
       {/* Helper text */}
-      <div className="tag-manager-hint">
-        Press Enter to add a tag, or select from suggestions
-      </div>
+      {!showSuggestions && (
+        <div className="tag-manager-hint">
+          Click to see all tags, or type to filter
+        </div>
+      )}
+      {showSuggestions && filteredSuggestions.length === 0 && inputValue.trim() !== '' && (
+        <div className="tag-manager-hint">
+          Press Enter to create "{inputValue}"
+        </div>
+      )}
     </div>
   );
 }
