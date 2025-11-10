@@ -352,6 +352,57 @@ describe('AdminServer API Routes', () => {
     });
   });
 
+  describe('GET /api/preview', () => {
+    it('should return HTML with status 200', async () => {
+      const response = await request(server.getApp())
+        .get('/api/preview')
+        .expect(200);
+
+      expect(response.headers['content-type']).toContain('text/html');
+      expect(response.text).toContain('<!DOCTYPE html>');
+    });
+
+    it('should include admin controls in generated HTML', async () => {
+      const response = await request(server.getApp())
+        .get('/api/preview')
+        .expect(200);
+
+      expect(response.text).toContain('admin-controls');
+      expect(response.text).toContain('admin-edit');
+      expect(response.text).toContain('admin-delete');
+      expect(response.text).toContain('admin-create');
+    });
+
+    it('should set X-Frame-Options header to SAMEORIGIN', async () => {
+      const response = await request(server.getApp())
+        .get('/api/preview')
+        .expect(200);
+
+      expect(response.headers['x-frame-options']).toBe('SAMEORIGIN');
+    });
+
+    it('should include all projects in preview', async () => {
+      const response = await request(server.getApp())
+        .get('/api/preview')
+        .expect(200);
+
+      expect(response.text).toContain('Project One');
+      expect(response.text).toContain('Project Two');
+    });
+
+    it('should handle error when project data cannot be loaded', async () => {
+      // Delete the projects file to simulate error
+      fs.unlinkSync(projectsFilePath);
+
+      const response = await request(server.getApp())
+        .get('/api/preview')
+        .expect(500);
+
+      expect(response.body).toHaveProperty('error', 'Failed to generate preview');
+      expect(response.body).toHaveProperty('message');
+    });
+  });
+
   describe('POST /api/preview', () => {
     it('should generate preview HTML for a project', async () => {
       const partialProject = {

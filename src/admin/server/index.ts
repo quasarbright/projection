@@ -308,6 +308,37 @@ export class AdminServer {
       }
     });
 
+    // GET /api/preview - Generate full portfolio HTML with admin controls
+    this.app.get('/api/preview', async (req: Request, res: Response) => {
+      try {
+        // Load current project data
+        const projectsData = await this.fileManager.readProjects();
+        
+        // Load configuration
+        const config = await this.configLoader.load({
+          configPath: this.config.configFilePath
+        });
+        
+        // Instantiate HTMLBuilder with adminMode: true
+        const htmlBuilder = new HTMLBuilder(config, { adminMode: true });
+        
+        // Generate HTML
+        const html = htmlBuilder.generateHTML(projectsData);
+        
+        // Set appropriate headers
+        res.setHeader('Content-Type', 'text/html');
+        res.setHeader('X-Frame-Options', 'SAMEORIGIN'); // Allow iframe from same origin
+        
+        res.send(html);
+      } catch (error: any) {
+        console.error('Error generating preview:', error);
+        res.status(500).json({
+          error: 'Failed to generate preview',
+          message: error.message
+        });
+      }
+    });
+
     // POST /api/preview - Generate preview HTML for a project
     this.app.post('/api/preview', async (req: Request, res: Response) => {
       try {

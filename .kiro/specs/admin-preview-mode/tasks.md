@@ -11,7 +11,7 @@
   - Ensure all admin features are omitted when adminMode is false
   - _Requirements: 1.2, 2.1, 2.3, 3.1, 5.2, 5.3_
 
-- [ ] 2. Add preview endpoint to admin server
+- [x] 2. Add preview endpoint to admin server
   - Create GET /api/preview endpoint in src/admin/server/index.ts
   - Load current project data using fileManager
   - Load configuration using ConfigLoader
