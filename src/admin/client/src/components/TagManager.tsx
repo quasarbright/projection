@@ -25,8 +25,10 @@ export function TagManager({
   const [inputValue, setInputValue] = useState('');
   const [showSuggestions, setShowSuggestions] = useState(false);
   const [highlightedIndex, setHighlightedIndex] = useState(-1);
+  const [dropdownPosition, setDropdownPosition] = useState<'below' | 'above'>('below');
   const inputRef = useRef<HTMLInputElement>(null);
   const suggestionsRef = useRef<HTMLDivElement>(null);
+  const containerRef = useRef<HTMLDivElement>(null);
 
   // Calculate similarity score (0-1, higher is better)
   const calculateSimilarity = (tag: string, query: string): number => {
@@ -92,6 +94,26 @@ export function TagManager({
   };
 
   const filteredSuggestions = getFilteredSuggestions();
+
+  // Calculate dropdown position based on available space
+  useEffect(() => {
+    if (showSuggestions && containerRef.current) {
+      const container = containerRef.current;
+      const rect = container.getBoundingClientRect();
+      const viewportHeight = window.innerHeight;
+      const dropdownHeight = 280; // max-height from CSS
+      
+      const spaceBelow = viewportHeight - rect.bottom;
+      const spaceAbove = rect.top;
+      
+      // If not enough space below but more space above, flip to above
+      if (spaceBelow < dropdownHeight && spaceAbove > spaceBelow) {
+        setDropdownPosition('above');
+      } else {
+        setDropdownPosition('below');
+      }
+    }
+  }, [showSuggestions]);
 
   // Handle click outside to close suggestions
   useEffect(() => {
@@ -185,7 +207,7 @@ export function TagManager({
   };
 
   return (
-    <div className="tag-manager">
+    <div className="tag-manager" ref={containerRef}>
       <div className={`tag-input-container ${disabled ? 'disabled' : ''}`}>
         {/* Selected tags as chips */}
         {selectedTags.map((tag) => (
@@ -226,7 +248,7 @@ export function TagManager({
         <div
           ref={suggestionsRef}
           id="tag-suggestions"
-          className="tag-suggestions"
+          className={`tag-suggestions tag-suggestions-${dropdownPosition}`}
           role="listbox"
         >
           {filteredSuggestions.map((suggestion, index) => (
