@@ -2,6 +2,7 @@ import * as fs from 'fs';
 import * as path from 'path';
 import { spawn } from 'child_process';
 import { Logger } from '../utils/logger';
+import { PortFinder } from '../utils/port-finder';
 
 /**
  * Options for the serve command
@@ -19,7 +20,8 @@ export interface ServeOptions {
  * Serve command - serves the generated dist directory with a local HTTP server
  */
 export async function serve(options: ServeOptions = {}): Promise<void> {
-  const port = options.port || 8080;
+  const requestedPort = options.port || 8080;
+  const userSuppliedPort = options.port !== undefined;
   const dir = options.dir || 'dist';
   const shouldOpen = options.open || false;
   
@@ -46,9 +48,30 @@ export async function serve(options: ServeOptions = {}): Promise<void> {
     process.exit(1);
   }
 
+  // Find available port with fallback behavior
+  let port: number;
+  let portResult;
+  
+  try {
+    portResult = await PortFinder.findPortWithFallback(requestedPort, userSuppliedPort);
+    port = portResult.port;
+  } catch (error: any) {
+    Logger.newline();
+    Logger.error(error.message);
+    Logger.newline();
+    process.exit(1);
+  }
+
   Logger.newline();
   Logger.header('🚀 Starting server');
   Logger.keyValue('Serving', distPath);
+  
+  // Show port fallback message if needed
+  if (!portResult.wasRequested) {
+    Logger.newline();
+    Logger.icon('⚠️', `Port ${requestedPort} was in use, using port ${port} instead`, '\x1b[33m');
+  }
+  
   Logger.keyValue('Server URL', `http://localhost:${port}`);
   
   if (shouldOpen) {

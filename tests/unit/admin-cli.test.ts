@@ -5,8 +5,20 @@ import { admin } from '../../src/cli/admin';
 // Mock dependencies
 jest.mock('../../src/admin/server', () => ({
   startAdminServer: jest.fn().mockResolvedValue({
-    stop: jest.fn().mockResolvedValue(undefined)
+    server: {
+      stop: jest.fn().mockResolvedValue(undefined)
+    },
+    port: 3000
   })
+}));
+
+jest.mock('../../src/utils/port-finder', () => ({
+  PortFinder: {
+    findPortWithFallback: jest.fn().mockResolvedValue({
+      port: 3000,
+      wasRequested: true
+    })
+  }
 }));
 
 jest.mock('child_process', () => ({
@@ -31,6 +43,7 @@ jest.mock('../../src/utils/logger', () => ({
 import { startAdminServer } from '../../src/admin/server';
 import { spawn } from 'child_process';
 import { Logger } from '../../src/utils/logger';
+import { PortFinder } from '../../src/utils/port-finder';
 
 describe('Admin CLI Command', () => {
   let consoleLogSpy: jest.SpyInstance;
@@ -59,8 +72,14 @@ describe('Admin CLI Command', () => {
 
   describe('Server startup', () => {
     it('should start admin server with default options', async () => {
+      (PortFinder.findPortWithFallback as jest.Mock).mockResolvedValue({
+        port: 3000,
+        wasRequested: true
+      });
+
       await admin({});
 
+      expect(PortFinder.findPortWithFallback).toHaveBeenCalledWith(3000, false);
       expect(startAdminServer).toHaveBeenCalledWith(
         expect.objectContaining({
           port: 3000,
@@ -72,8 +91,14 @@ describe('Admin CLI Command', () => {
     });
 
     it('should start admin server with custom port', async () => {
+      (PortFinder.findPortWithFallback as jest.Mock).mockResolvedValue({
+        port: 3001,
+        wasRequested: true
+      });
+
       await admin({ port: 3001 });
 
+      expect(PortFinder.findPortWithFallback).toHaveBeenCalledWith(3001, true);
       expect(startAdminServer).toHaveBeenCalledWith(
         expect.objectContaining({
           port: 3001
@@ -82,8 +107,14 @@ describe('Admin CLI Command', () => {
     });
 
     it('should parse port from string', async () => {
+      (PortFinder.findPortWithFallback as jest.Mock).mockResolvedValue({
+        port: 3002,
+        wasRequested: true
+      });
+
       await admin({ port: '3002' });
 
+      expect(PortFinder.findPortWithFallback).toHaveBeenCalledWith(3002, true);
       expect(startAdminServer).toHaveBeenCalledWith(
         expect.objectContaining({
           port: 3002
@@ -225,6 +256,11 @@ describe('Admin CLI Command', () => {
     });
 
     it('should accept valid port at lower boundary', async () => {
+      (PortFinder.findPortWithFallback as jest.Mock).mockResolvedValue({
+        port: 1,
+        wasRequested: true
+      });
+
       await admin({ port: 1 });
 
       expect(startAdminServer).toHaveBeenCalledWith(
@@ -235,6 +271,11 @@ describe('Admin CLI Command', () => {
     });
 
     it('should accept valid port at upper boundary', async () => {
+      (PortFinder.findPortWithFallback as jest.Mock).mockResolvedValue({
+        port: 65535,
+        wasRequested: true
+      });
+
       await admin({ port: 65535 });
 
       expect(startAdminServer).toHaveBeenCalledWith(
@@ -248,6 +289,14 @@ describe('Admin CLI Command', () => {
   describe('Browser opening', () => {
     beforeEach(() => {
       jest.useFakeTimers();
+      (PortFinder.findPortWithFallback as jest.Mock).mockResolvedValue({
+        port: 3000,
+        wasRequested: true
+      });
+      (startAdminServer as jest.Mock).mockResolvedValue({
+        server: { stop: jest.fn() },
+        port: 3000
+      });
     });
 
     afterEach(() => {
@@ -279,6 +328,15 @@ describe('Admin CLI Command', () => {
     });
 
     it('should open browser with custom port', async () => {
+      (PortFinder.findPortWithFallback as jest.Mock).mockResolvedValue({
+        port: 4000,
+        wasRequested: true
+      });
+      (startAdminServer as jest.Mock).mockResolvedValue({
+        server: { stop: jest.fn() },
+        port: 4000
+      });
+
       await admin({ port: 4000 });
 
       jest.advanceTimersByTime(500);
@@ -319,6 +377,15 @@ describe('Admin CLI Command', () => {
 
   describe('Logging', () => {
     it('should display startup information', async () => {
+      (PortFinder.findPortWithFallback as jest.Mock).mockResolvedValue({
+        port: 3000,
+        wasRequested: true
+      });
+      (startAdminServer as jest.Mock).mockResolvedValue({
+        server: { stop: jest.fn() },
+        port: 3000
+      });
+
       await admin({});
 
       expect(Logger.header).toHaveBeenCalledWith('🚀 Starting Admin Server');
@@ -351,6 +418,44 @@ describe('Admin CLI Command', () => {
       expect(Logger.icon).not.toHaveBeenCalledWith(
         '🔗',
         'Opening browser...',
+        expect.any(String)
+      );
+    });
+
+    it('should show port fallback message when default port is in use', async () => {
+      (PortFinder.findPortWithFallback as jest.Mock).mockResolvedValue({
+        port: 3001,
+        wasRequested: false
+      });
+      (startAdminServer as jest.Mock).mockResolvedValue({
+        server: { stop: jest.fn() },
+        port: 3001
+      });
+
+      await admin({});
+
+      expect(Logger.icon).toHaveBeenCalledWith(
+        '⚠️',
+        'Port 3000 was in use, using port 3001 instead',
+        '\x1b[33m'
+      );
+      expect(Logger.keyValue).toHaveBeenCalledWith(
+        'Server URL',
+        'http://localhost:3001'
+      );
+    });
+
+    it('should not show port fallback message when requested port is available', async () => {
+      (PortFinder.findPortWithFallback as jest.Mock).mockResolvedValue({
+        port: 3000,
+        wasRequested: true
+      });
+
+      await admin({});
+
+      expect(Logger.icon).not.toHaveBeenCalledWith(
+        '⚠️',
+        expect.stringContaining('was in use'),
         expect.any(String)
       );
     });

@@ -4,6 +4,7 @@ import { startAdminServer } from '../admin/server';
 import { AdminServerConfig } from '../admin/server/types';
 import { Logger } from '../utils/logger';
 import { ProjectFileFinder } from '../utils/project-file-finder';
+import { PortFinder } from '../utils/port-finder';
 
 /**
  * Options for the admin command
@@ -55,9 +56,10 @@ export async function admin(options: AdminOptions = {}): Promise<void> {
     const cwd = process.cwd();
     
     // Parse port option (can be string or number from CLI)
-    const port = options.port ? parseInt(options.port.toString(), 10) : 3000;
+    const requestedPort = options.port ? parseInt(options.port.toString(), 10) : 3000;
+    const userSuppliedPort = options.port !== undefined;
     
-    if (isNaN(port) || port < 1 || port > 65535) {
+    if (isNaN(requestedPort) || requestedPort < 1 || requestedPort > 65535) {
       Logger.newline();
       Logger.error(`Invalid port number: ${options.port}`);
       Logger.newline();
@@ -65,6 +67,10 @@ export async function admin(options: AdminOptions = {}): Promise<void> {
       Logger.newline();
       process.exit(1);
     }
+    
+    // Find available port with fallback behavior
+    const portResult = await PortFinder.findPortWithFallback(requestedPort, userSuppliedPort);
+    const port = portResult.port;
     
     // Determine if browser should auto-open
     // Default is true unless --no-open is specified
@@ -108,6 +114,13 @@ export async function admin(options: AdminOptions = {}): Promise<void> {
     Logger.newline();
     Logger.header('🚀 Starting Admin Server');
     Logger.keyValue('Projects file', projectsFilePath);
+    
+    // Show port fallback message if needed
+    if (!portResult.wasRequested) {
+      Logger.newline();
+      Logger.icon('⚠️', `Port ${requestedPort} was in use, using port ${port} instead`, '\x1b[33m');
+    }
+    
     Logger.keyValue('Server URL', `http://localhost:${port}`);
     
     if (shouldOpen) {
@@ -119,13 +132,13 @@ export async function admin(options: AdminOptions = {}): Promise<void> {
     Logger.newline();
     
     // Start the admin server
-    await startAdminServer(serverConfig);
+    const { port: actualPort } = await startAdminServer(serverConfig);
     
     // Open browser if requested
     if (shouldOpen) {
       // Small delay to ensure server is ready
       setTimeout(() => {
-        openBrowser(`http://localhost:${port}`);
+        openBrowser(`http://localhost:${actualPort}`);
       }, 500);
     }
     

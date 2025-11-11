@@ -593,13 +593,15 @@ export class AdminServer {
 
   /**
    * Start the admin server
+   * @returns The actual port the server is listening on
    */
-  async start(): Promise<void> {
+  async start(): Promise<number> {
     return new Promise((resolve, reject) => {
       try {
         this.server = this.app.listen(this.config.port, () => {
-          console.log(`Admin server running at http://localhost:${this.config.port}`);
-          resolve();
+          const actualPort = this.server.address().port;
+          console.log(`Admin server running at http://localhost:${actualPort}`);
+          resolve(actualPort);
         });
 
         // Track connections for graceful shutdown
@@ -664,10 +666,11 @@ export class AdminServer {
 
 /**
  * Create and start an admin server with the given configuration
+ * @returns Object containing the server instance and the actual port it's running on
  */
-export async function startAdminServer(config: AdminServerConfig): Promise<AdminServer> {
+export async function startAdminServer(config: AdminServerConfig): Promise<{ server: AdminServer; port: number }> {
   const server = new AdminServer(config);
-  await server.start();
+  const actualPort = await server.start();
 
   // Handle graceful shutdown on SIGINT (Ctrl+C) and SIGTERM
   const shutdownHandler = async () => {
@@ -684,5 +687,5 @@ export async function startAdminServer(config: AdminServerConfig): Promise<Admin
   process.on('SIGINT', shutdownHandler);
   process.on('SIGTERM', shutdownHandler);
 
-  return server;
+  return { server, port: actualPort };
 }
