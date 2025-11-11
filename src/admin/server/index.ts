@@ -5,6 +5,7 @@
 import express, { Express, Request, Response } from 'express';
 import cors from 'cors';
 import path from 'path';
+import fs from 'fs';
 import multer from 'multer';
 import { AdminServerConfig } from './types';
 import { FileManager } from './file-manager';
@@ -73,6 +74,29 @@ export class AdminServer {
     // Serve screenshots directory for thumbnail images
     const screenshotsPath = path.join(path.dirname(this.config.projectsFilePath), 'screenshots');
     this.app.use('/screenshots', express.static(screenshotsPath));
+
+    // Serve template assets (CSS/JS) for preview iframe
+    // Path works for both compiled (lib/) and source (src/) directories
+    const templatePath = path.join(__dirname, '../../templates/default');
+    const stylesPath = path.join(templatePath, 'styles');
+    const scriptsPath = path.join(templatePath, 'scripts');
+    const assetsPath = path.join(templatePath, 'assets');
+    
+    // Log paths for debugging
+    console.log('Template paths:', {
+      styles: stylesPath,
+      scripts: scriptsPath,
+      assets: assetsPath,
+      exists: {
+        styles: fs.existsSync(stylesPath),
+        scripts: fs.existsSync(scriptsPath),
+        assets: fs.existsSync(assetsPath)
+      }
+    });
+    
+    this.app.use('/styles', express.static(stylesPath));
+    this.app.use('/scripts', express.static(scriptsPath));
+    this.app.use('/assets', express.static(assetsPath));
 
     // Serve static files from the admin client build directory
     const clientBuildPath = path.join(__dirname, '../client');

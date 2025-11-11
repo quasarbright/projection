@@ -511,6 +511,28 @@ describe('HTMLBuilder', () => {
         expect(html).toContain('window.location.origin');
       });
 
+      it('should include base tag when adminMode is true', () => {
+        const builder = new HTMLBuilder(config, { adminMode: true });
+        const projectsData: ProjectsData = {
+          projects: [createValidProject()],
+          config: {}
+        };
+        const html = builder.generateHTML(projectsData);
+        
+        expect(html).toContain('<base href="http://localhost:3000/">');
+      });
+
+      it('should not include base tag when adminMode is false', () => {
+        const builder = new HTMLBuilder(config, { adminMode: false });
+        const projectsData: ProjectsData = {
+          projects: [createValidProject()],
+          config: {}
+        };
+        const html = builder.generateHTML(projectsData);
+        
+        expect(html).not.toContain('<base href');
+      });
+
       it('should generate valid HTML structure with admin controls', () => {
         const builder = new HTMLBuilder(config, { adminMode: true });
         const projectsData: ProjectsData = {

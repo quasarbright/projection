@@ -20,7 +20,7 @@
   - Add error handling for data loading and HTML generation failures
   - _Requirements: 1.1, 5.4, 6.4_
 
-- [ ] 3. Update admin React app for preview mode
+- [x] 3. Update admin React app for preview mode
   - Add ViewMode type ('list' | 'form' | 'preview') to App.tsx
   - Add viewMode state and view control buttons in header
   - Create iframe component with ref for preview display
@@ -34,7 +34,7 @@
   - Update handleSaveProject() to refresh preview after successful save
   - _Requirements: 1.3, 1.4, 1.5, 3.2, 3.3, 4.1, 4.2, 4.3, 4.4, 6.2, 6.3, 6.5_
 
-- [ ] 4. Add CSS styles for preview mode
+- [x] 4. Add CSS styles for preview mode
   - Add styles for view control buttons in admin.css
   - Add styles for preview-container with full height layout
   - Add styles for preview-iframe with no border and full dimensions
@@ -42,7 +42,7 @@
   - Ensure responsive layout for preview mode
   - _Requirements: 2.2, 2.4_
 
-- [ ] 5. Update Generator class to pass through adminMode option
+- [x] 5. Update Generator class to pass through adminMode option
   - Modify Generator constructor to accept and store adminMode option
   - Update Generator.create() to accept adminMode in GeneratorOptions
   - Pass adminMode to HTMLBuilder constructor when creating instance

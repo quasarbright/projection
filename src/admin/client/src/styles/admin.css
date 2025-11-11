@@ -1195,6 +1195,78 @@ button {
 }
 
 /* ============================================
+   PREVIEW MODE STYLES
+   ============================================ */
+
+/* View control buttons */
+.view-controls {
+  display: flex;
+  gap: var(--spacing-sm);
+  align-items: center;
+}
+
+.view-controls button {
+  padding: var(--spacing-sm) var(--spacing-md);
+  background: transparent;
+  border: 2px solid var(--primary-color);
+  color: var(--primary-color);
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  transition: all var(--transition-normal);
+  font-size: 0.95rem;
+  font-weight: 500;
+}
+
+.view-controls button:hover {
+  background-color: rgba(74, 158, 255, 0.1);
+}
+
+.view-controls button.active {
+  background: var(--primary-color);
+  color: #ffffff;
+}
+
+.view-controls button.active:hover {
+  background: var(--primary-hover);
+}
+
+/* Preview container */
+.preview-container {
+  width: 100%;
+  height: calc(100vh - 140px);
+  position: relative;
+  background-color: var(--bg-surface);
+  border-radius: var(--radius-md);
+  overflow: hidden;
+  box-shadow: var(--shadow-md);
+}
+
+.preview-iframe {
+  width: 100%;
+  height: 100%;
+  border: none;
+  background: white;
+  display: block;
+}
+
+/* Responsive preview mode */
+@media (max-width: 767px) {
+  .view-controls {
+    width: 100%;
+    justify-content: stretch;
+  }
+  
+  .view-controls button {
+    flex: 1;
+  }
+  
+  .preview-container {
+    height: calc(100vh - 180px);
+    border-radius: 0;
+  }
+}
+
+/* ============================================
    COMPONENT-SPECIFIC RESPONSIVE OVERRIDES
    ============================================ */
 

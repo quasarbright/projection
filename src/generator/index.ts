@@ -23,6 +23,8 @@ export interface GeneratorOptions {
   outputDir?: string;
   /** Whether to clean output directory before build */
   clean?: boolean;
+  /** Enable admin mode with edit/delete controls (for preview only) */
+  adminMode?: boolean;
 }
 
 /**
@@ -32,21 +34,23 @@ export class Generator {
   private config: Config;
   private cwd: string;
   private outputDir: string;
+  private adminMode: boolean;
   private configLoader: ConfigLoader;
   private validator: Validator;
   private htmlBuilder: HTMLBuilder;
   private assetCopier: AssetCopier;
 
-  constructor(config: Config, cwd: string = process.cwd()) {
+  constructor(config: Config, cwd: string = process.cwd(), adminMode: boolean = false) {
     this.config = config;
     this.cwd = cwd;
+    this.adminMode = adminMode;
     this.outputDir = path.isAbsolute(config.output || 'dist')
       ? config.output || 'dist'
       : path.join(cwd, config.output || 'dist');
     
     this.configLoader = new ConfigLoader(cwd);
     this.validator = new Validator(cwd);
-    this.htmlBuilder = new HTMLBuilder(config);
+    this.htmlBuilder = new HTMLBuilder(config, { adminMode: this.adminMode });
     this.assetCopier = new AssetCopier(cwd, this.outputDir);
   }
 
@@ -67,7 +71,10 @@ export class Generator {
       config.output = options.outputDir;
     }
 
-    return new Generator(config, cwd);
+    // Pass adminMode to constructor (defaults to false for production builds)
+    const adminMode = options.adminMode || false;
+
+    return new Generator(config, cwd, adminMode);
   }
 
   /**

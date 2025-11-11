@@ -1,36 +1,143 @@
-import { useState } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { ProjectProvider, useProjects } from './context/ProjectContext';
 import { ProjectList } from './components/ProjectList';
 import { ProjectForm } from './components/ProjectForm';
 import { ErrorBoundary } from './components/ErrorBoundary';
 import { ToastProvider, useToast } from './components/ToastContainer';
 import { LoadingSpinner } from './components/LoadingSpinner';
+import { ConfirmDialog } from './components/ConfirmDialog';
 import type { Project } from '../../../types';
 import './styles/App.css';
+
+type ViewMode = 'list' | 'form' | 'preview';
+
+interface AdminActionMessage {
+  type: 'admin-action';
+  action: 'edit' | 'delete' | 'create';
+  projectId?: string;
+}
 
 function AppContent() {
   const { projects, config, loading, error, createProject, updateProject, deleteProject, tags } = useProjects();
   const { showSuccess, showError } = useToast();
-  const [showNewProjectForm, setShowNewProjectForm] = useState(false);
+  const [viewMode, setViewMode] = useState<ViewMode>('preview');
   const [editingProject, setEditingProject] = useState<Project | null>(null);
+  const [confirmDialog, setConfirmDialog] = useState<{
+    isOpen: boolean;
+    projectId: string;
+    projectTitle: string;
+  }>({ isOpen: false, projectId: '', projectTitle: '' });
+  const iframeRef = useRef<HTMLIFrameElement>(null);
+
+  // Handle postMessage events from iframe
+  useEffect(() => {
+    const handleMessage = (event: MessageEvent) => {
+      // Verify origin (same origin for security)
+      if (event.origin !== window.location.origin) {
+        console.warn('Ignored message from unexpected origin:', event.origin);
+        return;
+      }
+
+      // Validate message structure
+      if (!event.data || event.data.type !== 'admin-action') {
+        return;
+      }
+
+      const message = event.data as AdminActionMessage;
+      const { action, projectId } = message;
+
+      switch (action) {
+        case 'edit':
+          if (projectId) {
+            handleEditFromPreview(projectId);
+          }
+          break;
+        case 'delete':
+          if (projectId) {
+            handleDeleteFromPreview(projectId);
+          }
+          break;
+        case 'create':
+          handleCreateFromPreview();
+          break;
+      }
+    };
+
+    window.addEventListener('message', handleMessage);
+    return () => window.removeEventListener('message', handleMessage);
+  }, [projects]);
+
+  const handleEditFromPreview = (projectId: string) => {
+    const project = projects.find((p) => p.id === projectId);
+    if (project) {
+      setEditingProject(project);
+      setViewMode('form');
+    }
+  };
+
+  const handleDeleteFromPreview = (projectId: string) => {
+    const project = projects.find((p) => p.id === projectId);
+    if (project) {
+      setConfirmDialog({
+        isOpen: true,
+        projectId: project.id,
+        projectTitle: project.title,
+      });
+    }
+  };
+
+  const handleCreateFromPreview = () => {
+    setEditingProject(null);
+    setViewMode('form');
+  };
+
+  const handleConfirmDelete = async () => {
+    try {
+      await deleteProject(confirmDialog.projectId);
+      showSuccess('Project deleted successfully');
+      setConfirmDialog({ isOpen: false, projectId: '', projectTitle: '' });
+      refreshPreview();
+    } catch (err) {
+      console.error('Failed to delete project:', err);
+      showError('Failed to delete project');
+    }
+  };
+
+  const handleCancelDelete = () => {
+    setConfirmDialog({ isOpen: false, projectId: '', projectTitle: '' });
+  };
+
+  const refreshPreview = () => {
+    if (iframeRef.current) {
+      // Force reload by updating src
+      const currentSrc = iframeRef.current.src;
+      iframeRef.current.src = '';
+      setTimeout(() => {
+        if (iframeRef.current) {
+          iframeRef.current.src = currentSrc;
+        }
+      }, 0);
+    }
+  };
 
   const handleNewProject = () => {
-    setShowNewProjectForm(true);
     setEditingProject(null);
+    setViewMode('form');
   };
 
   const handleEditProject = (project: Project) => {
     setEditingProject(project);
-    setShowNewProjectForm(false);
+    setViewMode('form');
   };
 
   const handleDeleteProject = async (projectId: string) => {
-    try {
-      await deleteProject(projectId);
-      showSuccess('Project deleted successfully');
-    } catch (err) {
-      console.error('Failed to delete project:', err);
-      showError('Failed to delete project');
+    const project = projects.find((p) => p.id === projectId);
+    if (project) {
+      setConfirmDialog({
+        isOpen: true,
+        projectId: project.id,
+        projectTitle: project.title,
+      });
     }
   };
 
@@ -44,7 +151,8 @@ function AppContent() {
         showSuccess('Project created successfully');
       }
       setEditingProject(null);
-      setShowNewProjectForm(false);
+      setViewMode('preview');
+      refreshPreview();
     } catch (err) {
       console.error('Failed to save project:', err);
       showError('Failed to save project');
@@ -52,11 +160,10 @@ function AppContent() {
   };
 
   const handleCancelForm = () => {
-    setShowNewProjectForm(false);
     setEditingProject(null);
+    setViewMode('preview');
   };
 
-  const showForm = showNewProjectForm || editingProject !== null;
   const existingProjectIds = projects.map((p) => p.id);
   const existingTags = tags.map((t) => t.name);
   const tagCounts = tags.reduce((acc, tag) => {
@@ -68,7 +175,21 @@ function AppContent() {
     <div className="app">
       <header className="app-header">
         <h1>Projection Admin</h1>
-        {!showForm && (
+        <div className="view-controls">
+          <button
+            className={viewMode === 'preview' ? 'active' : ''}
+            onClick={() => setViewMode('preview')}
+          >
+            Preview
+          </button>
+          <button
+            className={viewMode === 'list' ? 'active' : ''}
+            onClick={() => setViewMode('list')}
+          >
+            List View
+          </button>
+        </div>
+        {viewMode !== 'form' && (
           <button className="btn-primary" onClick={handleNewProject}>
             New Project
           </button>
@@ -84,7 +205,26 @@ function AppContent() {
         )}
         {!loading && !error && (
           <div className="content">
-            {showForm ? (
+            {viewMode === 'preview' && (
+              <div className="preview-container">
+                <iframe
+                  ref={iframeRef}
+                  src="/api/preview"
+                  className="preview-iframe"
+                  title="Portfolio Preview"
+                />
+              </div>
+            )}
+
+            {viewMode === 'list' && (
+              <ProjectList
+                projects={projects}
+                onEdit={handleEditProject}
+                onDelete={handleDeleteProject}
+              />
+            )}
+
+            {viewMode === 'form' && (
               <ProjectForm
                 project={editingProject || undefined}
                 onSave={handleSaveProject}
@@ -92,12 +232,6 @@ function AppContent() {
                 existingTags={existingTags}
                 tagCounts={tagCounts}
                 existingProjectIds={existingProjectIds}
-              />
-            ) : (
-              <ProjectList
-                projects={projects}
-                onEdit={handleEditProject}
-                onDelete={handleDeleteProject}
               />
             )}
           </div>
@@ -112,6 +246,17 @@ function AppContent() {
           </a>
         )}
       </footer>
+
+      <ConfirmDialog
+        isOpen={confirmDialog.isOpen}
+        title="Delete Project"
+        message={`Are you sure you want to delete "${confirmDialog.projectTitle}"? This action cannot be undone.`}
+        confirmLabel="Delete"
+        cancelLabel="Cancel"
+        onConfirm={handleConfirmDelete}
+        onCancel={handleCancelDelete}
+        variant="danger"
+      />
     </div>
   );
 }
