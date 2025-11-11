@@ -401,6 +401,26 @@ describe('AdminServer API Routes', () => {
       expect(response.body).toHaveProperty('error', 'Failed to generate preview');
       expect(response.body).toHaveProperty('message');
     });
+
+    it('should handle error when HTML generation fails', async () => {
+      // Mock HTMLBuilder to throw an error during generation
+      const HTMLBuilder = require('../../src/generator/html-builder').HTMLBuilder;
+      const originalGenerateHTML = HTMLBuilder.prototype.generateHTML;
+      
+      HTMLBuilder.prototype.generateHTML = jest.fn(() => {
+        throw new Error('HTML generation failed');
+      });
+
+      const response = await request(server.getApp())
+        .get('/api/preview')
+        .expect(500);
+
+      expect(response.body).toHaveProperty('error', 'Failed to generate preview');
+      expect(response.body).toHaveProperty('message', 'HTML generation failed');
+
+      // Restore original method
+      HTMLBuilder.prototype.generateHTML = originalGenerateHTML;
+    });
   });
 
   describe('POST /api/preview', () => {

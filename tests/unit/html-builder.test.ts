@@ -472,7 +472,7 @@ describe('HTMLBuilder', () => {
         expect(html).not.toContain('window.parent.postMessage');
       });
 
-      it('should include create button in header when adminMode is true', () => {
+      it('should not include create button in preview (create button is in admin UI)', () => {
         const builder = new HTMLBuilder(config, { adminMode: true });
         const projectsData: ProjectsData = {
           projects: [createValidProject()],
@@ -480,9 +480,9 @@ describe('HTMLBuilder', () => {
         };
         const html = builder.generateHTML(projectsData);
         
-        expect(html).toContain('class="admin-btn admin-create"');
-        expect(html).toContain('id="admin-create-btn"');
-        expect(html).toContain('Create New Project');
+        // Create button is intentionally not in preview - it's in the admin UI
+        expect(html).not.toContain('id="admin-create-btn"');
+        expect(html).not.toContain('Create New Project');
       });
 
       it('should not include create button when adminMode is false', () => {

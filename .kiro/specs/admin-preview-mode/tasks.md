@@ -49,7 +49,7 @@
   - Ensure CLI build command never enables admin mode
   - _Requirements: 5.1, 5.4_
 
-- [ ] 6. Write tests for HTMLBuilder admin mode
+- [x] 6. Write tests for HTMLBuilder admin mode
   - Test that admin controls are injected when adminMode is true
   - Test that admin controls are omitted when adminMode is false
   - Test that admin script is included only in admin mode
@@ -58,7 +58,7 @@
   - Test that generated HTML structure is valid with admin controls
   - _Requirements: 1.2, 2.1, 3.1, 5.2, 5.3_
 
-- [ ] 7. Write tests for preview endpoint
+- [x] 7. Write tests for preview endpoint
   - Test that /api/preview returns HTML with status 200
   - Test that returned HTML includes admin controls
   - Test that X-Frame-Options header is set to SAMEORIGIN
@@ -66,7 +66,7 @@
   - Test error handling when HTML generation fails
   - _Requirements: 1.1, 5.4, 6.4_
 
-- [ ] 8. Write integration tests for admin preview flow
+- [x] 8. Write integration tests for admin preview flow
   - Test complete flow: load preview, click edit button, save changes, verify refresh
   - Test delete action from preview with confirmation
   - Test create action from preview
