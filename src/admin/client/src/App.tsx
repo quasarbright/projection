@@ -17,7 +17,7 @@ interface AdminActionMessage {
 }
 
 function AppContent() {
-  const { projects, config, loading, error, createProject, updateProject, deleteProject, tags } = useProjects();
+  const { projects, loading, error, createProject, updateProject, deleteProject, tags } = useProjects();
   const { showSuccess, showError } = useToast();
   const [viewMode, setViewMode] = useState<ViewMode>('preview');
   const [editingProject, setEditingProject] = useState<Project | null>(null);
@@ -198,15 +198,6 @@ function AppContent() {
           </div>
         )}
       </main>
-
-      <footer className="app-footer">
-        <span>{projects.length} projects</span>
-        {config && (
-          <a href={config.baseUrl} target="_blank" rel="noopener noreferrer">
-            View Portfolio Site
-          </a>
-        )}
-      </footer>
 
       <ConfirmDialog
         isOpen={confirmDialog.isOpen}

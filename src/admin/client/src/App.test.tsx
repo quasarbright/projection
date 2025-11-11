@@ -50,25 +50,6 @@ describe('App Component', () => {
     expect(screen.getByRole('button', { name: /new project/i })).toBeInTheDocument();
   });
 
-  it('should render footer with project count and portfolio link', async () => {
-    mockedApi.getProjects.mockResolvedValue({
-      projects: mockProjects,
-      config: mockConfig,
-    });
-    mockedApi.getTags.mockResolvedValue({ tags: [] });
-
-    render(<App />);
-
-    await waitFor(() => {
-      expect(screen.getByText('2 projects')).toBeInTheDocument();
-    });
-
-    const portfolioLink = screen.getByRole('link', { name: /view portfolio site/i });
-    expect(portfolioLink).toBeInTheDocument();
-    expect(portfolioLink).toHaveAttribute('href', 'https://example.com');
-    expect(portfolioLink).toHaveAttribute('target', '_blank');
-  });
-
   it('should show loading state initially', () => {
     mockedApi.getProjects.mockImplementation(
       () => new Promise(() => {}) // Never resolves

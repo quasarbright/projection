@@ -109,28 +109,6 @@
   background: white;
 }
 
-.app-footer {
-  background-color: #16213e;
-  padding: 1rem 2rem;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  border-top: 1px solid #2a3f5f;
-  font-size: 0.9rem;
-  color: #a0a0a0;
-}
-
-.app-footer a {
-  color: #4a9eff;
-  text-decoration: none;
-  transition: color 0.2s;
-}
-
-.app-footer a:hover {
-  color: #3a8eef;
-  text-decoration: underline;
-}
-
 /* Responsive design */
 @media (max-width: 767px) {
   .app-header {
@@ -151,19 +129,13 @@
   .app-main {
     padding: 1rem;
   }
-
-  .app-footer {
-    flex-direction: column;
-    gap: 0.5rem;
-    text-align: center;
-  }
 }
 
 /* Form view styling */
 .content > form {
   max-width: 1400px;
   margin: 0 auto;
-  padding: 2rem;
+  padding: 3rem 2rem 2rem 2rem;
   width: 100%;
   overflow-y: auto;
 }
