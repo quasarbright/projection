@@ -179,15 +179,18 @@ button {
 .btn-secondary {
   background-color: var(--bg-elevated);
   color: var(--primary-color);
-  border: 1px solid var(--primary-color);
+  border: 2px solid var(--primary-color);
+  padding: calc(var(--spacing-sm) - 2px) calc(var(--spacing-md) - 2px); /* Adjust for border */
 }
 
 .btn-secondary:hover:not(:disabled) {
   background-color: var(--bg-input-hover);
+  transform: translateY(-1px);
 }
 
 .btn-secondary:active:not(:disabled) {
   background-color: var(--bg-input-disabled);
+  transform: translateY(0);
 }
 
 .btn-danger {
