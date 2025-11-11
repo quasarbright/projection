@@ -116,7 +116,7 @@ export function PreviewPane({ project, debounceMs = 500 }: PreviewPaneProps) {
             ref={iframeRef}
             className="preview-iframe"
             title="Project preview"
-            sandbox="allow-same-origin"
+            sandbox="allow-same-origin allow-scripts"
             aria-label="Project card preview"
           />
         )}

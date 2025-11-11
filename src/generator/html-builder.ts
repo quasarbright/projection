@@ -143,8 +143,17 @@ export class HTMLBuilder {
     return `
   <script>
     (function() {
-      // Handle admin button clicks
+      // Disable card click navigation in admin mode
+      // Use capture phase to intercept before modal.js handler
       document.addEventListener('click', function(e) {
+        const card = e.target.closest('.project-card');
+        
+        // If clicking on a card (but not on a link or tag), stop the event
+        // This prevents modal.js from opening the project link
+        if (card && !e.target.closest('a') && !e.target.closest('.tag')) {
+          e.stopImmediatePropagation();
+        }
+        
         // Handle edit button clicks
         if (e.target.closest('.admin-edit')) {
           const projectId = e.target.closest('.admin-edit').dataset.projectId;
@@ -172,7 +181,7 @@ export class HTMLBuilder {
             action: 'create'
           }, window.location.origin);
         }
-      });
+      }, true);
     })();
   </script>`;
   }

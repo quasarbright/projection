@@ -76,27 +76,10 @@ export class AdminServer {
     this.app.use('/screenshots', express.static(screenshotsPath));
 
     // Serve template assets (CSS/JS) for preview iframe
-    // Path works for both compiled (lib/) and source (src/) directories
     const templatePath = path.join(__dirname, '../../templates/default');
-    const stylesPath = path.join(templatePath, 'styles');
-    const scriptsPath = path.join(templatePath, 'scripts');
-    const assetsPath = path.join(templatePath, 'assets');
-    
-    // Log paths for debugging
-    console.log('Template paths:', {
-      styles: stylesPath,
-      scripts: scriptsPath,
-      assets: assetsPath,
-      exists: {
-        styles: fs.existsSync(stylesPath),
-        scripts: fs.existsSync(scriptsPath),
-        assets: fs.existsSync(assetsPath)
-      }
-    });
-    
-    this.app.use('/styles', express.static(stylesPath));
-    this.app.use('/scripts', express.static(scriptsPath));
-    this.app.use('/assets', express.static(assetsPath));
+    this.app.use('/styles', express.static(path.join(templatePath, 'styles')));
+    this.app.use('/scripts', express.static(path.join(templatePath, 'scripts')));
+    this.app.use('/assets', express.static(path.join(templatePath, 'assets')));
 
     // Serve static files from the admin client build directory
     const clientBuildPath = path.join(__dirname, '../client');
