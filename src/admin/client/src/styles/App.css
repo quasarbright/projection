@@ -40,8 +40,9 @@
 
 .app-main {
   flex: 1;
-  padding: 2rem;
-  overflow-y: auto;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
 }
 
 .loading {
@@ -88,8 +89,24 @@
 }
 
 .content {
-  max-width: 1400px;
-  margin: 0 auto;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.preview-container {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.preview-iframe {
+  flex: 1;
+  width: 100%;
+  border: none;
+  background: white;
 }
 
 .app-footer {
@@ -140,4 +157,13 @@
     gap: 0.5rem;
     text-align: center;
   }
+}
+
+/* Form view styling */
+.content > form {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 2rem;
+  width: 100%;
+  overflow-y: auto;
 }

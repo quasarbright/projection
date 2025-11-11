@@ -48,19 +48,10 @@ export class HTMLBuilder {
 
   /**
    * Generates the create new project button for header
-   * Only included when adminMode is true
+   * Disabled - create button is in admin UI, not preview
    */
   private generateCreateButton(): string {
-    if (!this.adminMode) return '';
-    
-    return `
-      <button class="admin-btn admin-create" id="admin-create-btn" title="Create new project">
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-          <line x1="12" y1="5" x2="12" y2="19"></line>
-          <line x1="5" y1="12" x2="19" y2="12"></line>
-        </svg>
-        Create New Project
-      </button>`;
+    return '';
   }
 
   /**

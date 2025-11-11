@@ -1,6 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
 import { ProjectProvider, useProjects } from './context/ProjectContext';
-import { ProjectList } from './components/ProjectList';
 import { ProjectForm } from './components/ProjectForm';
 import { ErrorBoundary } from './components/ErrorBoundary';
 import { ToastProvider, useToast } from './components/ToastContainer';
@@ -9,7 +8,7 @@ import { ConfirmDialog } from './components/ConfirmDialog';
 import type { Project } from '../../../types';
 import './styles/App.css';
 
-type ViewMode = 'list' | 'form' | 'preview';
+type ViewMode = 'form' | 'preview';
 
 interface AdminActionMessage {
   type: 'admin-action';
@@ -125,22 +124,6 @@ function AppContent() {
     setViewMode('form');
   };
 
-  const handleEditProject = (project: Project) => {
-    setEditingProject(project);
-    setViewMode('form');
-  };
-
-  const handleDeleteProject = async (projectId: string) => {
-    const project = projects.find((p) => p.id === projectId);
-    if (project) {
-      setConfirmDialog({
-        isOpen: true,
-        projectId: project.id,
-        projectTitle: project.title,
-      });
-    }
-  };
-
   const handleSaveProject = async (project: Project) => {
     try {
       if (editingProject) {
@@ -175,20 +158,6 @@ function AppContent() {
     <div className="app">
       <header className="app-header">
         <h1>Projection Admin</h1>
-        <div className="view-controls">
-          <button
-            className={viewMode === 'preview' ? 'active' : ''}
-            onClick={() => setViewMode('preview')}
-          >
-            Preview
-          </button>
-          <button
-            className={viewMode === 'list' ? 'active' : ''}
-            onClick={() => setViewMode('list')}
-          >
-            List View
-          </button>
-        </div>
         {viewMode !== 'form' && (
           <button className="btn-primary" onClick={handleNewProject}>
             New Project
@@ -214,14 +183,6 @@ function AppContent() {
                   title="Portfolio Preview"
                 />
               </div>
-            )}
-
-            {viewMode === 'list' && (
-              <ProjectList
-                projects={projects}
-                onEdit={handleEditProject}
-                onDelete={handleDeleteProject}
-              />
             )}
 
             {viewMode === 'form' && (
