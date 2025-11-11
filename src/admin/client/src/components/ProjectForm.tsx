@@ -55,6 +55,18 @@ export function ProjectForm({
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [apiErrors, setApiErrors] = useState<ValidationError[]>([]);
   const [uploadSuccess, setUploadSuccess] = useState(false);
+  const [idManuallyEdited, setIdManuallyEdited] = useState<boolean>(!!project);
+
+  // Helper function to convert title to slug
+  const titleToSlug = (title: string): string => {
+    return title
+      .toLowerCase()
+      .trim()
+      .replace(/[^\w\s-]/g, '') // Remove special characters
+      .replace(/\s+/g, '-') // Replace spaces with hyphens
+      .replace(/-+/g, '-') // Replace multiple hyphens with single hyphen
+      .replace(/^-+|-+$/g, ''); // Remove leading/trailing hyphens
+  };
 
   // Validate individual field
   const validateField = (name: keyof Project, value: any): string | undefined => {
@@ -165,10 +177,25 @@ export function ProjectForm({
     const { name, value, type } = e.target;
     const checked = (e.target as HTMLInputElement).checked;
 
-    setFormData((prev) => ({
-      ...prev,
-      [name]: type === 'checkbox' ? checked : value,
-    }));
+    // If user manually edits the ID field, mark it as manually edited
+    if (name === 'id' && !isEditMode) {
+      setIdManuallyEdited(true);
+    }
+
+    // Auto-generate ID from title if ID hasn't been manually edited
+    if (name === 'title' && !isEditMode && !idManuallyEdited) {
+      const slug = titleToSlug(value);
+      setFormData((prev) => ({
+        ...prev,
+        title: value,
+        id: slug,
+      }));
+    } else {
+      setFormData((prev) => ({
+        ...prev,
+        [name]: type === 'checkbox' ? checked : value,
+      }));
+    }
 
     // Clear API errors when user starts typing
     if (apiErrors.length > 0) {
@@ -330,6 +357,30 @@ export function ProjectForm({
 
       <form id="project-form" onSubmit={handleSubmit} className="project-form">
         <div className="form-group">
+          <label htmlFor="title" className="form-label required">
+            Title
+          </label>
+          <input
+            type="text"
+            id="title"
+            name="title"
+            value={formData.title}
+            onChange={handleChange}
+            onBlur={handleBlur}
+            disabled={isSubmitting}
+            className={`form-input ${showError('title') ? 'error' : ''}`}
+            placeholder="My Awesome Project"
+            aria-describedby={showError('title') ? 'title-error' : undefined}
+            aria-invalid={showError('title')}
+          />
+          {showError('title') && (
+            <span id="title-error" className="error-message" role="alert">
+              {errors.title}
+            </span>
+          )}
+        </div>
+
+        <div className="form-group">
           <label htmlFor="id" className="form-label required">
             Project ID
           </label>
@@ -354,29 +405,8 @@ export function ProjectForm({
           {isEditMode && (
             <span className="field-hint">ID cannot be changed after creation</span>
           )}
-        </div>
-
-        <div className="form-group">
-          <label htmlFor="title" className="form-label required">
-            Title
-          </label>
-          <input
-            type="text"
-            id="title"
-            name="title"
-            value={formData.title}
-            onChange={handleChange}
-            onBlur={handleBlur}
-            disabled={isSubmitting}
-            className={`form-input ${showError('title') ? 'error' : ''}`}
-            placeholder="My Awesome Project"
-            aria-describedby={showError('title') ? 'title-error' : undefined}
-            aria-invalid={showError('title')}
-          />
-          {showError('title') && (
-            <span id="title-error" className="error-message" role="alert">
-              {errors.title}
-            </span>
+          {!isEditMode && !idManuallyEdited && (
+            <span className="field-hint">Auto-generated from title (you can edit this)</span>
           )}
         </div>
 
