@@ -1,3 +1,5 @@
+- [ ] deploy to gh pages button
+- [ ] config management in admin ui, including backgrounds
 - [ ] build system with caching?
 - [ ] make it a proper npm package that generates assets in the same format as something like react so it's re-usable
   - [ ] move this whole thing into its own repo
@@ -5,8 +7,8 @@
   - [ ] update package.json and links to the homepage and projects.yaml entry for projection
 - [ ] markdown in description
 - [ ] let dynamic background see mouse movements
-- [ ] update readme
-- [ ] admin site?
+- [ ] update readme. and shorten it.
+- [x] admin site?
 - [x] more convenient build + run script
 - [x] generalize to all projects, not just web. add other projects. blog?
 - [x] update go to project vs show modal ui/ux
