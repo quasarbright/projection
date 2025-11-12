@@ -2,6 +2,10 @@
 
 A modern, reusable static site generator that creates beautiful, interactive galleries to showcase your coding projects. Generate your portfolio site with a single command.
 
+Here is an example of a portfolio site using Projection: https://quasarbright.github.io/portfolio/
+
+And its source code: https://github.com/quasarbright/portfolio
+
 ## ✨ Features
 
 - **📦 Easy Installation** - Install globally from source
