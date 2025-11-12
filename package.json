@@ -10,7 +10,7 @@
   "author": "Mike Delmonaco",
   "license": "MIT",
   "scripts": {
-    "build": "tsc && npm run copy-templates && npm run admin:build && npm link",
+    "build": "tsc && npm run copy-templates && npm run admin:build",
     "copy-templates": "mkdir -p lib/templates && cp -r src/templates/* lib/templates/",
     "admin:build": "cd src/admin/client && npm run build",
     "admin:dev": "concurrently \"npm run admin:server:dev\" \"npm run admin:client:dev\"",
