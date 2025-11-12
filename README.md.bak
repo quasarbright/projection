@@ -8,19 +8,6 @@ And its source code: https://github.com/quasarbright/portfolio
 
 ## ✨ Features
 
-- **🖥️ Web Admin Interface** - Manage projects through an intuitive web UI with live preview
-- **📦 Easy Installation** - Install globally from source
-- **🚀 Quick Setup** - Initialize a new project in seconds
-- **📱 Responsive Design** - Works perfectly on desktop, tablet, and mobile
-- **🔍 Search & Filter** - Real-time search and tag-based filtering
-- **🌙 Dark Theme** - Modern dark color scheme
-- **⭐ Featured Projects** - Highlight your best work
-- **🏷️ Flexible Tagging** - Organize projects with tags (ANY/ALL filtering)
-- **📊 Multiple Formats** - Support for both YAML and JSON
-- **🔥 Hot Reloading** - Development server with automatic rebuild and refresh
-- **🎨 Customizable** - Override default styles and scripts
-- **🚢 GitHub Pages Deployment** - Deploy with a single command
-- **🎯 TypeScript** - Built with TypeScript for reliability
 
 ## 📋 Table of Contents
 
@@ -130,7 +117,7 @@ projection build
 
 Your site will be generated in the `dist/` directory, ready for deployment.
 
-## 🖥️ Admin Interface
+## �️️ Admin Interface
 
 Projection includes a powerful web-based admin interface that makes managing your portfolio easier than editing files directly.
 
