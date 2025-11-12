@@ -78,6 +78,10 @@ This creates:
 
 ### 2. Edit Your Projects
 
+You can use `projection admin` to run a local admin UI for managing your projects.
+
+Alternatively, you can edit the content and configuration files yourself.
+
 Edit `projects.yaml` to add your own projects:
 
 ```yaml
