@@ -29,14 +29,16 @@ describe('CLI init command', () => {
   });
 
   describe('File creation in empty directory', () => {
-    it('should create projects.yaml and projection.config.js by default', async () => {
+    it('should create projects.yaml, projection.config.js, and .gitignore by default', async () => {
       await init();
 
       const projectsPath = path.join(tempDir, 'projects.yaml');
       const configPath = path.join(tempDir, 'projection.config.js');
+      const gitignorePath = path.join(tempDir, '.gitignore');
 
       expect(fs.existsSync(projectsPath)).toBe(true);
       expect(fs.existsSync(configPath)).toBe(true);
+      expect(fs.existsSync(gitignorePath)).toBe(true);
     });
 
     it('should create valid YAML content in projects.yaml', async () => {
@@ -103,6 +105,58 @@ describe('CLI init command', () => {
       expect(parsed.projects).toHaveLength(1);
       expect(parsed.projects[0].id).toBe('my-first-project');
     });
+
+    it('should create .gitignore with correct patterns', async () => {
+      await init();
+
+      const gitignorePath = path.join(tempDir, '.gitignore');
+      const content = fs.readFileSync(gitignorePath, 'utf-8');
+
+      // Check for required patterns
+      expect(content).toContain('dist/');
+      expect(content).toContain('.backup');
+      expect(content).toContain('.DS_Store');
+    });
+
+    it('should create .gitignore that ignores output directory', async () => {
+      await init();
+
+      const gitignorePath = path.join(tempDir, '.gitignore');
+      const content = fs.readFileSync(gitignorePath, 'utf-8');
+
+      // Should ignore the default output directory
+      expect(content).toContain('dist/');
+    });
+
+    it('should create .gitignore that ignores backup files', async () => {
+      await init();
+
+      const gitignorePath = path.join(tempDir, '.gitignore');
+      const content = fs.readFileSync(gitignorePath, 'utf-8');
+
+      expect(content).toContain('.backup');
+    });
+
+    it('should create .gitignore that ignores macOS files', async () => {
+      await init();
+
+      const gitignorePath = path.join(tempDir, '.gitignore');
+      const content = fs.readFileSync(gitignorePath, 'utf-8');
+
+      expect(content).toContain('.DS_Store');
+    });
+
+    it('should create .gitignore with helpful comments', async () => {
+      await init();
+
+      const gitignorePath = path.join(tempDir, '.gitignore');
+      const content = fs.readFileSync(gitignorePath, 'utf-8');
+
+      // Should have section comments
+      expect(content).toContain('# Projection build output');
+      expect(content).toContain('# Backup files');
+      expect(content).toContain('# macOS');
+    });
   });
 
   describe('--force flag behavior', () => {
@@ -110,9 +164,11 @@ describe('CLI init command', () => {
       // Create existing files
       const projectsPath = path.join(tempDir, 'projects.yaml');
       const configPath = path.join(tempDir, 'projection.config.js');
+      const gitignorePath = path.join(tempDir, '.gitignore');
       
       fs.writeFileSync(projectsPath, 'old content');
       fs.writeFileSync(configPath, 'old config');
+      fs.writeFileSync(gitignorePath, 'old gitignore');
 
       // Run init with force
       await init({ force: true });
@@ -120,17 +176,21 @@ describe('CLI init command', () => {
       // Check files were overwritten
       const projectsContent = fs.readFileSync(projectsPath, 'utf-8');
       const configContent = fs.readFileSync(configPath, 'utf-8');
+      const gitignoreContent = fs.readFileSync(gitignorePath, 'utf-8');
 
       expect(projectsContent).not.toBe('old content');
       expect(configContent).not.toBe('old config');
+      expect(gitignoreContent).not.toBe('old gitignore');
       expect(projectsContent).toContain('config:');
       expect(configContent).toContain('module.exports');
+      expect(gitignoreContent).toContain('dist/');
     });
 
     it('should not prompt when force is true and files exist', async () => {
       // Create existing files
       fs.writeFileSync(path.join(tempDir, 'projects.yaml'), 'old content');
       fs.writeFileSync(path.join(tempDir, 'projection.config.js'), 'old config');
+      fs.writeFileSync(path.join(tempDir, '.gitignore'), 'old gitignore');
 
       // Mock console.log to check for prompts
       const consoleSpy = jest.spyOn(console, 'log');
@@ -146,6 +206,22 @@ describe('CLI init command', () => {
       expect(hasWarning).toBe(false);
 
       consoleSpy.mockRestore();
+    });
+
+    it('should overwrite .gitignore when it exists and force is true', async () => {
+      // Create existing .gitignore with custom content
+      const gitignorePath = path.join(tempDir, '.gitignore');
+      fs.writeFileSync(gitignorePath, '# Custom gitignore\ncustom-pattern/');
+
+      await init({ force: true });
+
+      const content = fs.readFileSync(gitignorePath, 'utf-8');
+      
+      // Should be overwritten with standard template
+      expect(content).not.toContain('custom-pattern/');
+      expect(content).toContain('dist/');
+      expect(content).toContain('.backup');
+      expect(content).toContain('.DS_Store');
     });
 
     it('should overwrite only projects.yaml when only it exists', async () => {

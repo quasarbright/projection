@@ -19,18 +19,22 @@ export async function init(options: InitOptions = {}): Promise<void> {
   const format = options.format || 'yaml';
   const projectsFileName = format === 'yaml' ? 'projects.yaml' : 'projects.json';
   const configFileName = 'projection.config.js';
+  const gitignoreFileName = '.gitignore';
 
   const projectsFilePath = path.join(cwd, projectsFileName);
   const configFilePath = path.join(cwd, configFileName);
+  const gitignorePath = path.join(cwd, gitignoreFileName);
 
   // Check for existing files
   const projectsExists = fs.existsSync(projectsFilePath);
   const configExists = fs.existsSync(configFilePath);
+  const gitignoreExists = fs.existsSync(gitignorePath);
 
-  if ((projectsExists || configExists) && !options.force) {
+  if ((projectsExists || configExists || gitignoreExists) && !options.force) {
     const existingFiles = [];
     if (projectsExists) existingFiles.push(projectsFileName);
     if (configExists) existingFiles.push(configFileName);
+    if (gitignoreExists) existingFiles.push(gitignoreFileName);
 
     Logger.newline();
     Logger.warn('The following files already exist:');
@@ -60,8 +64,11 @@ export async function init(options: InitOptions = {}): Promise<void> {
   // Copy config file with deployment support
   await copyConfigTemplate(templateDir, configFilePath, gitInfo);
 
+  // Create .gitignore file
+  await createGitignoreFile(cwd, gitignorePath);
+
   // Display success message with deployment instructions
-  displaySuccessMessage(projectsFileName, configFileName, gitInfo);
+  displaySuccessMessage(projectsFileName, configFileName, gitignoreFileName, gitInfo);
 }
 
 /**
@@ -194,6 +201,31 @@ async function copyConfigTemplate(
 }
 
 /**
+ * Create .gitignore file with common patterns
+ */
+async function createGitignoreFile(cwd: string, targetPath: string): Promise<void> {
+  const gitignoreContent = `# Projection build output
+dist/
+
+# Backup files
+.backup
+
+# macOS
+.DS_Store
+
+# Node modules (if using npm scripts)
+node_modules/
+
+# Editor directories
+.vscode/
+.idea/
+`;
+
+  fs.writeFileSync(targetPath, gitignoreContent, 'utf-8');
+  Logger.success('Created .gitignore');
+}
+
+/**
  * Create minimal projects content
  */
 function createMinimalProjectsContent(format: 'yaml' | 'json'): string {
@@ -297,14 +329,15 @@ function promptUser(question: string): Promise<string> {
  */
 function displaySuccessMessage(
   projectsFile: string, 
-  configFile: string, 
+  configFile: string,
+  gitignoreFile: string,
   gitInfo: GitRepositoryInfo
 ): void {
   Logger.newline();
   Logger.icon('🎉', 'Successfully initialized Projection project!', '\x1b[32m');
   Logger.newline();
   Logger.info('Created files:');
-  Logger.list([projectsFile, configFile]);
+  Logger.list([projectsFile, configFile, gitignoreFile]);
   Logger.newline();
 
   // Display Git repository information if detected
