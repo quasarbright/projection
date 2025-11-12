@@ -3,6 +3,7 @@ import { build } from './build';
 import { dev } from './dev';
 import { serve } from './serve';
 import { admin } from './admin';
+import { deploy } from './deploy';
 
 /**
  * CLI class that orchestrates command routing and argument parsing
@@ -18,7 +19,8 @@ export class CLI {
       ['build', build as (options?: any) => Promise<void>],
       ['dev', dev as (options?: any) => Promise<void>],
       ['serve', serve as (options?: any) => Promise<void>],
-      ['admin', admin as (options?: any) => Promise<void>]
+      ['admin', admin as (options?: any) => Promise<void>],
+      ['deploy', deploy as (options?: any) => Promise<void>]
     ]);
   }
 
@@ -124,6 +126,7 @@ COMMANDS:
   dev               Start development server with live reload
   serve             Serve the generated site with a local HTTP server
   admin             Start admin interface for managing projects
+  deploy            Deploy the portfolio site to GitHub Pages
 
 OPTIONS:
   -h, --help        Show this help message
@@ -158,6 +161,16 @@ COMMAND OPTIONS:
     --projects <path> Path to projects file
     --config <path> Path to config file
 
+  projection deploy [options]
+    -b, --branch <branch>   Target branch (default: gh-pages)
+    -m, --message <message> Custom commit message
+    -r, --remote <remote>   Git remote (default: origin)
+    -d, --dir <dir>         Build directory (default: dist)
+    --no-build              Skip build step
+    --dry-run               Simulate deployment without pushing
+    --force                 Force push to remote
+    --help                  Show detailed deploy help
+
 EXAMPLES:
   # Initialize a new project
   projection init
@@ -176,6 +189,21 @@ EXAMPLES:
 
   # Start admin on custom port
   projection admin --port 3001
+
+  # Deploy to GitHub Pages
+  projection deploy
+
+  # Show detailed deployment help
+  projection deploy --help
+
+  # Deploy with custom branch and message
+  projection deploy --branch main --message "Update site"
+
+  # Deploy without building (use existing dist)
+  projection deploy --no-build
+
+  # Simulate deployment (dry run)
+  projection deploy --dry-run
 
 DOCUMENTATION:
   https://github.com/quasarbright/projection

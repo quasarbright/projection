@@ -2,6 +2,8 @@ import * as fs from 'fs';
 import * as path from 'path';
 import * as readline from 'readline';
 import { Logger } from '../utils/logger';
+import { GitHelper } from '../utils/git-helper';
+import { DeploymentConfigLoader } from '../utils/deployment-config';
 
 interface InitOptions {
   force?: boolean;
@@ -49,14 +51,66 @@ export async function init(options: InitOptions = {}): Promise<void> {
   // Get template directory path
   const templateDir = getTemplateDirectory();
   
+  // Detect Git repository and extract deployment info
+  const gitInfo = await detectGitRepository(cwd);
+
   // Copy projects file
   await copyProjectsTemplate(templateDir, projectsFilePath, format, options.minimal);
 
-  // Copy config file
-  await copyConfigTemplate(templateDir, configFilePath);
+  // Copy config file with deployment support
+  await copyConfigTemplate(templateDir, configFilePath, gitInfo);
 
-  // Display success message
-  displaySuccessMessage(projectsFileName, configFileName);
+  // Display success message with deployment instructions
+  displaySuccessMessage(projectsFileName, configFileName, gitInfo);
+}
+
+/**
+ * Git repository information for deployment
+ */
+interface GitRepositoryInfo {
+  isGitRepo: boolean;
+  hasRemote: boolean;
+  repositoryUrl: string | null;
+  baseUrl: string | null;
+  repoName: string | null;
+}
+
+/**
+ * Detect Git repository and extract deployment information
+ */
+async function detectGitRepository(cwd: string): Promise<GitRepositoryInfo> {
+  const result: GitRepositoryInfo = {
+    isGitRepo: false,
+    hasRemote: false,
+    repositoryUrl: null,
+    baseUrl: null,
+    repoName: null,
+  };
+
+  // Check if Git is installed
+  const gitInstalled = await GitHelper.isGitInstalled();
+  if (!gitInstalled) {
+    return result;
+  }
+
+  // Validate repository
+  try {
+    const validation = await GitHelper.validateRepository(cwd);
+    result.isGitRepo = validation.isGitRepo;
+    result.hasRemote = validation.hasRemote;
+
+    if (validation.hasRemote && validation.remoteUrl) {
+      result.repositoryUrl = validation.remoteUrl;
+      
+      // Extract repository name and generate baseUrl
+      result.repoName = DeploymentConfigLoader.extractRepoName(validation.remoteUrl);
+      result.baseUrl = `/${result.repoName}/`;
+    }
+  } catch (error) {
+    // Silently fail - Git detection is optional during init
+  }
+
+  return result;
 }
 
 /**
@@ -114,14 +168,27 @@ async function copyProjectsTemplate(
 /**
  * Copy the config template file
  */
-async function copyConfigTemplate(templateDir: string, targetPath: string): Promise<void> {
+async function copyConfigTemplate(
+  templateDir: string, 
+  targetPath: string, 
+  gitInfo: GitRepositoryInfo
+): Promise<void> {
   const templatePath = path.join(templateDir, 'projection.config.js.template');
   
   if (!fs.existsSync(templatePath)) {
     throw new Error(`Template file not found: ${templatePath}`);
   }
 
-  const content = fs.readFileSync(templatePath, 'utf-8');
+  let content = fs.readFileSync(templatePath, 'utf-8');
+
+  // If Git repository with remote is detected, update baseUrl
+  if (gitInfo.hasRemote && gitInfo.baseUrl) {
+    content = content.replace(
+      /baseUrl:\s*"\.\/"/,
+      `baseUrl: "${gitInfo.baseUrl}"`
+    );
+  }
+
   fs.writeFileSync(targetPath, content, 'utf-8');
   Logger.success(`Created ${path.basename(targetPath)}`);
 }
@@ -228,20 +295,47 @@ function promptUser(question: string): Promise<string> {
 /**
  * Display success message with next steps
  */
-function displaySuccessMessage(projectsFile: string, configFile: string): void {
+function displaySuccessMessage(
+  projectsFile: string, 
+  configFile: string, 
+  gitInfo: GitRepositoryInfo
+): void {
   Logger.newline();
   Logger.icon('🎉', 'Successfully initialized Projection project!', '\x1b[32m');
   Logger.newline();
   Logger.info('Created files:');
   Logger.list([projectsFile, configFile]);
   Logger.newline();
+
+  // Display Git repository information if detected
+  if (gitInfo.isGitRepo && gitInfo.hasRemote) {
+    Logger.info('Git repository detected:');
+    Logger.list([
+      `Repository: ${gitInfo.repositoryUrl}`,
+      `Base URL configured: ${gitInfo.baseUrl}`
+    ]);
+    Logger.newline();
+  } else if (gitInfo.isGitRepo && !gitInfo.hasRemote) {
+    Logger.warn('Git repository detected but no remote configured.');
+    Logger.dim('Add a remote to enable GitHub Pages deployment:');
+    Logger.dim('  git remote add origin <repository-url>');
+    Logger.newline();
+  }
+
   Logger.info('Next steps:');
-  Logger.numberedList([
+  const steps = [
     `Edit ${projectsFile} to add your projects`,
     `Customize ${configFile} if needed`,
     `Run 'projection build' to generate your site`,
     `Run 'projection dev' to start development server`
-  ]);
+  ];
+
+  // Add deployment step if Git is configured
+  if (gitInfo.isGitRepo && gitInfo.hasRemote) {
+    steps.push(`Run 'projection deploy' to deploy to GitHub Pages`);
+  }
+
+  Logger.numberedList(steps);
   Logger.newline();
   Logger.dim('📚 Documentation: https://github.com/quasarbright/projection');
   Logger.newline();

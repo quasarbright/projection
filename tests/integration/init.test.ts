@@ -1,7 +1,11 @@
 import * as fs from 'fs';
 import * as path from 'path';
 import * as os from 'os';
+import { exec } from 'child_process';
+import { promisify } from 'util';
 import { init } from '../../src/cli/init';
+
+const execAsync = promisify(exec);
 
 describe('CLI init command', () => {
   let tempDir: string;
@@ -279,6 +283,81 @@ describe('CLI init command', () => {
         const date = new Date(dateMatch[1]);
         expect(date.toString()).not.toBe('Invalid Date');
       }
+    });
+  });
+
+  describe('Deployment integration', () => {
+    it('should detect Git repository and configure baseUrl', async () => {
+      // Initialize Git repository
+      await execAsync('git init', { cwd: tempDir });
+      await execAsync('git remote add origin https://github.com/testuser/test-repo.git', { cwd: tempDir });
+
+      await init();
+
+      const configPath = path.join(tempDir, 'projection.config.js');
+      const content = fs.readFileSync(configPath, 'utf-8');
+
+      // Should have baseUrl set to repository name
+      expect(content).toContain('baseUrl: "/test-repo/"');
+    });
+
+    it('should use default baseUrl when no Git remote is configured', async () => {
+      // Initialize Git repository without remote
+      await execAsync('git init', { cwd: tempDir });
+
+      await init();
+
+      const configPath = path.join(tempDir, 'projection.config.js');
+      const content = fs.readFileSync(configPath, 'utf-8');
+
+      // Should use default relative baseUrl
+      expect(content).toContain('baseUrl: "./"');
+    });
+
+    it('should use default baseUrl when not a Git repository', async () => {
+      await init();
+
+      const configPath = path.join(tempDir, 'projection.config.js');
+      const content = fs.readFileSync(configPath, 'utf-8');
+
+      // Should use default relative baseUrl
+      expect(content).toContain('baseUrl: "./"');
+    });
+
+    it('should extract repository name from HTTPS URL', async () => {
+      await execAsync('git init', { cwd: tempDir });
+      await execAsync('git remote add origin https://github.com/user/my-portfolio.git', { cwd: tempDir });
+
+      await init();
+
+      const configPath = path.join(tempDir, 'projection.config.js');
+      const content = fs.readFileSync(configPath, 'utf-8');
+
+      expect(content).toContain('baseUrl: "/my-portfolio/"');
+    });
+
+    it('should extract repository name from SSH URL', async () => {
+      await execAsync('git init', { cwd: tempDir });
+      await execAsync('git remote add origin git@github.com:user/awesome-projects.git', { cwd: tempDir });
+
+      await init();
+
+      const configPath = path.join(tempDir, 'projection.config.js');
+      const content = fs.readFileSync(configPath, 'utf-8');
+
+      expect(content).toContain('baseUrl: "/awesome-projects/"');
+    });
+
+    it('should handle repository URL without .git extension', async () => {
+      await execAsync('git init', { cwd: tempDir });
+      await execAsync('git remote add origin https://github.com/user/no-extension', { cwd: tempDir });
+
+      await init();
+
+      const configPath = path.join(tempDir, 'projection.config.js');
+      const content = fs.readFileSync(configPath, 'utf-8');
+
+      expect(content).toContain('baseUrl: "/no-extension/"');
     });
   });
 });

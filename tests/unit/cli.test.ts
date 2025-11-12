@@ -21,11 +21,16 @@ jest.mock('../../src/cli/admin', () => ({
   admin: jest.fn().mockResolvedValue(undefined)
 }));
 
+jest.mock('../../src/cli/deploy', () => ({
+  deploy: jest.fn().mockResolvedValue(undefined)
+}));
+
 import { init } from '../../src/cli/init';
 import { build } from '../../src/cli/build';
 import { dev } from '../../src/cli/dev';
 import { serve } from '../../src/cli/serve';
 import { admin } from '../../src/cli/admin';
+import { deploy } from '../../src/cli/deploy';
 
 describe('CLI', () => {
   let cli: CLI;
@@ -85,6 +90,13 @@ describe('CLI', () => {
 
       expect(admin).toHaveBeenCalledTimes(1);
       expect(admin).toHaveBeenCalledWith({});
+    });
+
+    it('should route to deploy command', async () => {
+      await cli.run(['deploy']);
+
+      expect(deploy).toHaveBeenCalledTimes(1);
+      expect(deploy).toHaveBeenCalledWith({});
     });
   });
 
@@ -167,6 +179,94 @@ describe('CLI', () => {
         config: 'custom.config.js'
       });
     });
+
+    it('should parse deploy command with branch option', async () => {
+      await cli.run(['deploy', '--branch', 'main']);
+
+      expect(deploy).toHaveBeenCalledWith({
+        branch: 'main'
+      });
+    });
+
+    it('should parse deploy command with short branch flag', async () => {
+      await cli.run(['deploy', '-b', 'gh-pages']);
+
+      expect(deploy).toHaveBeenCalledWith({
+        b: 'gh-pages'
+      });
+    });
+
+    it('should parse deploy command with message option', async () => {
+      await cli.run(['deploy', '--message', 'Update site']);
+
+      expect(deploy).toHaveBeenCalledWith({
+        message: 'Update site'
+      });
+    });
+
+    it('should parse deploy command with remote option', async () => {
+      await cli.run(['deploy', '--remote', 'upstream']);
+
+      expect(deploy).toHaveBeenCalledWith({
+        remote: 'upstream'
+      });
+    });
+
+    it('should parse deploy command with dir option', async () => {
+      await cli.run(['deploy', '--dir', 'build']);
+
+      expect(deploy).toHaveBeenCalledWith({
+        dir: 'build'
+      });
+    });
+
+    it('should parse deploy command with no-build flag', async () => {
+      await cli.run(['deploy', '--no-build']);
+
+      expect(deploy).toHaveBeenCalledWith({
+        noBuild: true
+      });
+    });
+
+    it('should parse deploy command with dry-run flag', async () => {
+      await cli.run(['deploy', '--dry-run']);
+
+      expect(deploy).toHaveBeenCalledWith({
+        dryRun: true
+      });
+    });
+
+    it('should parse deploy command with force flag', async () => {
+      await cli.run(['deploy', '--force']);
+
+      expect(deploy).toHaveBeenCalledWith({
+        force: true
+      });
+    });
+
+    it('should parse deploy command with multiple options', async () => {
+      await cli.run(['deploy', '--branch', 'main', '--message', 'Deploy v2.0', '--remote', 'origin', '--no-build']);
+
+      expect(deploy).toHaveBeenCalledWith({
+        branch: 'main',
+        message: 'Deploy v2.0',
+        remote: 'origin',
+        noBuild: true
+      });
+    });
+
+    it('should parse deploy command with all options', async () => {
+      await cli.run(['deploy', '-b', 'gh-pages', '-m', 'Update', '-r', 'upstream', '-d', 'dist', '--force', '--dry-run']);
+
+      expect(deploy).toHaveBeenCalledWith({
+        b: 'gh-pages',
+        m: 'Update',
+        r: 'upstream',
+        d: 'dist',
+        force: true,
+        dryRun: true
+      });
+    });
   });
 
   describe('Help display', () => {
@@ -183,6 +283,7 @@ describe('CLI', () => {
       expect(output).toContain('dev');
       expect(output).toContain('serve');
       expect(output).toContain('admin');
+      expect(output).toContain('deploy');
     });
 
     it('should show help with -h flag', async () => {

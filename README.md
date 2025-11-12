@@ -716,36 +716,506 @@ npm link
 
 The generated `dist/` directory contains everything needed for deployment.
 
-### GitHub Pages
+### Deploying to GitHub Pages
+
+Projection includes a built-in `deploy` command that makes deploying to GitHub Pages effortless. It automatically builds your site and publishes it to the `gh-pages` branch.
+
+#### Quick Start
 
 ```bash
-# Build your site
-projection build
-
-# Deploy to gh-pages branch
-# Option 1: Using gh-pages package
-npm install -g gh-pages
-gh-pages -d dist
-
-# Option 2: Manual deployment
-git subtree push --prefix dist origin gh-pages
+# Deploy your site in one command
+projection deploy
 ```
 
-**Configure baseUrl for GitHub Pages:**
+That's it! Your site will be built and deployed to GitHub Pages automatically.
+
+#### Prerequisites
+
+Before deploying, make sure you have:
+
+1. **Git installed** on your system
+2. **A Git repository** initialized in your project:
+   ```bash
+   git init
+   git add .
+   git commit -m "Initial commit"
+   ```
+3. **A remote repository** configured (usually on GitHub):
+   ```bash
+   git remote add origin https://github.com/username/repository-name.git
+   ```
+
+#### Step-by-Step Deployment
+
+**1. Configure your site for GitHub Pages**
+
+Add a `baseUrl` to your `projection.config.js`:
+
 ```javascript
-// projection.config.js
 module.exports = {
-  baseUrl: "https://username.github.io/repository-name/"
+  title: "My Portfolio",
+  description: "My awesome projects",
+  baseUrl: "/repository-name/",  // Important for GitHub Pages!
 };
 ```
 
-### Netlify
+The `baseUrl` should match your repository name:
+- For `https://github.com/username/my-portfolio` → use `baseUrl: "/my-portfolio/"`
+- For user/org sites (`username.github.io`) → use `baseUrl: "/"`
+
+**2. Deploy your site**
+
+```bash
+projection deploy
+```
+
+This command will:
+- ✅ Validate your Git setup
+- ✅ Build your site with the correct base URL
+- ✅ Create/update the `gh-pages` branch
+- ✅ Push your site to GitHub
+- ✅ Display your GitHub Pages URL
+
+**3. Enable GitHub Pages (first time only)**
+
+After your first deployment:
+
+1. Go to your repository on GitHub
+2. Click **Settings** → **Pages**
+3. Under **Source**, select:
+   - Branch: `gh-pages`
+   - Folder: `/ (root)`
+4. Click **Save**
+
+Your site will be live at `https://username.github.io/repository-name/` within a few minutes!
+
+#### Configuration Options
+
+##### In projection.config.js
+
+```javascript
+module.exports = {
+  // Required for GitHub Pages
+  baseUrl: "/repository-name/",
+  
+  // Optional: Custom domain (creates CNAME file)
+  homepage: "portfolio.example.com",
+  
+  // Optional: Custom deployment branch
+  deployBranch: "gh-pages",
+};
+```
+
+##### Command-Line Options
+
+```bash
+# Deploy to a custom branch
+projection deploy --branch main
+
+# Custom commit message
+projection deploy --message "Update portfolio with new projects"
+
+# Use a different Git remote
+projection deploy --remote upstream
+
+# Skip the build step (use existing dist/)
+projection deploy --no-build
+
+# Deploy from a custom directory
+projection deploy --dir build
+
+# Simulate deployment without pushing
+projection deploy --dry-run
+
+# Force push (overwrites remote history)
+projection deploy --force
+```
+
+#### Examples for Different Repository Types
+
+##### Example 1: Project Repository (most common)
+
+**Repository:** `https://github.com/username/my-portfolio`
+
+**Configuration:**
+```javascript
+// projection.config.js
+module.exports = {
+  title: "My Portfolio",
+  baseUrl: "/my-portfolio/",
+};
+```
+
+**Deploy:**
+```bash
+projection deploy
+```
+
+**Result:** Site live at `https://username.github.io/my-portfolio/`
+
+##### Example 2: User/Organization Site
+
+**Repository:** `https://github.com/username/username.github.io`
+
+**Configuration:**
+```javascript
+// projection.config.js
+module.exports = {
+  title: "My Portfolio",
+  baseUrl: "/",  // Root path for user sites
+};
+```
+
+**Deploy:**
+```bash
+projection deploy
+```
+
+**Result:** Site live at `https://username.github.io/`
+
+##### Example 3: Custom Domain
+
+**Repository:** `https://github.com/username/portfolio`
+
+**Configuration:**
+```javascript
+// projection.config.js
+module.exports = {
+  title: "My Portfolio",
+  baseUrl: "/",  // Root path for custom domains
+  homepage: "portfolio.example.com",  // Creates CNAME file
+};
+```
+
+**Deploy:**
+```bash
+projection deploy
+```
+
+**DNS Setup (required for custom domains):**
+1. Add a CNAME record pointing to `username.github.io`
+2. Or add A records pointing to GitHub's IPs:
+   - `185.199.108.153`
+   - `185.199.109.153`
+   - `185.199.110.153`
+   - `185.199.111.153`
+
+**Result:** Site live at `https://portfolio.example.com/`
+
+##### Example 4: Deploy to Different Branch
+
+```bash
+# Deploy to 'main' branch instead of 'gh-pages'
+projection deploy --branch main
+```
+
+Then configure GitHub Pages to use the `main` branch.
+
+#### Troubleshooting Deployment
+
+##### "Git is not installed"
+
+**Problem:** Git is not found on your system.
+
+**Solution:**
+```bash
+# Install Git
+# macOS (with Homebrew):
+brew install git
+
+# Windows: Download from https://git-scm.com/
+# Linux (Ubuntu/Debian):
+sudo apt-get install git
+```
+
+##### "Not a git repository"
+
+**Problem:** Your project is not a Git repository.
+
+**Solution:**
+```bash
+# Initialize Git repository
+git init
+git add .
+git commit -m "Initial commit"
+```
+
+##### "No git remote found"
+
+**Problem:** No remote repository is configured.
+
+**Solution:**
+```bash
+# Add a remote (replace with your repository URL)
+git remote add origin https://github.com/username/repository-name.git
+
+# Verify remote was added
+git remote -v
+```
+
+##### "Authentication failed"
+
+**Problem:** Git cannot authenticate with GitHub.
+
+**Solution:**
+
+**Option 1: Use SSH (recommended)**
+```bash
+# Generate SSH key (if you don't have one)
+ssh-keygen -t ed25519 -C "your_email@example.com"
+
+# Add SSH key to ssh-agent
+eval "$(ssh-agent -s)"
+ssh-add ~/.ssh/id_ed25519
+
+# Add public key to GitHub:
+# 1. Copy your public key:
+cat ~/.ssh/id_ed25519.pub
+# 2. Go to GitHub → Settings → SSH and GPG keys → New SSH key
+# 3. Paste your key and save
+
+# Update remote to use SSH
+git remote set-url origin git@github.com:username/repository-name.git
+```
+
+**Option 2: Use Personal Access Token**
+```bash
+# 1. Create a token on GitHub:
+#    Settings → Developer settings → Personal access tokens → Generate new token
+#    Select 'repo' scope
+
+# 2. Use token as password when prompted, or configure credential helper:
+git config --global credential.helper store
+
+# 3. Next time you push, enter your token as the password
+```
+
+##### "Failed to push to remote"
+
+**Problem:** Push was rejected due to conflicts or permissions.
+
+**Solution:**
+
+**If there are conflicts:**
+```bash
+# Force push (caution: overwrites remote)
+projection deploy --force
+```
+
+**If you don't have permissions:**
+- Verify you have write access to the repository
+- Check that you're pushing to the correct remote
+- Ensure your authentication is working
+
+##### "Site not updating after deployment"
+
+**Problem:** GitHub Pages shows old content after deployment.
+
+**Solution:**
+1. **Wait a few minutes** - GitHub Pages can take 1-10 minutes to update
+2. **Check GitHub Actions** - Go to your repository → Actions tab to see build status
+3. **Hard refresh browser** - Press Ctrl+Shift+R (or Cmd+Shift+R on Mac)
+4. **Verify gh-pages branch** - Check that the branch has your latest changes
+5. **Check GitHub Pages settings** - Ensure it's configured to use the `gh-pages` branch
+
+##### "404 errors for assets (CSS, images)"
+
+**Problem:** Your site loads but CSS and images are broken.
+
+**Solution:** Check your `baseUrl` configuration:
+
+```javascript
+// ❌ Wrong - missing trailing slash
+baseUrl: "/my-portfolio"
+
+// ✅ Correct - includes trailing slash
+baseUrl: "/my-portfolio/"
+
+// ❌ Wrong - for project sites
+baseUrl: "/"
+
+// ✅ Correct - for project sites
+baseUrl: "/repository-name/"
+```
+
+After fixing, redeploy:
+```bash
+projection deploy
+```
+
+##### "Custom domain not working"
+
+**Problem:** Custom domain shows 404 or doesn't resolve.
+
+**Solution:**
+
+1. **Verify CNAME file exists:**
+   ```bash
+   # Check gh-pages branch for CNAME file
+   git checkout gh-pages
+   cat CNAME  # Should contain your domain
+   git checkout main
+   ```
+
+2. **Check DNS configuration:**
+   - CNAME record should point to `username.github.io`
+   - DNS changes can take up to 48 hours to propagate
+   - Use `dig portfolio.example.com` to verify DNS
+
+3. **Configure in GitHub:**
+   - Go to Settings → Pages
+   - Enter your custom domain
+   - Enable "Enforce HTTPS" (after DNS propagates)
+
+4. **Update your config:**
+   ```javascript
+   module.exports = {
+     baseUrl: "/",  // Root for custom domains
+     homepage: "portfolio.example.com",
+   };
+   ```
+
+##### "Build fails during deployment"
+
+**Problem:** The build step fails before deployment.
+
+**Solution:**
+```bash
+# Test build locally first
+projection build
+
+# Check for errors in your projects.yaml
+# Common issues:
+# - Invalid project IDs
+# - Missing required fields
+# - Invalid date formats
+
+# If build works locally, try:
+projection deploy --clean
+```
+
+##### "Permission denied (publickey)"
+
+**Problem:** SSH authentication is failing.
+
+**Solution:**
+```bash
+# Test SSH connection
+ssh -T git@github.com
+
+# If it fails, check your SSH key:
+ls -la ~/.ssh
+
+# Add your SSH key to the agent
+ssh-add ~/.ssh/id_ed25519
+
+# Or use HTTPS instead of SSH
+git remote set-url origin https://github.com/username/repository-name.git
+```
+
+#### Advanced Deployment Workflows
+
+##### Automated Deployment with GitHub Actions
+
+Create `.github/workflows/deploy.yml`:
+
+```yaml
+name: Deploy to GitHub Pages
+
+on:
+  push:
+    branches: [ main ]
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - uses: actions/checkout@v3
+    
+    - name: Setup Node.js
+      uses: actions/setup-node@v3
+      with:
+        node-version: '18'
+    
+    - name: Install Projection
+      run: |
+        git clone https://github.com/quasarbright/projection.git
+        cd projection
+        npm install
+        npm run build
+        npm link
+        cd ..
+    
+    - name: Deploy
+      run: projection deploy --message "Deploy from GitHub Actions"
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+```
+
+##### Deploy from a Monorepo
+
+```bash
+# If your portfolio is in a subdirectory
+cd portfolio/
+projection deploy
+
+# Or specify the directory
+projection deploy --dir ../portfolio/dist
+```
+
+##### Preview Deployments
+
+```bash
+# Deploy to a preview branch
+projection deploy --branch preview
+
+# View at: https://username.github.io/repository-name/ (configure Pages to use preview branch)
+```
+
+#### Best Practices
+
+1. **Always commit your changes first:**
+   ```bash
+   git add .
+   git commit -m "Update projects"
+   projection deploy
+   ```
+
+2. **Test locally before deploying:**
+   ```bash
+   projection dev  # Test in development
+   projection build  # Test production build
+   projection serve  # Serve production build locally
+   projection deploy  # Deploy when ready
+   ```
+
+3. **Use meaningful commit messages:**
+   ```bash
+   projection deploy --message "Add new machine learning projects"
+   ```
+
+4. **Keep your baseUrl in sync:**
+   - If you rename your repository, update `baseUrl` in your config
+   - Redeploy after changing `baseUrl`
+
+5. **Don't commit dist/ to main branch:**
+   - Add `dist/` to `.gitignore` on your main branch
+   - The deploy command handles the gh-pages branch separately
+
+6. **Use SSH for authentication:**
+   - More secure than HTTPS with tokens
+   - No need to enter credentials repeatedly
+
+### Other Deployment Options
+
+#### Netlify
 
 1. Build your site: `projection build`
 2. Drag and drop the `dist/` folder to Netlify
 3. Or connect your Git repository with build command: `projection build`
 
-### Vercel
+#### Vercel
 
 ```bash
 # Install Vercel CLI
@@ -763,7 +1233,7 @@ vercel --prod
 }
 ```
 
-### Static Hosting
+#### Static Hosting
 
 Upload the contents of `dist/` to any static hosting service:
 - AWS S3 + CloudFront
