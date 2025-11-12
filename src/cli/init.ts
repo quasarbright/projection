@@ -20,21 +20,25 @@ export async function init(options: InitOptions = {}): Promise<void> {
   const projectsFileName = format === 'yaml' ? 'projects.yaml' : 'projects.json';
   const configFileName = 'projection.config.js';
   const gitignoreFileName = '.gitignore';
+  const readmeFileName = 'README.md';
 
   const projectsFilePath = path.join(cwd, projectsFileName);
   const configFilePath = path.join(cwd, configFileName);
   const gitignorePath = path.join(cwd, gitignoreFileName);
+  const readmePath = path.join(cwd, readmeFileName);
 
   // Check for existing files
   const projectsExists = fs.existsSync(projectsFilePath);
   const configExists = fs.existsSync(configFilePath);
   const gitignoreExists = fs.existsSync(gitignorePath);
+  const readmeExists = fs.existsSync(readmePath);
 
-  if ((projectsExists || configExists || gitignoreExists) && !options.force) {
+  if ((projectsExists || configExists || gitignoreExists || readmeExists) && !options.force) {
     const existingFiles = [];
     if (projectsExists) existingFiles.push(projectsFileName);
     if (configExists) existingFiles.push(configFileName);
     if (gitignoreExists) existingFiles.push(gitignoreFileName);
+    if (readmeExists) existingFiles.push(readmeFileName);
 
     Logger.newline();
     Logger.warn('The following files already exist:');
@@ -67,8 +71,11 @@ export async function init(options: InitOptions = {}): Promise<void> {
   // Create .gitignore file
   await createGitignoreFile(cwd, gitignorePath);
 
+  // Create README.md file
+  await createReadmeFile(templateDir, readmePath);
+
   // Display success message with deployment instructions
-  displaySuccessMessage(projectsFileName, configFileName, gitignoreFileName, gitInfo);
+  displaySuccessMessage(projectsFileName, configFileName, gitignoreFileName, readmeFileName, gitInfo);
 }
 
 /**
@@ -226,6 +233,21 @@ node_modules/
 }
 
 /**
+ * Create README.md file from template
+ */
+async function createReadmeFile(templateDir: string, targetPath: string): Promise<void> {
+  const templatePath = path.join(templateDir, 'README.md.template');
+  
+  if (!fs.existsSync(templatePath)) {
+    throw new Error(`Template file not found: ${templatePath}`);
+  }
+
+  const content = fs.readFileSync(templatePath, 'utf-8');
+  fs.writeFileSync(targetPath, content, 'utf-8');
+  Logger.success('Created README.md');
+}
+
+/**
  * Create minimal projects content
  */
 function createMinimalProjectsContent(format: 'yaml' | 'json'): string {
@@ -331,13 +353,14 @@ function displaySuccessMessage(
   projectsFile: string, 
   configFile: string,
   gitignoreFile: string,
+  readmeFile: string,
   gitInfo: GitRepositoryInfo
 ): void {
   Logger.newline();
   Logger.icon('🎉', 'Successfully initialized Projection project!', '\x1b[32m');
   Logger.newline();
   Logger.info('Created files:');
-  Logger.list([projectsFile, configFile, gitignoreFile]);
+  Logger.list([projectsFile, configFile, gitignoreFile, readmeFile]);
   Logger.newline();
 
   // Display Git repository information if detected

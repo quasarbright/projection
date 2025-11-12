@@ -29,16 +29,18 @@ describe('CLI init command', () => {
   });
 
   describe('File creation in empty directory', () => {
-    it('should create projects.yaml, projection.config.js, and .gitignore by default', async () => {
+    it('should create projects.yaml, projection.config.js, .gitignore, and README.md by default', async () => {
       await init();
 
       const projectsPath = path.join(tempDir, 'projects.yaml');
       const configPath = path.join(tempDir, 'projection.config.js');
       const gitignorePath = path.join(tempDir, '.gitignore');
+      const readmePath = path.join(tempDir, 'README.md');
 
       expect(fs.existsSync(projectsPath)).toBe(true);
       expect(fs.existsSync(configPath)).toBe(true);
       expect(fs.existsSync(gitignorePath)).toBe(true);
+      expect(fs.existsSync(readmePath)).toBe(true);
     });
 
     it('should create valid YAML content in projects.yaml', async () => {
@@ -157,6 +159,40 @@ describe('CLI init command', () => {
       expect(content).toContain('# Backup files');
       expect(content).toContain('# macOS');
     });
+
+    it('should create README.md with getting started content', async () => {
+      await init();
+
+      const readmePath = path.join(tempDir, 'README.md');
+      const content = fs.readFileSync(readmePath, 'utf-8');
+
+      // Should have key sections
+      expect(content).toContain('# My Portfolio');
+      expect(content).toContain('## Quick Start');
+      expect(content).toContain('## Project Structure');
+    });
+
+    it('should create README.md with command examples', async () => {
+      await init();
+
+      const readmePath = path.join(tempDir, 'README.md');
+      const content = fs.readFileSync(readmePath, 'utf-8');
+
+      // Should include common commands
+      expect(content).toContain('projection dev');
+      expect(content).toContain('projection build');
+      expect(content).toContain('projection deploy');
+    });
+
+    it('should create README.md with documentation links', async () => {
+      await init();
+
+      const readmePath = path.join(tempDir, 'README.md');
+      const content = fs.readFileSync(readmePath, 'utf-8');
+
+      // Should link to main documentation
+      expect(content).toContain('https://github.com/quasarbright/projection');
+    });
   });
 
   describe('--force flag behavior', () => {
@@ -165,10 +201,12 @@ describe('CLI init command', () => {
       const projectsPath = path.join(tempDir, 'projects.yaml');
       const configPath = path.join(tempDir, 'projection.config.js');
       const gitignorePath = path.join(tempDir, '.gitignore');
+      const readmePath = path.join(tempDir, 'README.md');
       
       fs.writeFileSync(projectsPath, 'old content');
       fs.writeFileSync(configPath, 'old config');
       fs.writeFileSync(gitignorePath, 'old gitignore');
+      fs.writeFileSync(readmePath, 'old readme');
 
       // Run init with force
       await init({ force: true });
@@ -177,13 +215,16 @@ describe('CLI init command', () => {
       const projectsContent = fs.readFileSync(projectsPath, 'utf-8');
       const configContent = fs.readFileSync(configPath, 'utf-8');
       const gitignoreContent = fs.readFileSync(gitignorePath, 'utf-8');
+      const readmeContent = fs.readFileSync(readmePath, 'utf-8');
 
       expect(projectsContent).not.toBe('old content');
       expect(configContent).not.toBe('old config');
       expect(gitignoreContent).not.toBe('old gitignore');
+      expect(readmeContent).not.toBe('old readme');
       expect(projectsContent).toContain('config:');
       expect(configContent).toContain('module.exports');
       expect(gitignoreContent).toContain('dist/');
+      expect(readmeContent).toContain('# My Portfolio');
     });
 
     it('should not prompt when force is true and files exist', async () => {
@@ -191,6 +232,7 @@ describe('CLI init command', () => {
       fs.writeFileSync(path.join(tempDir, 'projects.yaml'), 'old content');
       fs.writeFileSync(path.join(tempDir, 'projection.config.js'), 'old config');
       fs.writeFileSync(path.join(tempDir, '.gitignore'), 'old gitignore');
+      fs.writeFileSync(path.join(tempDir, 'README.md'), 'old readme');
 
       // Mock console.log to check for prompts
       const consoleSpy = jest.spyOn(console, 'log');
@@ -222,6 +264,21 @@ describe('CLI init command', () => {
       expect(content).toContain('dist/');
       expect(content).toContain('.backup');
       expect(content).toContain('.DS_Store');
+    });
+
+    it('should overwrite README.md when it exists and force is true', async () => {
+      // Create existing README with custom content
+      const readmePath = path.join(tempDir, 'README.md');
+      fs.writeFileSync(readmePath, '# Custom README\nCustom content here');
+
+      await init({ force: true });
+
+      const content = fs.readFileSync(readmePath, 'utf-8');
+      
+      // Should be overwritten with standard template
+      expect(content).not.toContain('Custom content here');
+      expect(content).toContain('# My Portfolio');
+      expect(content).toContain('## Quick Start');
     });
 
     it('should overwrite only projects.yaml when only it exists', async () => {

@@ -1,0 +1,39 @@
+# My Portfolio
+
+A portfolio site built with [Projection](https://github.com/quasarbright/projection) - a static site generator for showcasing coding projects.
+
+## Quick Start
+
+```bash
+# Open admin mode for a content management UI
+projection admin
+
+# Start development server with live reload
+projection dev
+
+# Build for production
+projection build
+
+# Deploy to GitHub Pages
+projection deploy
+```
+
+## Project Structure
+
+```
+.
+├── projects.yaml              # Your project data
+├── projection.config.js       # Site configuration
+├── dist/                      # Generated site (gitignored)
+├── screenshots/               # Project thumbnails (optional)
+└── README.md                  # This file
+```
+
+## Need Help?
+
+- Check the [projection documentation](https://github.com/quasarbright/projection)
+- Open an [issue](https://github.com/quasarbright/projection/issues)
+
+---
+
+Built with ❤️ using [Projection](https://github.com/quasarbright/projection)
