@@ -104,13 +104,25 @@
   padding: 0.5rem 0.75rem;
   border-radius: 4px;
   font-size: 0.875rem;
-  white-space: nowrap;
+  white-space: normal;
   z-index: 1000;
   pointer-events: none;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
   max-width: 300px;
-  white-space: normal;
   text-align: center;
+  line-height: 1.4;
+  animation: tooltipFadeIn 0.2s ease;
+}
+
+@keyframes tooltipFadeIn {
+  from {
+    opacity: 0;
+    transform: translateX(-50%) translateY(4px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
+  }
 }
 
 .deploy-tooltip::after {

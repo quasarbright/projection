@@ -357,18 +357,11 @@ function displaySuccessMessage(
 
   Logger.info('Next steps:');
   const steps = [
-    `Edit ${projectsFile} to add your projects`,
-    `Customize ${configFile} if needed`,
-    `Run 'projection build' to generate your site`,
+    `Run 'projection admin' to manage your projects and see a live preview`,
     `Run 'projection dev' to start development server`
   ];
 
-  // Add deployment step if Git is configured
-  if (gitInfo.isGitRepo && gitInfo.hasRemote) {
-    steps.push(`Run 'projection deploy' to deploy to GitHub Pages`);
-  }
-
-  Logger.numberedList(steps);
+  Logger.list(steps);
   Logger.newline();
   Logger.dim('📚 Documentation: https://github.com/quasarbright/projection');
   Logger.newline();

@@ -138,12 +138,19 @@ export function DeployButton({
   };
 
   const getTooltipMessage = (): string => {
-    if (!gitStatus) {
+    // Show error message if there's an active error
+    if (errorMessage && deploymentState === 'error') {
+      return errorMessage;
+    }
+
+    // Show loading state
+    if (!gitStatus || isLoadingStatus) {
       return 'Checking Git status...';
     }
 
+    // Show specific issues that prevent deployment
     if (!gitStatus.gitInstalled) {
-      return 'Git is not installed';
+      return 'Git is not installed. Install Git to enable deployment.';
     }
 
     if (!gitStatus.isGitRepo) {
@@ -151,13 +158,24 @@ export function DeployButton({
     }
 
     if (!gitStatus.hasRemote) {
-      return 'No Git remote configured. Run "git remote add origin <url>".';
+      return `No Git remote configured. Run "git remote add origin <url>" to add a remote.`;
     }
 
     if (gitStatus.issues && gitStatus.issues.length > 0) {
       return gitStatus.issues.join('. ');
     }
 
+    // Show deploying state
+    if (deploymentState === 'deploying') {
+      return 'Deployment in progress...';
+    }
+
+    // Show success state
+    if (deploymentState === 'success') {
+      return 'Successfully deployed to GitHub Pages!';
+    }
+
+    // Default ready state
     return 'Deploy to GitHub Pages';
   };
 
@@ -226,13 +244,14 @@ export function DeployButton({
           disabled={isButtonDisabled}
           aria-label="Deploy to GitHub Pages"
           aria-disabled={isButtonDisabled}
+          title={getTooltipMessage()}
         >
           {getButtonContent()}
         </button>
         
         {showTooltip && (
           <div className="deploy-tooltip" role="tooltip">
-            {errorMessage || getTooltipMessage()}
+            {getTooltipMessage()}
           </div>
         )}
       </div>

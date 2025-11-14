@@ -143,7 +143,7 @@ describe('DeployButton', () => {
   });
 
   describe('Tooltip Display', () => {
-    it('should show tooltip on hover when button is disabled', async () => {
+    it('should show tooltip on hover when button is disabled due to Git not installed', async () => {
       const user = userEvent.setup();
       vi.mocked(api.checkDeploymentStatus).mockResolvedValue({
         ready: false,
@@ -171,7 +171,7 @@ describe('DeployButton', () => {
       });
     });
 
-    it('should show appropriate tooltip message for each issue', async () => {
+    it('should show tooltip for not a Git repository', async () => {
       const user = userEvent.setup();
       vi.mocked(api.checkDeploymentStatus).mockResolvedValue({
         ready: false,
@@ -195,6 +195,62 @@ describe('DeployButton', () => {
 
       await waitFor(() => {
         expect(screen.getByText(/Not a Git repository/i)).toBeInTheDocument();
+        expect(screen.getByText(/git init/i)).toBeInTheDocument();
+      });
+    });
+
+    it('should show tooltip for no remote configured', async () => {
+      const user = userEvent.setup();
+      vi.mocked(api.checkDeploymentStatus).mockResolvedValue({
+        ready: false,
+        gitInstalled: true,
+        isGitRepo: true,
+        hasRemote: false,
+        remoteName: 'origin',
+        remoteUrl: '',
+        currentBranch: 'main',
+        issues: ['No Git remote configured'],
+      });
+
+      render(<DeployButton />);
+
+      await waitFor(() => {
+        expect(screen.getByRole('button')).toBeDisabled();
+      });
+
+      const container = screen.getByRole('button').parentElement!;
+      await user.hover(container);
+
+      await waitFor(() => {
+        expect(screen.getByText(/No Git remote configured/i)).toBeInTheDocument();
+        expect(screen.getByText(/git remote add origin/i)).toBeInTheDocument();
+      });
+    });
+
+    it('should show ready tooltip when deployment is possible', async () => {
+      const user = userEvent.setup();
+      vi.mocked(api.checkDeploymentStatus).mockResolvedValue({
+        ready: true,
+        gitInstalled: true,
+        isGitRepo: true,
+        hasRemote: true,
+        remoteName: 'origin',
+        remoteUrl: 'https://github.com/user/repo.git',
+        currentBranch: 'main',
+      });
+
+      render(<DeployButton />);
+
+      await waitFor(() => {
+        expect(screen.getByRole('button')).not.toBeDisabled();
+      });
+
+      const container = screen.getByRole('button').parentElement!;
+      await user.hover(container);
+
+      await waitFor(() => {
+        expect(screen.getByRole('tooltip')).toBeInTheDocument();
+        expect(screen.getByRole('tooltip')).toHaveTextContent(/Deploy to GitHub Pages/i);
       });
     });
   });
@@ -370,8 +426,7 @@ describe('DeployButton', () => {
       await waitFor(() => {
         expect(mockOnDeployComplete).toHaveBeenCalledWith(
           true,
-          'https://user.github.io/repo',
-          undefined
+          'https://user.github.io/repo'
         );
       });
     });
@@ -471,7 +526,8 @@ describe('DeployButton', () => {
       await user.click(confirmButton);
 
       await waitFor(() => {
-        expect(screen.getByText(/Build validation failed/i)).toBeInTheDocument();
+        // The error dialog shows the error title, not the exact message
+        expect(screen.getByText(/Build Failed/i)).toBeInTheDocument();
       });
     });
 

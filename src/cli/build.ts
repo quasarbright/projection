@@ -41,9 +41,8 @@ export async function build(options: BuildOptions = {}): Promise<void> {
     Logger.newline();
     Logger.info('Next steps:');
     Logger.list([
-      `Open ${outputDir}/index.html in your browser`,
-      `Run 'projection serve' to preview with a local server`,
-      `Run 'projection dev' for development with live reload`
+      `Run 'projection admin' to manage your projects and see a live preview`,
+      `Run 'projection dev' to start development server`
     ]);
     Logger.newline();
 
