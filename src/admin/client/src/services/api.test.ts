@@ -28,6 +28,8 @@ import {
   getTags,
   getConfig,
   generatePreview,
+  checkDeploymentStatus,
+  triggerDeployment,
 } from './api';
 
 const mockAxios = vi.mocked(axios);
@@ -317,6 +319,190 @@ describe('API Client', () => {
         { headers: { Accept: 'text/html' } }
       );
       expect(result).toBe(mockHTML);
+    });
+  });
+
+  describe('checkDeploymentStatus', () => {
+    it('should fetch deployment status successfully', async () => {
+      const mockResponse = {
+        data: {
+          ready: true,
+          gitInstalled: true,
+          isGitRepo: true,
+          hasRemote: true,
+          remoteName: 'origin',
+          remoteUrl: 'https://github.com/user/repo.git',
+          currentBranch: 'main',
+          deployConfig: {
+            branch: 'gh-pages',
+            baseUrl: '/repo/',
+            homepage: 'https://user.github.io/repo',
+            buildDir: 'dist',
+          },
+        },
+      };
+
+      mockAxiosInstance.get.mockResolvedValue(mockResponse);
+
+      const result = await checkDeploymentStatus();
+
+      expect(mockAxiosInstance.get).toHaveBeenCalledWith('/deploy/status');
+      expect(result.ready).toBe(true);
+      expect(result.gitInstalled).toBe(true);
+      expect(result.deployConfig?.branch).toBe('gh-pages');
+    });
+
+    it('should handle deployment status with issues', async () => {
+      const mockResponse = {
+        data: {
+          ready: false,
+          gitInstalled: true,
+          isGitRepo: false,
+          hasRemote: false,
+          remoteName: 'origin',
+          remoteUrl: '',
+          currentBranch: '',
+          issues: ['Not a Git repository', 'No Git remote configured'],
+        },
+      };
+
+      mockAxiosInstance.get.mockResolvedValue(mockResponse);
+
+      const result = await checkDeploymentStatus();
+
+      expect(result.ready).toBe(false);
+      expect(result.issues).toHaveLength(2);
+      expect(result.issues).toContain('Not a Git repository');
+    });
+
+    it('should handle errors when checking deployment status', async () => {
+      const mockError = {
+        response: {
+          data: { message: 'Failed to check deployment status' },
+          status: 500,
+        },
+        message: 'Server error',
+      };
+
+      mockAxiosInstance.get.mockRejectedValue(mockError);
+      (mockAxios.isAxiosError as any).mockReturnValue(true);
+
+      await expect(checkDeploymentStatus()).rejects.toMatchObject({
+        message: 'Failed to check deployment status',
+        status: 500,
+      });
+    });
+  });
+
+  describe('triggerDeployment', () => {
+    it('should trigger deployment successfully', async () => {
+      const mockResponse = {
+        data: {
+          success: true,
+          message: 'Deployment completed successfully',
+          url: 'https://user.github.io/repo',
+          branch: 'gh-pages',
+          duration: 45000,
+        },
+      };
+
+      mockAxiosInstance.post.mockResolvedValue(mockResponse);
+
+      const result = await triggerDeployment();
+
+      expect(mockAxiosInstance.post).toHaveBeenCalledWith('/deploy', {});
+      expect(result.success).toBe(true);
+      expect(result.url).toBe('https://user.github.io/repo');
+      expect(result.duration).toBe(45000);
+    });
+
+    it('should trigger deployment with custom options', async () => {
+      const deployOptions = {
+        force: true,
+        message: 'Custom deployment message',
+      };
+
+      const mockResponse = {
+        data: {
+          success: true,
+          message: 'Deployment completed successfully',
+          url: 'https://user.github.io/repo',
+          branch: 'gh-pages',
+          duration: 50000,
+        },
+      };
+
+      mockAxiosInstance.post.mockResolvedValue(mockResponse);
+
+      const result = await triggerDeployment(deployOptions);
+
+      expect(mockAxiosInstance.post).toHaveBeenCalledWith('/deploy', deployOptions);
+      expect(result.success).toBe(true);
+    });
+
+    it('should handle deployment failure', async () => {
+      const mockResponse = {
+        data: {
+          success: false,
+          message: 'Deployment failed',
+          duration: 10000,
+          error: {
+            code: 'BUILD_ERROR',
+            message: 'Build validation failed',
+            details: 'Invalid project data',
+          },
+        },
+      };
+
+      mockAxiosInstance.post.mockResolvedValue(mockResponse);
+
+      const result = await triggerDeployment();
+
+      expect(result.success).toBe(false);
+      expect(result.error?.code).toBe('BUILD_ERROR');
+      expect(result.error?.message).toBe('Build validation failed');
+    });
+
+    it('should handle authentication errors', async () => {
+      const mockError = {
+        response: {
+          data: {
+            message: 'Authentication failed',
+            error: {
+              code: 'AUTH_ERROR',
+              message: 'Permission denied',
+            },
+          },
+          status: 401,
+        },
+        message: 'Unauthorized',
+      };
+
+      mockAxiosInstance.post.mockRejectedValue(mockError);
+      (mockAxios.isAxiosError as any).mockReturnValue(true);
+
+      await expect(triggerDeployment()).rejects.toMatchObject({
+        message: 'Authentication failed',
+        status: 401,
+      });
+    });
+
+    it('should handle network errors', async () => {
+      const mockError = {
+        response: {
+          data: { message: 'Network error during deployment' },
+          status: 500,
+        },
+        message: 'Network error',
+      };
+
+      mockAxiosInstance.post.mockRejectedValue(mockError);
+      (mockAxios.isAxiosError as any).mockReturnValue(true);
+
+      await expect(triggerDeployment()).rejects.toMatchObject({
+        message: 'Network error during deployment',
+        status: 500,
+      });
     });
   });
 });

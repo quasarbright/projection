@@ -1,0 +1,238 @@
+.deploy-dialog-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.7);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  animation: fadeIn 0.2s ease-in-out;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.deploy-dialog {
+  background-color: #16213e;
+  border-radius: 8px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
+  max-width: 700px;
+  width: 90%;
+  animation: slideIn 0.2s ease-in-out;
+}
+
+@keyframes slideIn {
+  from {
+    transform: translateY(-20px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+.deploy-dialog-header {
+  padding: 20px 24px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.deploy-dialog-title {
+  margin: 0;
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: #4a9eff;
+}
+
+.deploy-dialog-body {
+  padding: 24px;
+}
+
+.deploy-dialog-description {
+  margin: 0 0 20px 0;
+  font-size: 1rem;
+  line-height: 1.5;
+  color: #b0b0b0;
+}
+
+.deploy-config-details {
+  background-color: rgba(0, 0, 0, 0.2);
+  border-radius: 6px;
+  padding: 16px;
+  margin-bottom: 20px;
+}
+
+.config-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  padding: 8px 0;
+  gap: 16px;
+}
+
+.config-item:not(:last-child) {
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.config-label {
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: #8a8a8a;
+  flex-shrink: 0;
+  min-width: 120px;
+}
+
+.config-value {
+  font-size: 0.875rem;
+  color: #e0e0e0;
+  word-break: break-word;
+  overflow-wrap: break-word;
+  text-align: right;
+  font-family: 'Courier New', monospace;
+  max-width: 450px;
+}
+
+.deploy-warning {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 12px 16px;
+  background-color: rgba(255, 152, 0, 0.1);
+  border-left: 3px solid #ff9800;
+  border-radius: 4px;
+}
+
+.warning-icon {
+  font-size: 1.25rem;
+  flex-shrink: 0;
+}
+
+.warning-text {
+  font-size: 0.875rem;
+  line-height: 1.5;
+  color: #e0e0e0;
+}
+
+.warning-text strong {
+  color: #ff9800;
+  font-weight: 600;
+}
+
+.deploy-dialog-footer {
+  padding: 16px 24px;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+}
+
+.deploy-dialog-footer button {
+  padding: 10px 20px;
+  border-radius: 4px;
+  font-size: 0.875rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  border: none;
+}
+
+.btn-secondary {
+  background-color: #2c3e50;
+  color: #e0e0e0;
+}
+
+.btn-secondary:hover {
+  background-color: #34495e;
+}
+
+.btn-secondary:focus {
+  outline: 2px solid #4a9eff;
+  outline-offset: 2px;
+}
+
+.btn-deploy {
+  background-color: #4a9eff;
+  color: #ffffff;
+  font-weight: 600;
+  position: relative;
+  overflow: hidden;
+}
+
+.btn-deploy::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 0;
+  height: 0;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.2);
+  transform: translate(-50%, -50%);
+  transition: width 0.6s, height 0.6s;
+}
+
+.btn-deploy:active::before {
+  width: 300px;
+  height: 300px;
+}
+
+.btn-deploy:hover {
+  background-color: #3a8eef;
+  transform: translateY(-1px);
+  box-shadow: 0 2px 8px rgba(74, 158, 255, 0.3);
+}
+
+.btn-deploy:active {
+  transform: translateY(0);
+  background-color: #2a7edf;
+}
+
+.btn-deploy:focus {
+  outline: 2px solid #4a9eff;
+  outline-offset: 2px;
+}
+
+/* Responsive design */
+@media (max-width: 767px) {
+  .deploy-dialog {
+    width: 95%;
+    max-width: none;
+  }
+
+  .deploy-dialog-header,
+  .deploy-dialog-body,
+  .deploy-dialog-footer {
+    padding: 16px;
+  }
+
+  .config-item {
+    flex-direction: column;
+    gap: 4px;
+  }
+
+  .config-label {
+    min-width: auto;
+  }
+
+  .config-value {
+    text-align: left;
+  }
+
+  .deploy-dialog-footer {
+    flex-direction: column-reverse;
+  }
+
+  .deploy-dialog-footer button {
+    width: 100%;
+    min-height: 44px;
+  }
+}

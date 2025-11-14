@@ -5,6 +5,7 @@ import { ErrorBoundary } from './components/ErrorBoundary';
 import { ToastProvider, useToast } from './components/ToastContainer';
 import { LoadingSpinner } from './components/LoadingSpinner';
 import { ConfirmDialog } from './components/ConfirmDialog';
+import { DeployButton } from './components/DeployButton';
 import type { Project } from '../../../types';
 import './styles/App.css';
 
@@ -18,7 +19,7 @@ interface AdminActionMessage {
 
 function AppContent() {
   const { projects, loading, error, createProject, updateProject, deleteProject, tags } = useProjects();
-  const { showSuccess, showError } = useToast();
+  const { showSuccess, showError, showInfo } = useToast();
   const [viewMode, setViewMode] = useState<ViewMode>('preview');
   const [editingProject, setEditingProject] = useState<Project | null>(null);
   const [confirmDialog, setConfirmDialog] = useState<{
@@ -154,15 +155,32 @@ function AppContent() {
     return acc;
   }, {} as Record<string, number>);
 
+  const handleDeployStart = () => {
+    showInfo('🚀 Starting deployment...');
+  };
+
+  const handleDeployComplete = (success: boolean) => {
+    if (success) {
+      showSuccess('🎉 Deployed successfully!');
+    }
+    // Error handling is now done by ErrorDialog, no need for error toast
+  };
+
   return (
     <div className="app">
       <header className="app-header">
         <h1>Projection Admin</h1>
-        {viewMode !== 'form' && (
-          <button className="btn-primary" onClick={handleNewProject}>
-            New Project
-          </button>
-        )}
+        <div className="header-actions">
+          <DeployButton 
+            onDeployStart={handleDeployStart}
+            onDeployComplete={handleDeployComplete}
+          />
+          {viewMode !== 'form' && (
+            <button className="btn-primary" onClick={handleNewProject}>
+              New Project
+            </button>
+          )}
+        </div>
       </header>
 
       <main className="app-main">

@@ -19,6 +19,12 @@
   margin: 0;
 }
 
+.header-actions {
+  display: flex;
+  gap: 1rem;
+  align-items: center;
+}
+
 .btn-primary {
   background-color: #4a9eff;
   color: #ffffff;
@@ -119,6 +125,11 @@
 
   .app-header h1 {
     text-align: center;
+  }
+
+  .header-actions {
+    flex-direction: column;
+    gap: 0.5rem;
   }
 
   .btn-primary {

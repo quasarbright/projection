@@ -527,6 +527,91 @@ describe('AdminServer API Routes', () => {
     });
   });
 
+  describe('GET /api/deploy/status', () => {
+    it('should return deployment status', async () => {
+      const response = await request(server.getApp())
+        .get('/api/deploy/status')
+        .expect(200);
+
+      expect(response.body).toHaveProperty('ready');
+      expect(response.body).toHaveProperty('gitInstalled');
+      expect(response.body).toHaveProperty('isGitRepo');
+      expect(response.body).toHaveProperty('hasRemote');
+      expect(response.body).toHaveProperty('remoteName');
+      expect(response.body).toHaveProperty('remoteUrl');
+      expect(response.body).toHaveProperty('currentBranch');
+    });
+
+    it('should indicate when Git is not installed', async () => {
+      const response = await request(server.getApp())
+        .get('/api/deploy/status')
+        .expect(200);
+
+      // In test environment, Git may or may not be installed
+      expect(typeof response.body.gitInstalled).toBe('boolean');
+      
+      if (!response.body.gitInstalled) {
+        expect(response.body.ready).toBe(false);
+        expect(response.body.issues).toContain('Git is not installed or not in PATH');
+      }
+    });
+
+    it('should indicate when not a Git repository', async () => {
+      const response = await request(server.getApp())
+        .get('/api/deploy/status')
+        .expect(200);
+
+      // Temp directory is not a Git repo
+      expect(response.body.isGitRepo).toBe(false);
+      expect(response.body.ready).toBe(false);
+    });
+  });
+
+  describe('POST /api/deploy', () => {
+    it('should validate request body', async () => {
+      const response = await request(server.getApp())
+        .post('/api/deploy')
+        .send({ force: 'invalid' })
+        .expect(400);
+
+      expect(response.body).toHaveProperty('error');
+      expect(response.body.message).toContain('force must be a boolean');
+    });
+
+    it('should validate message field', async () => {
+      const response = await request(server.getApp())
+        .post('/api/deploy')
+        .send({ message: 123 })
+        .expect(400);
+
+      expect(response.body).toHaveProperty('error');
+      expect(response.body.message).toContain('message must be a string');
+    });
+
+    it('should fail when Git is not configured', async () => {
+      const response = await request(server.getApp())
+        .post('/api/deploy')
+        .send({})
+        .expect(500);
+
+      expect(response.body).toHaveProperty('success', false);
+      expect(response.body).toHaveProperty('message');
+    });
+
+    it('should accept valid deployment request', async () => {
+      const response = await request(server.getApp())
+        .post('/api/deploy')
+        .send({ 
+          force: false,
+          message: 'Test deployment'
+        });
+
+      // Will fail because temp dir is not a Git repo, but request format is valid
+      expect(response.body).toHaveProperty('success');
+      expect(response.body).toHaveProperty('message');
+    });
+  });
+
   describe('Static file serving', () => {
     it('should have static file serving configured', async () => {
       // The server is configured to serve from lib/admin/client

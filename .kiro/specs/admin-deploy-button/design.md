@@ -4,6 +4,8 @@
 
 This feature adds GitHub Pages deployment functionality to the Projection admin interface. The design leverages the existing CLI deployment infrastructure (`deploy.ts`, `GitHelper`, `DeploymentConfigLoader`) and exposes it through a new API endpoint. The UI will include a deploy button in the header that triggers deployment and displays real-time progress feedback.
 
+**Current Admin Architecture:** The admin interface uses a preview-first design where the portfolio is displayed in an iframe with admin controls (edit/delete buttons) overlaid on project cards. The main App.tsx component manages view state (preview vs. form) and communicates with the iframe via postMessage. The deploy button will be added to the parent window's header, making it accessible from both preview and form views.
+
 ## Architecture
 
 ### High-Level Flow
@@ -91,6 +93,11 @@ interface DeployButtonState {
 - Opens confirmation dialog when clicked
 - Displays deployment progress during deployment
 - Shows success/error toast when complete
+
+**Integration with Preview Mode:**
+- The button is rendered in the App.tsx header, not in the iframe preview
+- The button is visible regardless of whether the user is viewing the preview or editing a project
+- After successful deployment, the preview iframe is NOT automatically refreshed (the preview shows the local state, not the deployed state)
 
 #### DeployDialog Component
 
@@ -390,7 +397,7 @@ All errors will be displayed using:
 
 ### Button Placement
 
-The deploy button will be positioned in the header to the left of "New Project":
+The deploy button will be positioned in the header next to "New Project":
 
 ```
 ┌─────────────────────────────────────────────────────────┐
@@ -398,7 +405,16 @@ The deploy button will be positioned in the header to the left of "New Project":
 │                                                          │
 │  [🚀 Deploy to GitHub Pages]  [+ New Project]          │
 └─────────────────────────────────────────────────────────┘
+│                                                          │
+│  ┌────────────────────────────────────────────────────┐ │
+│  │  Portfolio Preview (iframe)                        │ │
+│  │  - Project cards with edit/delete buttons         │ │
+│  │  - Create button overlaid in preview              │ │
+│  └────────────────────────────────────────────────────┘ │
+└─────────────────────────────────────────────────────────┘
 ```
+
+Note: The admin interface uses a preview-first design where the portfolio is displayed in an iframe. The deploy button is in the parent window's header, not overlaid on the preview.
 
 ### Visual States
 

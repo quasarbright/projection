@@ -2,7 +2,7 @@
 
 ## Introduction
 
-This feature adds a "Deploy to GitHub Pages" button to the Projection admin interface, allowing users to deploy their portfolio directly from the web UI without switching to the command line. The button will be positioned to the left of the "New Project" button in the header and will trigger the same deployment functionality available through the CLI.
+This feature adds a "Deploy to GitHub Pages" button to the Projection admin interface, allowing users to deploy their portfolio directly from the web UI without switching to the command line. The button will be positioned in the admin header next to the "New Project" button and will trigger the same deployment functionality available through the CLI. The admin interface uses a preview-first design where the portfolio is displayed in an iframe with admin controls overlaid.
 
 ## Glossary
 
@@ -20,7 +20,7 @@ This feature adds a "Deploy to GitHub Pages" button to the Projection admin inte
 
 #### Acceptance Criteria
 
-1. WHEN THE Admin Interface loads, THE Admin Interface SHALL display a "Deploy to GitHub Pages" button in the header to the left of the "New Project" button
+1. WHEN THE Admin Interface loads, THE Admin Interface SHALL display a "Deploy to GitHub Pages" button in the header next to the "New Project" button
 2. WHEN THE user clicks the "Deploy to GitHub Pages" button, THE Admin Interface SHALL trigger a deployment process that builds and publishes the site to GitHub Pages
 3. WHEN THE deployment process starts, THE Admin Interface SHALL display a loading indicator showing deployment progress
 4. WHEN THE deployment completes successfully, THE Admin Interface SHALL display a success message with the GitHub Pages URL

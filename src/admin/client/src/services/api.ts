@@ -7,6 +7,9 @@ import type {
   DeleteProjectResponse,
   GetTagsResponse,
   ApiError,
+  DeployStatusResponse,
+  DeployRequest,
+  DeployResponse,
 } from '../types/api';
 
 const API_BASE_URL = '/api';
@@ -192,6 +195,48 @@ export async function cancelThumbnail(projectId: string): Promise<{ success: boo
     const response = await apiClient.post<{ success: boolean }>(
       `/projects/${projectId}/thumbnail/cancel`
     );
+    return response.data;
+  } catch (error) {
+    return handleApiError(error);
+  }
+}
+
+/**
+ * Check deployment status and Git configuration
+ */
+export async function checkDeploymentStatus(): Promise<DeployStatusResponse> {
+  try {
+    const response = await apiClient.get<DeployStatusResponse>('/deploy/status');
+    return response.data;
+  } catch (error) {
+    return handleApiError(error);
+  }
+}
+
+/**
+ * Get deployment configuration details
+ */
+export async function getDeploymentConfig(): Promise<{
+  repositoryUrl: string;
+  branch: string;
+  baseUrl: string;
+  homepage: string | null;
+  buildDir: string;
+}> {
+  try {
+    const response = await apiClient.get('/deploy/config');
+    return response.data;
+  } catch (error) {
+    return handleApiError(error);
+  }
+}
+
+/**
+ * Trigger deployment to GitHub Pages
+ */
+export async function triggerDeployment(options: DeployRequest = {}): Promise<DeployResponse> {
+  try {
+    const response = await apiClient.post<DeployResponse>('/deploy', options);
     return response.data;
   } catch (error) {
     return handleApiError(error);

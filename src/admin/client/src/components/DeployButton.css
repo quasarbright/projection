@@ -1,0 +1,176 @@
+.deploy-button-container {
+  position: relative;
+  display: inline-block;
+}
+
+.deploy-button {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  background-color: #4a9eff;
+  color: #ffffff;
+  border: none;
+  padding: 0.5rem 1rem;
+  border-radius: 4px;
+  font-size: 1rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  white-space: nowrap;
+  min-height: 40px;
+  position: relative;
+  overflow: hidden;
+}
+
+.deploy-button::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 0;
+  height: 0;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.2);
+  transform: translate(-50%, -50%);
+  transition: width 0.6s, height 0.6s;
+}
+
+.deploy-button:active:not(.disabled)::before {
+  width: 300px;
+  height: 300px;
+}
+
+.deploy-button:hover:not(.disabled) {
+  background-color: #3a8eef;
+  transform: translateY(-1px);
+  box-shadow: 0 2px 8px rgba(74, 158, 255, 0.3);
+}
+
+.deploy-button:active:not(.disabled) {
+  background-color: #2a7edf;
+  transform: translateY(0);
+}
+
+.deploy-button:focus-visible {
+  outline: 2px solid #4a9eff;
+  outline-offset: 2px;
+}
+
+.deploy-button.disabled {
+  background-color: #666;
+  color: #999;
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+.deploy-button.deploying {
+  background-color: #ff9800;
+  cursor: wait;
+  box-shadow: 0 0 20px rgba(255, 152, 0, 0.4);
+}
+
+.deploy-button.deploying:hover {
+  background-color: #ff9800;
+  transform: none;
+}
+
+.deploy-button.success {
+  background-color: #4caf50;
+  animation: successPulse 0.5s ease;
+  box-shadow: 0 0 20px rgba(76, 175, 80, 0.4);
+}
+
+.deploy-button.error {
+  background-color: #f44336;
+  animation: errorShake 0.5s ease;
+  box-shadow: 0 0 20px rgba(244, 67, 54, 0.4);
+}
+
+.deploy-icon {
+  font-size: 1.2rem;
+  line-height: 1;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.deploy-tooltip {
+  position: absolute;
+  bottom: calc(100% + 8px);
+  left: 50%;
+  transform: translateX(-50%);
+  background-color: #1a1a1a;
+  color: #ffffff;
+  padding: 0.5rem 0.75rem;
+  border-radius: 4px;
+  font-size: 0.875rem;
+  white-space: nowrap;
+  z-index: 1000;
+  pointer-events: none;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+  max-width: 300px;
+  white-space: normal;
+  text-align: center;
+}
+
+.deploy-tooltip::after {
+  content: '';
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  border: 6px solid transparent;
+  border-top-color: #1a1a1a;
+}
+
+@keyframes successPulse {
+  0%, 100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.05);
+  }
+}
+
+@keyframes errorShake {
+  0%, 100% {
+    transform: translateX(0);
+  }
+  25% {
+    transform: translateX(-5px);
+  }
+  75% {
+    transform: translateX(5px);
+  }
+}
+
+/* Responsive design */
+@media (max-width: 767px) {
+  .deploy-button {
+    width: 100%;
+    justify-content: center;
+    min-height: 44px;
+  }
+
+  .deploy-tooltip {
+    max-width: 250px;
+    font-size: 0.8125rem;
+  }
+}
+
+/* Inline spinner for deploy button */
+.deploy-spinner {
+  display: inline-block;
+  width: 16px;
+  height: 16px;
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  border-top-color: #ffffff;
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}

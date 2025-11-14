@@ -10,6 +10,7 @@ import multer from 'multer';
 import { AdminServerConfig } from './types';
 import { FileManager } from './file-manager';
 import { ImageManager } from './image-manager';
+import { DeploymentService } from './deployment-service';
 import { ConfigLoader } from '../../generator/config';
 import { Validator } from '../../generator/validator';
 import { HTMLBuilder } from '../../generator/html-builder';
@@ -575,6 +576,82 @@ export class AdminServer {
           success: false,
           error: 'Failed to cancel thumbnail',
           message: error.message
+        });
+      }
+    });
+
+    // GET /api/deploy/status - Check deployment readiness and configuration
+    this.app.get('/api/deploy/status', async (req: Request, res: Response) => {
+      try {
+        const cwd = path.dirname(this.config.projectsFilePath);
+        const status = await DeploymentService.getDeploymentStatus(cwd);
+        
+        res.json(status);
+      } catch (error: any) {
+        console.error('Error checking deployment status:', error);
+        res.status(500).json({
+          error: 'Failed to check deployment status',
+          message: error.message
+        });
+      }
+    });
+
+    // GET /api/deploy/config - Get deployment configuration details
+    this.app.get('/api/deploy/config', async (req: Request, res: Response) => {
+      try {
+        const cwd = path.dirname(this.config.projectsFilePath);
+        const config = await DeploymentService.getDeploymentConfig(cwd);
+        
+        res.json(config);
+      } catch (error: any) {
+        console.error('Error getting deployment config:', error);
+        res.status(500).json({
+          error: 'Failed to get deployment configuration',
+          message: error.message
+        });
+      }
+    });
+
+    // POST /api/deploy - Trigger deployment to GitHub Pages
+    this.app.post('/api/deploy', async (req: Request, res: Response) => {
+      try {
+        const cwd = path.dirname(this.config.projectsFilePath);
+        const deployRequest = req.body;
+        
+        // Validate request body
+        if (deployRequest.force !== undefined && typeof deployRequest.force !== 'boolean') {
+          res.status(400).json({
+            error: 'Invalid request',
+            message: 'force must be a boolean'
+          });
+          return;
+        }
+
+        if (deployRequest.message !== undefined && typeof deployRequest.message !== 'string') {
+          res.status(400).json({
+            error: 'Invalid request',
+            message: 'message must be a string'
+          });
+          return;
+        }
+
+        // Execute deployment
+        const result = await DeploymentService.deploy(cwd, deployRequest);
+        
+        if (result.success) {
+          res.json(result);
+        } else {
+          res.status(500).json(result);
+        }
+      } catch (error: any) {
+        console.error('Error during deployment:', error);
+        res.status(500).json({
+          success: false,
+          message: 'Deployment failed',
+          error: {
+            code: 'DEPLOYMENT_ERROR',
+            message: error.message
+          }
         });
       }
     });

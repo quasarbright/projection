@@ -1,6 +1,5 @@
 - [ ] update readme. and shorten it.
 - [ ] publish npm package
-- [ ] deploy to gh pages button
 - [ ] config management in admin ui, including backgrounds
 - [ ] build system with caching?
 - [ ] markdown in description
@@ -25,3 +24,4 @@
   - [x] move this whole thing into its own repo
   - [x] make another repo that uses it as a SSG, and do something like react-github-pages or what you do for your racket blog, or tbh just commit dist
   - [x] update package.json and links to the homepage and projects.yaml entry for projection
+- [x] deploy to gh pages button
