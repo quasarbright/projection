@@ -1,4 +1,4 @@
-# 🎬 Projection
+# Projection
 
 A modern, reusable static site generator that creates beautiful, interactive galleries to showcase your coding projects. Generate your portfolio site with a single command.
 
@@ -6,36 +6,35 @@ Here is an example of a portfolio site using Projection: https://quasarbright.gi
 
 And its source code: https://github.com/quasarbright/portfolio
 
+![screenshot](images/screenshot.png)
+
 ## ✨ Features
 
 - **🖥️ Web Admin Interface** - Manage projects through an intuitive web UI with live preview
 - **📦 Easy Installation** - Install globally from source
 - **🚀 Quick Setup** - Initialize a new project in seconds
-- **📱 Responsive Design** - Works perfectly on desktop, tablet, and mobile
+- **📱 Responsive Design** - Works on desktop, tablet, and mobile
 - **🔍 Search & Filter** - Real-time search and tag-based filtering
-- **🌙 Dark Theme** - Modern dark color scheme
 - **⭐ Featured Projects** - Highlight your best work
 - **🏷️ Flexible Tagging** - Organize projects with tags (ANY/ALL filtering)
-- **📊 Multiple Formats** - Support for both YAML and JSON
 - **🔥 Hot Reloading** - Development server with automatic rebuild and refresh
 - **🎨 Customizable** - Override default styles and scripts
-- **🚢 GitHub Pages Deployment** - Deploy with a single command
-- **🎯 TypeScript** - Built with TypeScript for reliability
+- **🚢 GitHub Pages Deployment** - Deploy with a single command (or through the admin UI)
 
 ## 📋 Table of Contents
 
 - [Installation](#-installation)
 - [Quick Start](#-quick-start)
 - [Admin Interface](#-admin-interface)
-- [CLI Commands](#-cli-commands)
 - [Configuration](#-configuration)
 - [Project Data Format](#-project-data-format)
 - [Customization](#-customization)
-- [Examples](#-examples)
 - [Troubleshooting](#-troubleshooting)
 - [Deployment](#-deployment)
+- [Project Structure](#-project-structure)
 - [Contributing](#-contributing)
 - [License](#-license)
+- [Links](#-links)
 
 ## 📦 Installation
 
@@ -172,246 +171,6 @@ This opens a local web server at http://localhost:3000 with a full-featured admi
 - Date picker for creation dates
 - Toggle featured status with a checkbox
 
-### Why Use the Admin Interface?
-
-- **Easier than editing YAML/JSON** - No need to worry about syntax or indentation
-- **Visual feedback** - See your changes immediately
-- **Error prevention** - Form validation catches mistakes before they break your site
-- **Image handling** - Upload and manage thumbnails without manual file management
-- **Faster workflow** - Edit multiple projects quickly with a streamlined interface
-
-### Admin Options
-
-```bash
-# Start admin on custom port
-projection admin --port 4000
-
-# Use custom projects file
-projection admin --projects my-projects.yaml
-
-# Specify config file
-projection admin --config my-config.js
-```
-
-### Admin Workflow
-
-1. **Start the admin interface**: `projection admin`
-2. **Edit your projects** in the web UI with live preview
-3. **Save changes** - automatically updates your `projects.yaml`
-4. **Preview your site** with `projection dev` or deploy with `projection deploy`
-
-The admin interface is perfect for:
-- Quick project updates
-- Adding new projects with images
-- Managing tags across your portfolio
-- Previewing changes before deployment
-- Non-technical users who prefer a GUI
-
-## 🛠️ CLI Commands
-
-### `projection init`
-
-Initialize a new Projection project with sample files.
-
-**Usage:**
-```bash
-projection init [options]
-```
-
-**Options:**
-- `--force` - Overwrite existing files without prompting
-- `--format <yaml|json>` - Choose data format (default: yaml)
-- `--minimal` - Create minimal example instead of full sample
-
-**Examples:**
-```bash
-# Initialize with default settings
-projection init
-
-# Force overwrite existing files
-projection init --force
-
-# Initialize with JSON format
-projection init --format json
-
-# Create minimal example
-projection init --minimal
-```
-
-### `projection build`
-
-Generate the static site from your project data.
-
-**Usage:**
-```bash
-projection build [options]
-```
-
-**Options:**
-- `--config <path>` - Path to custom config file
-- `--output <path>` - Custom output directory (default: dist)
-- `--clean` - Clean output directory before build
-
-**Examples:**
-```bash
-# Basic build
-projection build
-
-# Build with custom config
-projection build --config my-config.js
-
-# Build to custom directory
-projection build --output public
-
-# Clean build
-projection build --clean
-```
-
-### `projection dev`
-
-Start development server with file watching and live reload.
-
-**Usage:**
-```bash
-projection dev [options]
-```
-
-**Options:**
-- `--config <path>` - Path to custom config file
-- `--output <path>` - Custom output directory (default: dist)
-- `--port <number>` - Server port (default: 8080)
-- `--no-open` - Don't open browser automatically
-
-**Examples:**
-```bash
-# Start dev server
-projection dev
-
-# Use custom port
-projection dev --port 3000
-
-# Don't open browser
-projection dev --no-open
-
-# Use custom config
-projection dev --config my-config.js
-```
-
-**What it watches:**
-- `projects.yaml` / `projects.yml` / `projects.json`
-- `projection.config.js` / `projection.config.json`
-- `styles/` directory (if exists)
-- `scripts/` directory (if exists)
-
-### `projection serve`
-
-Serve the generated site with a local HTTP server.
-
-**Usage:**
-```bash
-projection serve [options]
-```
-
-**Options:**
-- `--port <number>` - Server port (default: 8080)
-- `--open` - Open browser automatically
-- `--dir <path>` - Directory to serve (default: dist)
-
-**Examples:**
-```bash
-# Serve the dist directory
-projection serve
-
-# Serve on custom port and open browser
-projection serve --port 3000 --open
-
-# Serve custom directory
-projection serve --dir public
-```
-
-### `projection admin`
-
-Open the web-based admin interface for managing projects.
-
-**Usage:**
-```bash
-projection admin [options]
-```
-
-**Options:**
-- `--port <number>` - Server port (default: 3000)
-- `--projects <path>` - Path to projects file
-- `--config <path>` - Path to config file
-- `--no-open` - Don't open browser automatically
-
-**Examples:**
-```bash
-# Start admin interface
-projection admin
-
-# Use custom port
-projection admin --port 4000
-
-# Use custom projects file
-projection admin --projects my-projects.yaml
-
-# Don't open browser
-projection admin --no-open
-```
-
-**What it does:**
-- Starts a local web server with admin UI
-- Provides visual project editor with live preview
-- Handles image uploads for project thumbnails
-- Validates project data in real-time
-- Automatically saves changes to your projects file
-
-### `projection deploy`
-
-Deploy your portfolio to GitHub Pages.
-
-**Usage:**
-```bash
-projection deploy [options]
-```
-
-**Options:**
-- `--branch <branch>` - Target branch (default: gh-pages)
-- `--message <message>` - Custom commit message
-- `--remote <remote>` - Git remote (default: origin)
-- `--no-build` - Skip build step
-- `--dry-run` - Simulate deployment
-- `--force` - Force push (overwrites remote)
-
-**Examples:**
-```bash
-# Deploy to GitHub Pages
-projection deploy
-
-# Deploy with custom message
-projection deploy --message "Update portfolio"
-
-# Deploy without rebuilding
-projection deploy --no-build
-
-# Test deployment
-projection deploy --dry-run
-```
-
-See the [Deploying to GitHub Pages](#deploying-to-github-pages) section for detailed deployment instructions.
-
-### Help and Version
-
-```bash
-# Show help
-projection --help
-projection -h
-
-# Show version
-projection --version
-projection -v
-```
-
 ## ⚙️ Configuration
 
 ### Configuration File
@@ -447,7 +206,7 @@ JSON format configuration file:
 | `title` | string | "My Projects" | Site title displayed in header |
 | `description` | string | "A showcase of my coding projects" | Site description and meta description |
 | `baseUrl` | string | "./" | Base URL for resolving relative paths |
-| `dynamicBackgrounds` | string[] | [] | Array of background iframe URLs |
+| `dynamicBackgrounds` | string[] | [] | Array of background URLs (see [Dynamic Backgrounds](#-dynamic-backgrounds)) |
 | `customStyles` | string | null | Path to custom styles directory |
 | `customScripts` | string | null | Path to custom scripts directory |
 | `output` | string | "dist" | Output directory path |
@@ -473,13 +232,68 @@ The `baseUrl` is used to resolve relative paths in your project data:
 **Example:**
 ```javascript
 // Config
-baseUrl: "https://username.github.io/portfolio/"
+baseUrl: "https://username.github.io/"
 
 // Project data
-pageLink: "./my-project/"  // → https://username.github.io/portfolio/my-project/
+pageLink: "./my-project/"  // → https://username.github.io/my-project/
 pageLink: "/absolute"      // → /absolute
 pageLink: "https://..."    // → https://...
 ```
+
+### 🎨 Dynamic Backgrounds
+
+Projection supports dynamic backgrounds that add visual interest to your portfolio. These are web pages (like p5.js sketches, animations, or visualizations) that display behind your project cards.
+
+#### What are Dynamic Backgrounds?
+
+Dynamic backgrounds are full-screen web pages loaded in an iframe behind your portfolio content. Each time a visitor loads your site, one background is randomly selected from your list, creating a unique experience.
+
+#### Managing Dynamic Backgrounds
+
+**Option A: Admin Interface (Recommended)**
+
+1. Open the admin interface: `projection admin`
+2. Click the **Settings** button
+3. Navigate to the **Dynamic Backgrounds** tab
+4. Add background URLs with live preview
+5. Test each background before saving
+
+The admin interface provides:
+- Live iframe previews of each background
+- Visual status indicators (loaded/error)
+- Click to expand and test backgrounds full-screen
+
+**Option B: Edit Configuration Manually**
+
+Add background URLs to your `projection.config.json`:
+
+```json
+{
+  "title": "My Projects",
+  "description": "My portfolio",
+  "baseUrl": "./",
+  "dynamicBackgrounds": [
+    "https://example.com/background1",
+    "https://example.com/background2",
+    "https://example.com/background3"
+  ]
+}
+```
+
+#### Background Requirements
+
+Your background pages should:
+
+1. **Be full-screen** - Fill the entire viewport
+2. **Work in an iframe** - Not blocked by X-Frame-Options
+3. **Be performant** - Lightweight animations that don't slow down the site
+
+#### Best Practices
+
+1. **Test performance** - Ensure backgrounds don't slow down your site
+2. **Keep it subtle** - Backgrounds should enhance, not distract from your projects
+4. **Consider accessibility** - Avoid flashing or rapidly moving elements
+5. **Mobile-friendly** - Test on mobile devices for performance
 
 ## 📊 Project Data Format
 
@@ -607,7 +421,7 @@ my-portfolio/
 │   ├── cards.css     # Override card styles
 │   └── custom.css    # Add your own styles
 ├── projects.yaml
-└── projection.config.js
+└── projection.config.json
 ```
 
 If the `styles/` directory exists, Projection will use your custom styles instead of the bundled defaults. You can copy the default styles and modify them:
@@ -652,75 +466,6 @@ This allows you to:
 - Use defaults out of the box
 - Override specific files as needed
 - Mix custom and default files
-
-## 💡 Examples
-
-### Example 1: Personal Portfolio
-
-```bash
-# Initialize project
-mkdir my-portfolio && cd my-portfolio
-projection init
-
-# Edit projects.yaml with your projects
-# ...
-
-# Start development
-projection dev
-```
-
-### Example 2: GitHub Pages Deployment
-
-```bash
-# Build for GitHub Pages
-projection build
-
-# Configure for GitHub Pages
-# In projection.config.js:
-module.exports = {
-  title: "My Projects",
-  baseUrl: "https://username.github.io/repository-name/"
-};
-
-# Deploy dist/ to gh-pages branch
-```
-
-### Example 3: Custom Styling
-
-```bash
-# Initialize project
-projection init
-
-# Create custom styles
-mkdir styles
-echo "body { background: #1a1a2e; }" > styles/custom.css
-
-# Build with custom styles
-projection build
-```
-
-### Example 4: Multiple Environments
-
-```bash
-# Development config
-projection dev --config dev.config.js
-
-# Production config
-projection build --config prod.config.js --output public
-```
-
-### Example 5: JSON Format
-
-```bash
-# Initialize with JSON
-projection init --format json
-
-# Edit projects.json
-# ...
-
-# Build
-projection build
-```
 
 ## 🔧 Troubleshooting
 
@@ -780,14 +525,7 @@ projection dev --port 3000
 **Solution:**
 1. Check that `thumbnailLink` paths are correct
 2. Verify images exist at specified paths
-3. Use relative paths from your project root:
-   ```yaml
-   thumbnailLink: "./images/project.png"
-   ```
-4. Or use absolute URLs:
-   ```yaml
-   thumbnailLink: "https://example.com/image.png"
-   ```
+3. Run `projection dev` and use inspect element to check the img src on the card. You may need to update `thumbnailLink` or `baseUrl`.
 
 ### Build Output Directory Not Created
 
@@ -803,36 +541,6 @@ projection build --clean
 
 # Check file permissions
 ls -la
-```
-
-### TypeScript Errors During Development
-
-**Problem:** Seeing TypeScript compilation errors.
-
-**Solution:**
-```bash
-# Rebuild the package
-npm run build
-
-# If you're developing the package itself:
-npm install
-npm run build
-```
-
-### Module Not Found Errors
-
-**Problem:** Getting "Cannot find module" errors.
-
-**Solution:**
-```bash
-# Reinstall dependencies
-rm -rf node_modules package-lock.json
-npm install
-
-# For global installation, re-link:
-cd /path/to/projection
-npm run build
-npm link
 ```
 
 ## 🚢 Deployment
@@ -872,19 +580,17 @@ Before deploying, make sure you have:
 
 **1. Configure your site for GitHub Pages**
 
-Add a `baseUrl` to your `projection.config.js`:
+Add a `baseUrl` to your `projection.config.json`:
 
-```javascript
-module.exports = {
-  title: "My Portfolio",
-  description: "My awesome projects",
-  baseUrl: "/repository-name/",  // Important for GitHub Pages!
-};
+```json
+{
+  "title": "My Portfolio",
+  "description": "My awesome projects",
+  "baseUrl": "/"
+}
 ```
 
-The `baseUrl` should match your repository name:
-- For `https://github.com/username/my-portfolio` → use `baseUrl: "/my-portfolio/"`
-- For user/org sites (`username.github.io`) → use `baseUrl: "/"`
+> **Note:** The `baseUrl` is important for GitHub Pages if you're linking to other repos' pages.
 
 **2. Deploy your site**
 
@@ -914,20 +620,20 @@ Your site will be live at `https://username.github.io/repository-name/` within a
 
 #### Configuration Options
 
-##### In projection.config.js
+##### In projection.config.json
 
-```javascript
-module.exports = {
-  // Required for GitHub Pages
-  baseUrl: "/repository-name/",
-  
-  // Optional: Custom domain (creates CNAME file)
-  homepage: "portfolio.example.com",
-  
-  // Optional: Custom deployment branch
-  deployBranch: "gh-pages",
-};
+```json
+{
+  "baseUrl": "/repository-name/",
+  "homepage": "portfolio.example.com",
+  "deployBranch": "gh-pages"
+}
 ```
+
+**Configuration notes:**
+- `baseUrl` - Required for GitHub Pages (use your repository name)
+- `homepage` - Optional: Custom domain (creates CNAME file)
+- `deployBranch` - Optional: Custom deployment branch (defaults to "gh-pages")
 
 ##### Command-Line Options
 
@@ -961,12 +667,11 @@ projection deploy --force
 **Repository:** `https://github.com/username/my-portfolio`
 
 **Configuration:**
-```javascript
-// projection.config.js
-module.exports = {
-  title: "My Portfolio",
-  baseUrl: "/my-portfolio/",
-};
+```json
+{
+  "title": "My Portfolio",
+  "baseUrl": "/my-portfolio/"
+}
 ```
 
 **Deploy:**
@@ -976,39 +681,22 @@ projection deploy
 
 **Result:** Site live at `https://username.github.io/my-portfolio/`
 
-##### Example 2: User/Organization Site
-
-**Repository:** `https://github.com/username/username.github.io`
-
-**Configuration:**
-```javascript
-// projection.config.js
-module.exports = {
-  title: "My Portfolio",
-  baseUrl: "/",  // Root path for user sites
-};
-```
-
-**Deploy:**
-```bash
-projection deploy
-```
-
-**Result:** Site live at `https://username.github.io/`
-
-##### Example 3: Custom Domain
+##### Example 2: Custom Domain
 
 **Repository:** `https://github.com/username/portfolio`
 
 **Configuration:**
-```javascript
-// projection.config.js
-module.exports = {
-  title: "My Portfolio",
-  baseUrl: "/",  // Root path for custom domains
-  homepage: "portfolio.example.com",  // Creates CNAME file
-};
+```json
+{
+  "title": "My Portfolio",
+  "baseUrl": "/",
+  "homepage": "portfolio.example.com"
+}
 ```
+
+**Notes:**
+- Use `baseUrl: "/"` for custom domains (root path)
+- The `homepage` field creates a CNAME file for your custom domain
 
 **Deploy:**
 ```bash
@@ -1024,15 +712,6 @@ projection deploy
    - `185.199.111.153`
 
 **Result:** Site live at `https://portfolio.example.com/`
-
-##### Example 4: Deploy to Different Branch
-
-```bash
-# Deploy to 'main' branch instead of 'gh-pages'
-projection deploy --branch main
-```
-
-Then configure GitHub Pages to use the `main` branch.
 
 #### Troubleshooting Deployment
 
@@ -1082,53 +761,7 @@ git remote -v
 
 **Solution:**
 
-**Option 1: Use SSH (recommended)**
-```bash
-# Generate SSH key (if you don't have one)
-ssh-keygen -t ed25519 -C "your_email@example.com"
-
-# Add SSH key to ssh-agent
-eval "$(ssh-agent -s)"
-ssh-add ~/.ssh/id_ed25519
-
-# Add public key to GitHub:
-# 1. Copy your public key:
-cat ~/.ssh/id_ed25519.pub
-# 2. Go to GitHub → Settings → SSH and GPG keys → New SSH key
-# 3. Paste your key and save
-
-# Update remote to use SSH
-git remote set-url origin git@github.com:username/repository-name.git
-```
-
-**Option 2: Use Personal Access Token**
-```bash
-# 1. Create a token on GitHub:
-#    Settings → Developer settings → Personal access tokens → Generate new token
-#    Select 'repo' scope
-
-# 2. Use token as password when prompted, or configure credential helper:
-git config --global credential.helper store
-
-# 3. Next time you push, enter your token as the password
-```
-
-##### "Failed to push to remote"
-
-**Problem:** Push was rejected due to conflicts or permissions.
-
-**Solution:**
-
-**If there are conflicts:**
-```bash
-# Force push (caution: overwrites remote)
-projection deploy --force
-```
-
-**If you don't have permissions:**
-- Verify you have write access to the repository
-- Check that you're pushing to the correct remote
-- Ensure your authentication is working
+https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/about-authentication-to-github#authenticating-with-the-command-line
 
 ##### "Site not updating after deployment"
 
@@ -1147,24 +780,8 @@ projection deploy --force
 
 **Solution:** Check your `baseUrl` configuration:
 
-```javascript
-// ❌ Wrong - missing trailing slash
-baseUrl: "/my-portfolio"
-
-// ✅ Correct - includes trailing slash
-baseUrl: "/my-portfolio/"
-
-// ❌ Wrong - for project sites
-baseUrl: "/"
-
-// ✅ Correct - for project sites
-baseUrl: "/repository-name/"
-```
-
-After fixing, redeploy:
-```bash
-projection deploy
-```
+- Make sure it has a trailing slash
+- inspect the project's card, find the `img` for the thumbnail, and look at its `src` attribute. Make sure it is correct. You may need to adjust `baseurl`.
 
 ##### "Custom domain not working"
 
@@ -1191,9 +808,9 @@ projection deploy
    - Enable "Enforce HTTPS" (after DNS propagates)
 
 4. **Update your config:**
-   ```javascript
-   module.exports = {
-     baseUrl: "/",  // Root for custom domains
+   ```json
+   {
+     baseUrl: "/",
      homepage: "portfolio.example.com",
    };
    ```
@@ -1217,160 +834,12 @@ projection build
 projection deploy --clean
 ```
 
-##### "Permission denied (publickey)"
-
-**Problem:** SSH authentication is failing.
-
-**Solution:**
-```bash
-# Test SSH connection
-ssh -T git@github.com
-
-# If it fails, check your SSH key:
-ls -la ~/.ssh
-
-# Add your SSH key to the agent
-ssh-add ~/.ssh/id_ed25519
-
-# Or use HTTPS instead of SSH
-git remote set-url origin https://github.com/username/repository-name.git
-```
-
-#### Advanced Deployment Workflows
-
-##### Automated Deployment with GitHub Actions
-
-Create `.github/workflows/deploy.yml`:
-
-```yaml
-name: Deploy to GitHub Pages
-
-on:
-  push:
-    branches: [ main ]
-
-jobs:
-  deploy:
-    runs-on: ubuntu-latest
-    
-    steps:
-    - uses: actions/checkout@v3
-    
-    - name: Setup Node.js
-      uses: actions/setup-node@v3
-      with:
-        node-version: '18'
-    
-    - name: Install Projection
-      run: |
-        git clone https://github.com/quasarbright/projection.git
-        cd projection
-        npm install
-        npm run build
-        npm link
-        cd ..
-    
-    - name: Deploy
-      run: projection deploy --message "Deploy from GitHub Actions"
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-```
-
-##### Deploy from a Monorepo
-
-```bash
-# If your portfolio is in a subdirectory
-cd portfolio/
-projection deploy
-
-# Or specify the directory
-projection deploy --dir ../portfolio/dist
-```
-
-##### Preview Deployments
-
-```bash
-# Deploy to a preview branch
-projection deploy --branch preview
-
-# View at: https://username.github.io/repository-name/ (configure Pages to use preview branch)
-```
-
-#### Best Practices
-
-1. **Always commit your changes first:**
-   ```bash
-   git add .
-   git commit -m "Update projects"
-   projection deploy
-   ```
-
-2. **Test locally before deploying:**
-   ```bash
-   projection dev  # Test in development
-   projection build  # Test production build
-   projection serve  # Serve production build locally
-   projection deploy  # Deploy when ready
-   ```
-
-3. **Use meaningful commit messages:**
-   ```bash
-   projection deploy --message "Add new machine learning projects"
-   ```
-
-4. **Keep your baseUrl in sync:**
-   - If you rename your repository, update `baseUrl` in your config
-   - Redeploy after changing `baseUrl`
-
-5. **Don't commit dist/ to main branch:**
-   - Add `dist/` to `.gitignore` on your main branch
-   - The deploy command handles the gh-pages branch separately
-
-6. **Use SSH for authentication:**
-   - More secure than HTTPS with tokens
-   - No need to enter credentials repeatedly
-
-### Other Deployment Options
-
-#### Netlify
-
-1. Build your site: `projection build`
-2. Drag and drop the `dist/` folder to Netlify
-3. Or connect your Git repository with build command: `projection build`
-
-#### Vercel
-
-```bash
-# Install Vercel CLI
-npm install -g vercel
-
-# Deploy
-vercel --prod
-```
-
-**vercel.json:**
-```json
-{
-  "buildCommand": "projection build",
-  "outputDirectory": "dist"
-}
-```
-
-#### Static Hosting
-
-Upload the contents of `dist/` to any static hosting service:
-- AWS S3 + CloudFront
-- Google Cloud Storage
-- Azure Static Web Apps
-- Cloudflare Pages
-- Surge.sh
-
 ## 📁 Project Structure
 
 ```
 my-portfolio/
 ├── projects.yaml              # Your project data
-├── projection.config.js       # Configuration (optional)
+├── projection.config.json     # Configuration (optional)
 ├── styles/                    # Custom styles (optional)
 │   ├── main.css
 │   └── custom.css
@@ -1387,121 +856,6 @@ my-portfolio/
     ├── scripts/
     └── assets/
 ```
-
-## 🔄 Migration Guide
-
-### Migrating from Version 1.x
-
-If you were using the original version of Projection (running `node generator.js` directly), here's how to migrate to the new npm package version:
-
-#### What Changed
-
-**Version 2.0** is a complete refactor that transforms Projection from a personal tool into a reusable npm package. The good news: **your existing project data works without any changes!**
-
-#### Migration Steps
-
-1. **Install the new version:**
-   ```bash
-   # From source (recommended for now)
-   cd /path/to/projection
-   npm install
-   npm run build
-   npm link
-   ```
-
-2. **Your existing files work as-is:**
-   - `projects.yaml` - No changes needed ✅
-   - Embedded config in YAML - Still supported ✅
-   - Custom styles/scripts - Still work ✅
-
-3. **Update your workflow:**
-   ```bash
-   # Old way:
-   node generator.js
-   
-   # New way:
-   projection build
-   
-   # For development with live reload:
-   projection dev
-   ```
-
-4. **Optional: Extract configuration (recommended):**
-   
-   If you have config embedded in your `projects.yaml`:
-   ```yaml
-   config:
-     title: "My Projects"
-     description: "..."
-   
-   projects:
-     - id: "project-1"
-       # ...
-   ```
-   
-   You can extract it to a separate `projection.config.js`:
-   ```javascript
-   module.exports = {
-     title: "My Projects",
-     description: "...",
-     // ... other config
-   };
-   ```
-   
-   Then remove the `config:` section from `projects.yaml`. Both approaches work!
-
-#### What Was Moved to Archive
-
-To preserve the original implementation while transitioning to the new architecture:
-
-- **`archive/generator.js`** - Original generator script (kept for reference)
-- **`archive/design.md`** - Original design document
-
-These files are preserved but no longer used. The new implementation is in `src/` and compiles to `lib/`.
-
-#### New Features You Get
-
-- ✨ **CLI Commands** - `init`, `build`, `dev`, `serve`
-- 🔥 **Hot Reload** - Automatic rebuild and browser refresh
-- 🎨 **Better Logging** - Colored, informative console output
-- ✅ **Validation** - Better error messages with suggestions
-- 📦 **Bundled Templates** - No need to copy template files
-- 🔧 **TypeScript** - Better code quality and maintainability
-
-#### Troubleshooting Migration
-
-**Problem:** "Command not found: projection"
-
-**Solution:**
-```bash
-# Make sure you've linked the package
-cd /path/to/projection
-npm link
-
-# Or use npx
-npx projection build
-```
-
-**Problem:** "Projects file not found"
-
-**Solution:** Make sure you're in the directory containing `projects.yaml`:
-```bash
-cd /path/to/your/portfolio
-projection build
-```
-
-**Problem:** Build output looks different
-
-**Solution:** The HTML structure is the same, but if you had custom modifications to the generator, you may need to:
-- Use custom styles in `styles/` directory
-- Use custom scripts in `scripts/` directory
-- Check the new configuration options
-
-#### Need Help?
-
-- Check the [Troubleshooting](#-troubleshooting) section
-- Review the [CHANGELOG.md](CHANGELOG.md) for detailed changes
-- Open an issue on [GitHub](https://github.com/quasarbright/projection/issues)
 
 ## 🤝 Contributing
 
@@ -1527,10 +881,18 @@ npm run build
 # Run tests
 npm test
 
-# Test locally
+# Make projection command accessible
 npm link
+```
+
+Creating a test portfolio
+
+```bash
+cd ../
+mkdir projection-test
+cd projection-test
 projection init
-projection dev
+projection admin
 ```
 
 ### Running Tests
@@ -1553,17 +915,9 @@ MIT License - see [LICENSE](LICENSE) file for details.
 ## 🔗 Links
 
 - **GitHub Repository:** https://github.com/quasarbright/projection
-- **Live Demo:** https://quasarbright.github.io/projection/
-- **Author:** [Mike Delmonaco](https://quasarbright.github.io/)
+- **Live Demo:** https://quasarbright.github.io/portfolio/
+- **Author:** [Mike Delmonaco](https://github.com/quasarbright)
 - **Issues:** https://github.com/quasarbright/projection/issues
-
-## 🙏 Acknowledgments
-
-Built with ❤️ using:
-- TypeScript
-- Chokidar (file watching)
-- Browser-sync (live reload)
-- js-yaml (YAML parsing)
 
 ---
 
