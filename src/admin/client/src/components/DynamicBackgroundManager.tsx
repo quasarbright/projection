@@ -85,7 +85,7 @@ export const DynamicBackgroundManager: React.FC<DynamicBackgroundManagerProps> =
           Dynamic backgrounds are web pages (like p5.js sketches, animations, or visualizations) 
           that will be displayed as the background of your portfolio site. Each time a visitor loads your 
           portfolio, one background will be randomly selected from your list. These background pages should be
-          full screen. <a href="https://quasarbright.github.io/p5js/honeycomb-mst/" target="_blank">Example</a>
+          full screen. <a href="https://quasarbright.github.io/p5js/voronoi?background" target="_blank">Example</a>
         </p>
       </div>
 

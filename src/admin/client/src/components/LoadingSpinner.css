@@ -6,36 +6,32 @@
   gap: 16px;
 }
 
-.spinner {
-  display: inline-block;
-}
-
-.spinner-circle {
+.loading-spinner-circle {
   border: 3px solid rgba(255, 255, 255, 0.1);
   border-top-color: #4a9eff;
   border-radius: 50%;
-  animation: spin 0.8s linear infinite;
+  animation: loading-spinner-spin 0.8s linear infinite;
 }
 
-@keyframes spin {
+@keyframes loading-spinner-spin {
   to {
     transform: rotate(360deg);
   }
 }
 
-.loading-spinner-small .spinner-circle {
+.loading-spinner-small .loading-spinner-circle {
   width: 20px;
   height: 20px;
   border-width: 2px;
 }
 
-.loading-spinner-medium .spinner-circle {
+.loading-spinner-medium .loading-spinner-circle {
   width: 40px;
   height: 40px;
   border-width: 3px;
 }
 
-.loading-spinner-large .spinner-circle {
+.loading-spinner-large .loading-spinner-circle {
   width: 60px;
   height: 60px;
   border-width: 4px;
