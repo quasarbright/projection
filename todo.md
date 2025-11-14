@@ -1,13 +1,10 @@
+- [ ] update readme. and shorten it.
+- [ ] publish npm package
 - [ ] deploy to gh pages button
 - [ ] config management in admin ui, including backgrounds
 - [ ] build system with caching?
-- [ ] make it a proper npm package that generates assets in the same format as something like react so it's re-usable
-  - [ ] move this whole thing into its own repo
-  - [ ] make another repo that uses it as a SSG, and do something like react-github-pages or what you do for your racket blog, or tbh just commit dist
-  - [ ] update package.json and links to the homepage and projects.yaml entry for projection
 - [ ] markdown in description
 - [ ] let dynamic background see mouse movements
-- [ ] update readme. and shorten it.
 - [x] admin site?
 - [x] more convenient build + run script
 - [x] generalize to all projects, not just web. add other projects. blog?
@@ -24,3 +21,7 @@
   - [x] boids, but they avoid the mouse?
   - [x] majority automaton, but black and white?
   - [x] genetic steering
+- [x] make it a proper npm package that generates assets in the same format as something like react so it's re-usable
+  - [x] move this whole thing into its own repo
+  - [x] make another repo that uses it as a SSG, and do something like react-github-pages or what you do for your racket blog, or tbh just commit dist
+  - [x] update package.json and links to the homepage and projects.yaml entry for projection
