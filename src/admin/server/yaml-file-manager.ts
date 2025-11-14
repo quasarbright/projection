@@ -122,4 +122,5 @@ export class YAMLFileManager {
     // Write back to file
     await fs.promises.writeFile(this.filePath, this.doc.toString(), 'utf-8');
   }
+
 }

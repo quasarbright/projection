@@ -460,9 +460,7 @@ export class HTMLBuilder {
         title: mergedConfig.title,
         description: mergedConfig.description,
         baseUrl: mergedConfig.baseUrl,
-        itemsPerPage: mergedConfig.itemsPerPage,
-        dynamicBackgrounds: mergedConfig.dynamicBackgrounds,
-        defaultScreenshot: mergedConfig.defaultScreenshot
+        dynamicBackgrounds: mergedConfig.dynamicBackgrounds
       }
     }, null, 2)};
   </script>

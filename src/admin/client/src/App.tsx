@@ -6,7 +6,9 @@ import { ToastProvider, useToast } from './components/ToastContainer';
 import { LoadingSpinner } from './components/LoadingSpinner';
 import { ConfirmDialog } from './components/ConfirmDialog';
 import { DeployButton } from './components/DeployButton';
-import type { Project } from '../../../types';
+import { SettingsModal } from './components/SettingsModal';
+import { updateConfig } from './services/api';
+import type { Project, Config } from '../../../types';
 import './styles/App.css';
 
 type ViewMode = 'form' | 'preview';
@@ -18,10 +20,11 @@ interface AdminActionMessage {
 }
 
 function AppContent() {
-  const { projects, loading, error, createProject, updateProject, deleteProject, tags } = useProjects();
+  const { projects, config, loading, error, createProject, updateProject, deleteProject, tags, refreshConfig } = useProjects();
   const { showSuccess, showError, showInfo } = useToast();
   const [viewMode, setViewMode] = useState<ViewMode>('preview');
   const [editingProject, setEditingProject] = useState<Project | null>(null);
+  const [isSettingsOpen, setIsSettingsOpen] = useState(false);
   const [confirmDialog, setConfirmDialog] = useState<{
     isOpen: boolean;
     projectId: string;
@@ -166,11 +169,26 @@ function AppContent() {
     // Error handling is now done by ErrorDialog, no need for error toast
   };
 
+  const handleSaveConfig = async (newConfig: Config) => {
+    try {
+      await updateConfig(newConfig);
+      await refreshConfig();
+      showSuccess('Configuration updated successfully');
+      refreshPreview();
+    } catch (err: any) {
+      console.error('Failed to update config:', err);
+      throw err; // Re-throw to let SettingsModal handle the error display
+    }
+  };
+
   return (
     <div className="app">
       <header className="app-header">
         <h1>Projection Admin</h1>
         <div className="header-actions">
+          <button className="btn-secondary" onClick={() => setIsSettingsOpen(true)}>
+            Settings
+          </button>
           <DeployButton 
             onDeployStart={handleDeployStart}
             onDeployComplete={handleDeployComplete}
@@ -227,6 +245,15 @@ function AppContent() {
         onCancel={handleCancelDelete}
         variant="danger"
       />
+
+      {config && (
+        <SettingsModal
+          isOpen={isSettingsOpen}
+          onClose={() => setIsSettingsOpen(false)}
+          config={config}
+          onSave={handleSaveConfig}
+        />
+      )}
     </div>
   );
 }

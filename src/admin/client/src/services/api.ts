@@ -104,7 +104,19 @@ export async function getTags(): Promise<GetTagsResponse> {
  */
 export async function getConfig(): Promise<Config> {
   try {
-    const response = await apiClient.get<Config>('/config');
+    const response = await apiClient.get<{ config: Config }>('/config');
+    return response.data.config;
+  } catch (error) {
+    return handleApiError(error);
+  }
+}
+
+/**
+ * Update configuration
+ */
+export async function updateConfig(config: Config): Promise<{ success: boolean; config: Config }> {
+  try {
+    const response = await apiClient.put<{ success: boolean; config: Config }>('/config', { config });
     return response.data;
   } catch (error) {
     return handleApiError(error);

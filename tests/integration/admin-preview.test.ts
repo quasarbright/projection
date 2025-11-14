@@ -36,7 +36,7 @@ describe('Admin Preview Flow Integration', () => {
     const config: AdminServerConfig = {
       port: 0, // Use random available port
       projectsFilePath,
-      configFilePath: path.join(tempDir, 'projection.config.js'),
+      configFilePath: path.join(tempDir, 'projection.config.json'),
       autoOpen: false,
       cors: true
     };
@@ -64,11 +64,6 @@ describe('Admin Preview Flow Integration', () => {
    */
   function createProjectsFile(): void {
     const content = `
-config:
-  title: "Test Portfolio"
-  description: "Test portfolio for preview"
-  baseUrl: "./"
-
 projects:
   - id: "test-project-1"
     title: "Test Project 1"
@@ -98,15 +93,12 @@ projects:
    * Helper function to create a config file
    */
   function createConfigFile(): void {
-    const content = `
-module.exports = {
-  title: "Preview Test Portfolio",
-  description: "Testing preview mode",
-  baseUrl: "./",
-  itemsPerPage: 20
-};
-`;
-    fs.writeFileSync(path.join(tempDir, 'projection.config.js'), content, 'utf-8');
+    const config = {
+      title: "Preview Test Portfolio",
+      description: "Testing preview mode",
+      baseUrl: "./",
+    };
+    fs.writeFileSync(path.join(tempDir, 'projection.config.json'), JSON.stringify(config, null, 2), 'utf-8');
   }
 
   describe('Preview Endpoint', () => {
@@ -323,10 +315,10 @@ module.exports = {
     });
 
     it('should return 500 when config file is invalid', async () => {
-      // Create invalid config file
+      // Create invalid config file (invalid JSON)
       fs.writeFileSync(
-        path.join(tempDir, 'projection.config.js'),
-        'module.exports = { invalid syntax',
+        path.join(tempDir, 'projection.config.json'),
+        '{ invalid json syntax',
         'utf-8'
       );
 

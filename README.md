@@ -77,7 +77,9 @@ projection init
 
 This creates:
 - `projects.yaml` - Sample project data
-- `projection.config.js` - Configuration file with defaults
+- `projection.config.json` - Configuration file with defaults
+- `.gitignore` - Git ignore patterns
+- `README.md` - Quick start guide
 
 ### 2. Edit Your Projects
 
@@ -412,84 +414,30 @@ projection -v
 
 ## ⚙️ Configuration
 
-### Configuration File Formats
+### Configuration File
 
-Projection supports multiple configuration formats. It will look for configuration in this order:
+Projection uses a `projection.config.json` file for site configuration. This file is separate from your project data and can be edited through the admin interface or manually.
+
+Configuration is loaded in this order:
 
 1. Command-line `--config` option
-2. `projection.config.js` in current directory
-3. `projection.config.json` in current directory
-4. `config` section in `projects.yaml` / `projects.json`
-5. Default configuration
-
-### projection.config.js
-
-**Recommended format** - JavaScript configuration file:
-
-```javascript
-module.exports = {
-  // Site title (displayed in header)
-  title: "My Projects",
-  
-  // Site description (used in meta tags)
-  description: "A showcase of my coding projects",
-  
-  // Base URL for resolving relative paths
-  baseUrl: "https://username.github.io/",
-  
-  // Number of items per page (for future pagination)
-  itemsPerPage: 20,
-  
-  // Dynamic background iframe URLs (optional)
-  dynamicBackgrounds: [
-    "https://example.com/background1",
-    "https://example.com/background2"
-  ],
-  
-  // Fallback thumbnail image (optional)
-  defaultScreenshot: "./images/default-thumbnail.png",
-  
-  // Custom styles directory (optional)
-  customStyles: "./my-styles",
-  
-  // Custom scripts directory (optional)
-  customScripts: "./my-scripts",
-  
-  // Output directory (default: dist)
-  output: "dist"
-};
-```
+2. `projection.config.json` in current directory
+3. Default configuration
 
 ### projection.config.json
 
-JSON format configuration:
+JSON format configuration file:
 
 ```json
 {
   "title": "My Projects",
   "description": "A showcase of my coding projects",
-  "baseUrl": "https://username.github.io/",
-  "itemsPerPage": 20,
+  "baseUrl": "./",
   "dynamicBackgrounds": [],
-  "defaultScreenshot": null,
+  "customStyles": null,
+  "customScripts": null,
   "output": "dist"
 }
-```
-
-### Embedded Configuration
-
-You can also embed configuration in your `projects.yaml`:
-
-```yaml
-config:
-  title: "My Projects"
-  description: "A showcase of my coding projects"
-  baseUrl: "https://username.github.io/"
-  itemsPerPage: 20
-
-projects:
-  - id: "project-1"
-    # ...
 ```
 
 ### Configuration Options
@@ -499,12 +447,20 @@ projects:
 | `title` | string | "My Projects" | Site title displayed in header |
 | `description` | string | "A showcase of my coding projects" | Site description and meta description |
 | `baseUrl` | string | "./" | Base URL for resolving relative paths |
-| `itemsPerPage` | number | 20 | Number of projects per page (future use) |
 | `dynamicBackgrounds` | string[] | [] | Array of background iframe URLs |
-| `defaultScreenshot` | string | undefined | Fallback thumbnail image path |
-| `customStyles` | string | undefined | Path to custom styles directory |
-| `customScripts` | string | undefined | Path to custom scripts directory |
+| `customStyles` | string | null | Path to custom styles directory |
+| `customScripts` | string | null | Path to custom scripts directory |
 | `output` | string | "dist" | Output directory path |
+
+### Editing Configuration
+
+**Option A: Admin Interface (Recommended)**
+
+Use the Settings button in the admin interface to edit configuration through a user-friendly form with validation.
+
+**Option B: Edit Manually**
+
+Edit `projection.config.json` directly in your text editor.
 
 ### Path Resolution
 

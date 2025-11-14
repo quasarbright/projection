@@ -1,30 +1,7 @@
-# Projection Configuration and Project Data
-# This file contains both your site configuration and project data
+# Projection Project Data
+# This file contains your project data
+# Site configuration is in projection.config.json
 
-config:
-  # Site title displayed in the browser tab and header
-  title: "My Projects"
-  
-  # Site description for SEO and social sharing
-  description: "A showcase of my coding projects"
-  
-  # Base URL for your site (used for absolute paths)
-  # Examples: "https://username.github.io/" or "./" for relative paths
-  baseUrl: "./"
-  
-  # Number of items to display per page (for future pagination feature)
-  itemsPerPage: 20
-  
-  # Optional: URLs to dynamic visual webpages
-  # These will be displayed as iframes in the background
-  dynamicBackgrounds: []
-    # - https://example.com/background1
-    # - https://example.com/background2
-  
-  # Optional: Default screenshot to use when a project has no thumbnailLink
-  # defaultScreenshot: "https://example.com/default-screenshot.png"
-
-# Your projects array
 projects:
   # Example project with all available fields
   - id: "example-project"

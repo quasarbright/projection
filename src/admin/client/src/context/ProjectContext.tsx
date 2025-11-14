@@ -14,6 +14,7 @@ interface ProjectContextState {
   updateProject: (projectId: string, project: Project) => Promise<void>;
   deleteProject: (projectId: string) => Promise<void>;
   fetchTags: () => Promise<void>;
+  refreshConfig: () => Promise<void>;
   clearError: () => void;
 }
 
@@ -118,6 +119,16 @@ export function ProjectProvider({ children }: ProjectProviderProps) {
     }
   }, []);
 
+  const refreshConfig = useCallback(async () => {
+    try {
+      const newConfig = await api.getConfig();
+      setConfig(newConfig);
+    } catch (err) {
+      console.error('Failed to refresh config:', err);
+      throw err;
+    }
+  }, []);
+
   // Fetch projects on mount
   useEffect(() => {
     fetchProjects();
@@ -135,6 +146,7 @@ export function ProjectProvider({ children }: ProjectProviderProps) {
     updateProject,
     deleteProject,
     fetchTags,
+    refreshConfig,
     clearError,
   };
 

@@ -18,7 +18,7 @@ export async function init(options: InitOptions = {}): Promise<void> {
   const cwd = process.cwd();
   const format = options.format || 'yaml';
   const projectsFileName = format === 'yaml' ? 'projects.yaml' : 'projects.json';
-  const configFileName = 'projection.config.js';
+  const configFileName = 'projection.config.json';
   const gitignoreFileName = '.gitignore';
   const readmeFileName = 'README.md';
 
@@ -187,22 +187,16 @@ async function copyConfigTemplate(
   targetPath: string, 
   gitInfo: GitRepositoryInfo
 ): Promise<void> {
-  const templatePath = path.join(templateDir, 'projection.config.js.template');
-  
-  if (!fs.existsSync(templatePath)) {
-    throw new Error(`Template file not found: ${templatePath}`);
-  }
+  // Create config object
+  const config = {
+    title: "My Projects",
+    description: "A showcase of my coding projects",
+    baseUrl: gitInfo.hasRemote && gitInfo.baseUrl ? gitInfo.baseUrl : "./",
+    dynamicBackgrounds: []
+  };
 
-  let content = fs.readFileSync(templatePath, 'utf-8');
-
-  // If Git repository with remote is detected, update baseUrl
-  if (gitInfo.hasRemote && gitInfo.baseUrl) {
-    content = content.replace(
-      /baseUrl:\s*"\.\/"/,
-      `baseUrl: "${gitInfo.baseUrl}"`
-    );
-  }
-
+  // Write as JSON with 2-space indentation
+  const content = JSON.stringify(config, null, 2);
   fs.writeFileSync(targetPath, content, 'utf-8');
   Logger.success(`Created ${path.basename(targetPath)}`);
 }
@@ -253,11 +247,6 @@ async function createReadmeFile(templateDir: string, targetPath: string): Promis
 function createMinimalProjectsContent(format: 'yaml' | 'json'): string {
   if (format === 'json') {
     return JSON.stringify({
-      config: {
-        title: "My Projects",
-        description: "A showcase of my coding projects",
-        baseUrl: "./"
-      },
       projects: [
         {
           id: "my-first-project",
@@ -272,11 +261,6 @@ function createMinimalProjectsContent(format: 'yaml' | 'json'): string {
   } else {
     const today = new Date().toISOString().split('T')[0];
     return `# Projection Project Data
-
-config:
-  title: "My Projects"
-  description: "A showcase of my coding projects"
-  baseUrl: "./"
 
 projects:
   - id: "my-first-project"
@@ -298,13 +282,6 @@ function convertYamlTemplateToJson(yamlContent: string): string {
   // In a real implementation, we'd parse the YAML and convert to JSON
   // But since this is a template with comments, we'll create a clean JSON version
   return JSON.stringify({
-    config: {
-      title: "My Projects",
-      description: "A showcase of my coding projects",
-      baseUrl: "./",
-      itemsPerPage: 20,
-      dynamicBackgrounds: []
-    },
     projects: [
       {
         id: "example-project",

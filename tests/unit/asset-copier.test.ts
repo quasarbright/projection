@@ -21,7 +21,6 @@ describe('AssetCopier', () => {
       title: 'Test',
       description: 'Test',
       baseUrl: './',
-      itemsPerPage: 20,
       dynamicBackgrounds: [],
       output: 'dist'
     };

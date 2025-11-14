@@ -39,25 +39,7 @@ describe('ConfigLoader', () => {
       expect(config.baseUrl).toBe('https://custom.com/');
     });
 
-    it('should use projection.config.js when no explicit path provided', async () => {
-      const configPath = path.join(tempDir, 'projection.config.js');
-      const configContent = `
-        module.exports = {
-          title: 'JS Config Title',
-          description: 'JS Config Description',
-          baseUrl: 'https://jsconfig.com/'
-        };
-      `;
-      fs.writeFileSync(configPath, configContent);
-
-      const config = await configLoader.load();
-
-      expect(config.title).toBe('JS Config Title');
-      expect(config.description).toBe('JS Config Description');
-      expect(config.baseUrl).toBe('https://jsconfig.com/');
-    });
-
-    it('should use projection.config.json when no .js file exists', async () => {
+    it('should use projection.config.json when no explicit path provided', async () => {
       const configPath = path.join(tempDir, 'projection.config.json');
       const customConfig = {
         title: 'JSON Config Title',
@@ -73,73 +55,7 @@ describe('ConfigLoader', () => {
       expect(config.baseUrl).toBe('https://jsonconfig.com/');
     });
 
-    it('should prioritize projection.config.js over projection.config.json', async () => {
-      const jsConfigPath = path.join(tempDir, 'projection.config.js');
-      const jsonConfigPath = path.join(tempDir, 'projection.config.json');
 
-      fs.writeFileSync(jsConfigPath, `
-        module.exports = {
-          title: 'JS Config',
-          description: 'From JS',
-          baseUrl: './'
-        };
-      `);
-
-      fs.writeFileSync(jsonConfigPath, JSON.stringify({
-        title: 'JSON Config',
-        description: 'From JSON',
-        baseUrl: './'
-      }));
-
-      const config = await configLoader.load();
-
-      expect(config.title).toBe('JS Config');
-      expect(config.description).toBe('From JS');
-    });
-
-    it('should use embedded config from projects.yaml when no config files exist', async () => {
-      const projectsPath = path.join(tempDir, 'projects.yaml');
-      const yamlContent = `
-config:
-  title: "Embedded YAML Title"
-  description: "Embedded YAML Description"
-  baseUrl: "https://embedded.com/"
-
-projects:
-  - id: "test-project"
-    title: "Test"
-    description: "Test project"
-    creationDate: "2024-01-01"
-    tags: ["test"]
-    pageLink: "https://test.com"
-`;
-      fs.writeFileSync(projectsPath, yamlContent);
-
-      const config = await configLoader.load();
-
-      expect(config.title).toBe('Embedded YAML Title');
-      expect(config.description).toBe('Embedded YAML Description');
-      expect(config.baseUrl).toBe('https://embedded.com/');
-    });
-
-    it('should use embedded config from projects.json when no YAML exists', async () => {
-      const projectsPath = path.join(tempDir, 'projects.json');
-      const jsonContent = {
-        config: {
-          title: 'Embedded JSON Title',
-          description: 'Embedded JSON Description',
-          baseUrl: 'https://embeddedjson.com/'
-        },
-        projects: []
-      };
-      fs.writeFileSync(projectsPath, JSON.stringify(jsonContent));
-
-      const config = await configLoader.load();
-
-      expect(config.title).toBe('Embedded JSON Title');
-      expect(config.description).toBe('Embedded JSON Description');
-      expect(config.baseUrl).toBe('https://embeddedjson.com/');
-    });
 
     it('should use defaults when no config files exist', async () => {
       const config = await configLoader.load();
@@ -147,7 +63,6 @@ projects:
       expect(config.title).toBe(DEFAULT_CONFIG.title);
       expect(config.description).toBe(DEFAULT_CONFIG.description);
       expect(config.baseUrl).toBe(DEFAULT_CONFIG.baseUrl);
-      expect(config.itemsPerPage).toBe(DEFAULT_CONFIG.itemsPerPage);
     });
   });
 
@@ -165,7 +80,6 @@ projects:
       expect(config.title).toBe('Custom Title');
       expect(config.description).toBe(DEFAULT_CONFIG.description);
       expect(config.baseUrl).toBe(DEFAULT_CONFIG.baseUrl);
-      expect(config.itemsPerPage).toBe(DEFAULT_CONFIG.itemsPerPage);
     });
 
     it('should preserve all user-provided values', async () => {
@@ -174,9 +88,7 @@ projects:
         title: 'Full Config',
         description: 'Complete configuration',
         baseUrl: 'https://full.com/',
-        itemsPerPage: 50,
         dynamicBackgrounds: ['https://bg1.com', 'https://bg2.com'],
-        defaultScreenshot: '/default.png',
         customStyles: './my-styles',
         customScripts: './my-scripts',
         output: 'build'
@@ -219,26 +131,7 @@ projects:
       });
     });
 
-    it('should throw error for invalid itemsPerPage', async () => {
-      const configPath = path.join(tempDir, 'projection.config.json');
-      const invalidConfig = {
-        title: 'Valid Title',
-        description: 'Valid description',
-        baseUrl: './',
-        itemsPerPage: -5
-      };
-      fs.writeFileSync(configPath, JSON.stringify(invalidConfig));
 
-      await expect(configLoader.load()).rejects.toThrow(ProjectionError);
-      await expect(configLoader.load()).rejects.toMatchObject({
-        code: ErrorCodes.CONFIG_ERROR,
-        details: {
-          errors: expect.arrayContaining([
-            expect.stringContaining('itemsPerPage must be a positive number')
-          ])
-        }
-      });
-    });
 
     it('should throw error for invalid dynamicBackgrounds type', async () => {
       const configPath = path.join(tempDir, 'projection.config.json');
@@ -288,7 +181,6 @@ projects:
         title: '',
         description: 123,
         baseUrl: './',
-        itemsPerPage: 0,
         dynamicBackgrounds: 'invalid'
       };
       fs.writeFileSync(configPath, JSON.stringify(invalidConfig));
@@ -300,7 +192,6 @@ projects:
           errors: expect.arrayContaining([
             expect.stringContaining('title'),
             expect.stringContaining('description'),
-            expect.stringContaining('itemsPerPage'),
             expect.stringContaining('dynamicBackgrounds')
           ])
         }
@@ -334,7 +225,7 @@ projects:
       await expect(configLoader.load({ configPath })).rejects.toMatchObject({
         code: ErrorCodes.CONFIG_ERROR,
         details: {
-          supportedFormats: ['.js', '.json']
+          supportedFormats: ['.json']
         }
       });
     });

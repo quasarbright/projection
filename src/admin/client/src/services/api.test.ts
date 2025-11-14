@@ -280,11 +280,12 @@ describe('API Client', () => {
         title: 'My Portfolio',
         description: 'Test portfolio',
         baseUrl: './',
-        itemsPerPage: 20,
       };
 
       const mockResponse = {
-        data: mockConfig,
+        data: {
+          config: mockConfig,
+        },
       };
 
       mockAxiosInstance.get.mockResolvedValue(mockResponse);

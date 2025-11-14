@@ -8,12 +8,8 @@ export interface Config {
   description: string;
   /** Base URL for path resolution */
   baseUrl: string;
-  /** Number of items per page (for pagination, future use) */
-  itemsPerPage?: number;
   /** Array of background iframe URLs for dynamic backgrounds */
   dynamicBackgrounds?: string[];
-  /** Fallback thumbnail image path */
-  defaultScreenshot?: string;
   /** Path to custom styles directory */
   customStyles?: string;
   /** Path to custom scripts directory */
@@ -29,9 +25,7 @@ export const DEFAULT_CONFIG: Config = {
   title: "My Projects",
   description: "A showcase of my coding projects",
   baseUrl: "./",
-  itemsPerPage: 20,
   dynamicBackgrounds: [],
-  defaultScreenshot: undefined,
   customStyles: undefined,
   customScripts: undefined,
   output: "dist"

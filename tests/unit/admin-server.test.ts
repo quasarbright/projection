@@ -352,6 +352,87 @@ describe('AdminServer API Routes', () => {
     });
   });
 
+  describe('PUT /api/config', () => {
+    it('should update configuration', async () => {
+      const newConfig = {
+        title: 'Updated Title',
+        description: 'Updated Description',
+        baseUrl: 'https://example.com',
+        dynamicBackgrounds: ['https://example.com/bg1', 'https://example.com/bg2']
+      };
+
+      const response = await request(server.getApp())
+        .put('/api/config')
+        .send({ config: newConfig })
+        .expect(200);
+
+      expect(response.body).toHaveProperty('success', true);
+      expect(response.body.config.title).toBe('Updated Title');
+      expect(response.body.config.description).toBe('Updated Description');
+      expect(response.body.config.baseUrl).toBe('https://example.com');
+    });
+
+    it('should return 400 when config field is missing', async () => {
+      const response = await request(server.getApp())
+        .put('/api/config')
+        .send({})
+        .expect(400);
+
+      expect(response.body).toHaveProperty('error', 'Invalid request');
+    });
+
+    it('should return 400 when required fields are missing', async () => {
+      const invalidConfig = {
+        title: '',
+        description: 'Valid description',
+        baseUrl: './'
+      };
+
+      const response = await request(server.getApp())
+        .put('/api/config')
+        .send({ config: invalidConfig })
+        .expect(400);
+
+      expect(response.body).toHaveProperty('success', false);
+      expect(response.body.errors).toBeDefined();
+      expect(response.body.errors.length).toBeGreaterThan(0);
+    });
+
+    it('should return 400 when baseUrl is invalid', async () => {
+      const invalidConfig = {
+        title: 'Valid Title',
+        description: 'Valid description',
+        baseUrl: 'not-a-valid-url'
+      };
+
+      const response = await request(server.getApp())
+        .put('/api/config')
+        .send({ config: invalidConfig })
+        .expect(400);
+
+      expect(response.body).toHaveProperty('success', false);
+      expect(response.body.errors).toBeDefined();
+    });
+
+
+
+    it('should accept relative paths for baseUrl', async () => {
+      const newConfig = {
+        title: 'Valid Title',
+        description: 'Valid description',
+        baseUrl: './'
+      };
+
+      const response = await request(server.getApp())
+        .put('/api/config')
+        .send({ config: newConfig })
+        .expect(200);
+
+      expect(response.body).toHaveProperty('success', true);
+      expect(response.body.config.baseUrl).toBe('./');
+    });
+  });
+
   describe('GET /api/preview', () => {
     it('should return HTML with status 200', async () => {
       const response = await request(server.getApp())

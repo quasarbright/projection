@@ -174,15 +174,13 @@ describe('DeploymentConfigLoader', () => {
       const repoUrl = 'https://github.com/user/my-portfolio.git';
       mockGitHelper.getRepositoryUrl.mockResolvedValue(repoUrl);
 
-      const configPath = path.join(tempDir, 'projection.config.js');
-      fs.writeFileSync(configPath, `
-        module.exports = {
-          title: 'My Portfolio',
-          description: 'Test portfolio',
-          baseUrl: '/my-portfolio/',
-          homepage: 'portfolio.example.com'
-        };
-      `);
+      const configPath = path.join(tempDir, 'projection.config.json');
+      fs.writeFileSync(configPath, JSON.stringify({
+        title: 'My Portfolio',
+        description: 'Test portfolio',
+        baseUrl: '/my-portfolio/',
+        homepage: 'portfolio.example.com'
+      }, null, 2));
 
       const result = await DeploymentConfigLoader.load(tempDir, {});
 
@@ -193,15 +191,13 @@ describe('DeploymentConfigLoader', () => {
       const repoUrl = 'https://github.com/user/my-portfolio.git';
       mockGitHelper.getRepositoryUrl.mockResolvedValue(repoUrl);
 
-      const configPath = path.join(tempDir, 'projection.config.js');
-      fs.writeFileSync(configPath, `
-        module.exports = {
-          title: 'My Portfolio',
-          description: 'Test portfolio',
-          baseUrl: '/my-portfolio/',
-          deployBranch: 'production'
-        };
-      `);
+      const configPath = path.join(tempDir, 'projection.config.json');
+      fs.writeFileSync(configPath, JSON.stringify({
+        title: 'My Portfolio',
+        description: 'Test portfolio',
+        baseUrl: '/my-portfolio/',
+        deployBranch: 'production'
+      }, null, 2));
 
       const result = await DeploymentConfigLoader.load(tempDir, {});
 
@@ -212,16 +208,14 @@ describe('DeploymentConfigLoader', () => {
       const repoUrl = 'https://github.com/user/my-portfolio.git';
       mockGitHelper.getRepositoryUrl.mockResolvedValue(repoUrl);
 
-      const configPath = path.join(tempDir, 'projection.config.js');
-      fs.writeFileSync(configPath, `
-        module.exports = {
-          title: 'My Portfolio',
-          description: 'Test portfolio',
-          baseUrl: '/my-portfolio/',
-          deployBranch: 'production',
-          output: 'build'
-        };
-      `);
+      const configPath = path.join(tempDir, 'projection.config.json');
+      fs.writeFileSync(configPath, JSON.stringify({
+        title: 'My Portfolio',
+        description: 'Test portfolio',
+        baseUrl: '/my-portfolio/',
+        deployBranch: 'production',
+        output: 'build'
+      }, null, 2));
 
       const options: DeployOptions = {
         branch: 'custom-branch',
@@ -339,17 +333,15 @@ describe('DeploymentConfigLoader', () => {
       const repoUrl = 'https://github.com/user/my-portfolio.git';
       mockGitHelper.getRepositoryUrl.mockResolvedValue(repoUrl);
 
-      const configPath = path.join(tempDir, 'projection.config.js');
-      fs.writeFileSync(configPath, `
-        module.exports = {
-          title: 'My Portfolio',
-          description: 'Test portfolio',
-          baseUrl: '/custom/',
-          homepage: 'example.com',
-          deployBranch: 'main',
-          output: 'public'
-        };
-      `);
+      const configPath = path.join(tempDir, 'projection.config.json');
+      fs.writeFileSync(configPath, JSON.stringify({
+        title: 'My Portfolio',
+        description: 'Test portfolio',
+        baseUrl: '/custom/',
+        homepage: 'example.com',
+        deployBranch: 'main',
+        output: 'public'
+      }, null, 2));
 
       const options: DeployOptions = {
         branch: 'deploy',

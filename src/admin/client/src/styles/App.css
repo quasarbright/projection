@@ -44,6 +44,27 @@
   background-color: #2a7edf;
 }
 
+.btn-secondary {
+  background-color: transparent;
+  color: #e0e0e0;
+  border: 1px solid #2a3f5f;
+  padding: 0.5rem 1rem;
+  border-radius: 4px;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.btn-secondary:hover {
+  background-color: rgba(74, 158, 255, 0.1);
+  border-color: #4a9eff;
+  color: #4a9eff;
+}
+
+.btn-secondary:active {
+  background-color: rgba(74, 158, 255, 0.2);
+}
+
 .app-main {
   flex: 1;
   overflow: hidden;

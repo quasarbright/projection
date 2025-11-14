@@ -10,6 +10,7 @@ import multer from 'multer';
 import { AdminServerConfig } from './types';
 import { FileManager } from './file-manager';
 import { ImageManager } from './image-manager';
+import { ConfigFileManager } from './config-file-manager';
 import { DeploymentService } from './deployment-service';
 import { ConfigLoader } from '../../generator/config';
 import { Validator } from '../../generator/validator';
@@ -25,6 +26,7 @@ export class AdminServer {
   private server: any;
   private fileManager: FileManager;
   private imageManager: ImageManager;
+  private configFileManager: ConfigFileManager;
   private configLoader: ConfigLoader;
   private connections: Set<any>;
   private upload: multer.Multer;
@@ -34,6 +36,7 @@ export class AdminServer {
     this.app = express();
     this.fileManager = new FileManager(config.projectsFilePath);
     this.imageManager = new ImageManager(path.dirname(config.projectsFilePath));
+    this.configFileManager = new ConfigFileManager(path.dirname(config.projectsFilePath));
     this.configLoader = new ConfigLoader(path.dirname(config.projectsFilePath));
     this.connections = new Set();
     
@@ -311,6 +314,99 @@ export class AdminServer {
         console.error('Error loading config:', error);
         res.status(500).json({
           error: 'Failed to load configuration',
+          message: error.message
+        });
+      }
+    });
+
+    // PUT /api/config - Update configuration
+    this.app.put('/api/config', async (req: Request, res: Response) => {
+      try {
+        const newConfig = req.body.config;
+        
+        if (!newConfig) {
+          res.status(400).json({
+            error: 'Invalid request',
+            message: 'Request body must contain a "config" field'
+          });
+          return;
+        }
+
+        // Validate required fields
+        const errors: string[] = [];
+        
+        if (!newConfig.title || typeof newConfig.title !== 'string' || newConfig.title.trim() === '') {
+          errors.push('title is required and must be a non-empty string');
+        }
+        
+        if (!newConfig.description || typeof newConfig.description !== 'string' || newConfig.description.trim() === '') {
+          errors.push('description is required and must be a non-empty string');
+        }
+        
+        if (!newConfig.baseUrl || typeof newConfig.baseUrl !== 'string' || newConfig.baseUrl.trim() === '') {
+          errors.push('baseUrl is required and must be a non-empty string');
+        }
+        
+        // Validate baseUrl format (URL or relative path)
+        if (newConfig.baseUrl) {
+          const baseUrl = newConfig.baseUrl.trim();
+          const isRelativePath = baseUrl.startsWith('./') || baseUrl.startsWith('../') || baseUrl === '.';
+          const isAbsolutePath = baseUrl.startsWith('/');
+          
+          if (!isRelativePath && !isAbsolutePath) {
+            // Try to parse as URL
+            try {
+              new URL(baseUrl);
+            } catch {
+              errors.push('baseUrl must be a valid URL or relative path (e.g., "./" or "https://example.com")');
+            }
+          }
+        }
+        
+        // Validate dynamicBackgrounds if provided
+        if (newConfig.dynamicBackgrounds !== undefined) {
+          if (!Array.isArray(newConfig.dynamicBackgrounds)) {
+            errors.push('dynamicBackgrounds must be an array');
+          } else {
+            newConfig.dynamicBackgrounds.forEach((url: any, index: number) => {
+              if (typeof url !== 'string') {
+                errors.push(`dynamicBackgrounds[${index}] must be a string`);
+              } else {
+                try {
+                  new URL(url);
+                } catch {
+                  errors.push(`dynamicBackgrounds[${index}] must be a valid URL`);
+                }
+              }
+            });
+          }
+        }
+
+        if (errors.length > 0) {
+          res.status(400).json({
+            success: false,
+            errors: errors.map(msg => ({ message: msg })),
+            message: 'Validation failed'
+          });
+          return;
+        }
+
+        // Write the config to projection.config.json
+        await this.configFileManager.writeConfig(newConfig);
+
+        // Reload config to get the updated version
+        const updatedConfig = await this.configLoader.load({
+          configPath: this.config.configFilePath
+        });
+
+        res.json({
+          success: true,
+          config: updatedConfig
+        });
+      } catch (error: any) {
+        console.error('Error updating config:', error);
+        res.status(500).json({
+          error: 'Failed to update configuration',
           message: error.message
         });
       }

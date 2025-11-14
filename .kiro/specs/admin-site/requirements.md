@@ -161,8 +161,8 @@ This document specifies the requirements for an admin site feature for the Proje
 #### Acceptance Criteria
 
 1. WHEN the user clicks a "Settings" button in the admin header, THE Admin Site SHALL open a modal dialog displaying the site configuration form
-2. THE Admin Site SHALL display input fields for all configuration properties including title, description, baseUrl, itemsPerPage, defaultScreenshot, customStyles, customScripts, and output directory
-3. WHEN the user modifies configuration values and saves, THE Projection System SHALL update the config section in the Projects Data File
+2. THE Admin Site SHALL display input fields for all configuration properties including title, description, baseUrl, dynamicBackgrounds, customStyles, customScripts, and output directory
+3. WHEN the user modifies configuration values and saves, THE Projection System SHALL update the projection.config.json file
 4. WHEN the user cancels the settings dialog, THE Admin Site SHALL close the modal without saving changes
 5. WHEN configuration is successfully updated, THE Admin Site SHALL display a success notification
 

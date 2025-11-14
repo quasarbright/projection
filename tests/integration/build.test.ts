@@ -29,11 +29,6 @@ describe('CLI build command', () => {
    */
   function createProjectsFile(content?: string): void {
     const defaultContent = `
-config:
-  title: "Test Projects"
-  description: "Test portfolio"
-  baseUrl: "./"
-
 projects:
   - id: "test-project-1"
     title: "Test Project 1"
@@ -61,22 +56,30 @@ projects:
       content || defaultContent,
       'utf-8'
     );
+    
+    // Also create default config file if not exists
+    const configPath = path.join(tempDir, 'projection.config.json');
+    if (!fs.existsSync(configPath)) {
+      const config = {
+        title: "Test Projects",
+        description: "Test portfolio",
+        baseUrl: "./"
+      };
+      fs.writeFileSync(configPath, JSON.stringify(config, null, 2), 'utf-8');
+    }
   }
 
   /**
    * Helper function to create a config file
    */
-  function createConfigFile(configPath: string = 'projection.config.js'): void {
-    const content = `
-module.exports = {
-  title: "Custom Title",
-  description: "Custom description",
-  baseUrl: "./",
-  itemsPerPage: 20,
-  dynamicBackgrounds: []
-};
-`;
-    fs.writeFileSync(path.join(tempDir, configPath), content, 'utf-8');
+  function createConfigFile(configPath: string = 'projection.config.json'): void {
+    const config = {
+      title: "Custom Title",
+      description: "Custom description",
+      baseUrl: "./",
+      dynamicBackgrounds: []
+    };
+    fs.writeFileSync(path.join(tempDir, configPath), JSON.stringify(config, null, 2), 'utf-8');
   }
 
   describe('Successful build with sample data', () => {
@@ -146,9 +149,9 @@ module.exports = {
   describe('Build with custom config path', () => {
     it('should use custom config file when --config is specified', async () => {
       createProjectsFile();
-      createConfigFile('custom.config.js');
+      createConfigFile('custom.config.json');
 
-      await build({ config: 'custom.config.js' });
+      await build({ config: 'custom.config.json' });
 
       const outputPath = path.join(tempDir, 'dist', 'index.html');
       const html = fs.readFileSync(outputPath, 'utf-8');
@@ -159,8 +162,8 @@ module.exports = {
 
     it('should handle absolute config path', async () => {
       createProjectsFile();
-      const configPath = path.join(tempDir, 'my-config.js');
-      createConfigFile('my-config.js');
+      const configPath = path.join(tempDir, 'my-config.json');
+      createConfigFile('my-config.json');
 
       await build({ config: configPath });
 
@@ -300,10 +303,10 @@ projects:
     it('should fail when config file is invalid', async () => {
       createProjectsFile();
       
-      // Create invalid config file
+      // Create invalid config file (invalid JSON)
       fs.writeFileSync(
-        path.join(tempDir, 'projection.config.js'),
-        'module.exports = { invalid syntax',
+        path.join(tempDir, 'projection.config.json'),
+        '{ invalid json syntax',
         'utf-8'
       );
 
@@ -351,11 +354,6 @@ projects:
   describe('JSON format support', () => {
     it('should build from projects.json file', async () => {
       const projectsData = {
-        config: {
-          title: "JSON Test Projects",
-          description: "Test with JSON",
-          baseUrl: "./"
-        },
         projects: [
           {
             id: "json-project",
@@ -371,6 +369,18 @@ projects:
       fs.writeFileSync(
         path.join(tempDir, 'projects.json'),
         JSON.stringify(projectsData, null, 2),
+        'utf-8'
+      );
+      
+      // Create config file
+      const config = {
+        title: "JSON Test Projects",
+        description: "Test with JSON",
+        baseUrl: "./"
+      };
+      fs.writeFileSync(
+        path.join(tempDir, 'projection.config.json'),
+        JSON.stringify(config, null, 2),
         'utf-8'
       );
 

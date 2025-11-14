@@ -456,7 +456,7 @@
   - _Requirements: 11.1, 11.7_
 
 
-- [ ] 15. Implement configuration management
+- [x] 15. Implement configuration management
   - Add API endpoints for config operations
   - Create SettingsModal component with tabs
   - Create ConfigForm for general settings
@@ -464,17 +464,16 @@
   - Add validation for config fields
   - _Requirements: 12.1, 12.2, 12.3, 12.4, 12.5_
 
-- [ ] 15.1 Add config API endpoints
+- [x] 15.1 Add config API endpoints
   - Implement GET /api/config endpoint (already exists from task 3.6)
   - Implement PUT /api/config endpoint to update entire config
   - Validate required fields (title, description, baseUrl)
   - Validate baseUrl format (URL or relative path)
-  - Validate itemsPerPage is positive integer
-  - Use FileManager to update config section in projects data file
+  - Use ConfigFileManager to update projection.config.json file
   - Return updated config or validation errors
   - _Requirements: 12.1, 12.2, 12.3_
 
-- [ ] 15.2 Create SettingsModal component
+- [x] 15.2 Create SettingsModal component
   - Write `src/admin/client/src/components/SettingsModal.tsx`
   - Create modal overlay with backdrop
   - Add tabbed interface (General, Dynamic Backgrounds, Advanced)
@@ -484,21 +483,21 @@
   - Close modal on cancel or successful save
   - _Requirements: 12.1, 12.4_
 
-- [ ] 15.3 Create ConfigForm component
+- [x] 15.3 Create ConfigForm component
   - Write `src/admin/client/src/components/ConfigForm.tsx`
-  - Add input fields for title, description, baseUrl, itemsPerPage, defaultScreenshot
-  - Implement field validation (required fields, URL format, number validation)
+  - Add input fields for title, description, baseUrl
+  - Implement field validation (required fields, URL format)
   - Display inline error messages
   - Update parent state on field changes
   - _Requirements: 12.2_
 
-- [ ] 15.4 Create AdvancedConfigForm component
+- [x] 15.4 Create AdvancedConfigForm component
   - Write `src/admin/client/src/components/AdvancedConfigForm.tsx`
   - Add input fields for customStyles, customScripts, output directory
   - Update parent state on field changes
   - _Requirements: 12.2_
 
-- [ ] 15.5 Integrate SettingsModal with App
+- [x] 15.5 Integrate SettingsModal with App
   - Add "Settings" button to app header
   - Show SettingsModal when button clicked
   - Pass current config to modal

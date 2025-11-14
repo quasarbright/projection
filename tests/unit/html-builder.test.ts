@@ -11,7 +11,6 @@ describe('HTMLBuilder', () => {
       title: 'Test Portfolio',
       description: 'A test portfolio site',
       baseUrl: './',
-      itemsPerPage: 20,
       dynamicBackgrounds: [],
       output: 'dist'
     };

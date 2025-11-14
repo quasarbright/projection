@@ -29,11 +29,11 @@ describe('CLI init command', () => {
   });
 
   describe('File creation in empty directory', () => {
-    it('should create projects.yaml, projection.config.js, .gitignore, and README.md by default', async () => {
+    it('should create projects.yaml, projection.config.json, .gitignore, and README.md by default', async () => {
       await init();
 
       const projectsPath = path.join(tempDir, 'projects.yaml');
-      const configPath = path.join(tempDir, 'projection.config.js');
+      const configPath = path.join(tempDir, 'projection.config.json');
       const gitignorePath = path.join(tempDir, '.gitignore');
       const readmePath = path.join(tempDir, 'README.md');
 
@@ -49,30 +49,30 @@ describe('CLI init command', () => {
       const projectsPath = path.join(tempDir, 'projects.yaml');
       const content = fs.readFileSync(projectsPath, 'utf-8');
 
-      expect(content).toContain('config:');
-      expect(content).toContain('title:');
       expect(content).toContain('projects:');
       expect(content).toContain('id:');
       expect(content).toContain('example-project');
+      expect(content).not.toContain('config:'); // Config is now in separate file
     });
 
-    it('should create valid JavaScript config file', async () => {
+    it('should create valid JSON config file', async () => {
       await init();
 
-      const configPath = path.join(tempDir, 'projection.config.js');
+      const configPath = path.join(tempDir, 'projection.config.json');
       const content = fs.readFileSync(configPath, 'utf-8');
+      const config = JSON.parse(content);
 
-      expect(content).toContain('module.exports');
-      expect(content).toContain('title:');
-      expect(content).toContain('description:');
-      expect(content).toContain('baseUrl:');
+      expect(config).toHaveProperty('title');
+      expect(config).toHaveProperty('description');
+      expect(config).toHaveProperty('baseUrl');
+      expect(config).toHaveProperty('dynamicBackgrounds');
     });
 
     it('should create projects.json when format is json', async () => {
       await init({ format: 'json' });
 
       const projectsPath = path.join(tempDir, 'projects.json');
-      const configPath = path.join(tempDir, 'projection.config.js');
+      const configPath = path.join(tempDir, 'projection.config.json');
 
       expect(fs.existsSync(projectsPath)).toBe(true);
       expect(fs.existsSync(configPath)).toBe(true);
@@ -80,9 +80,9 @@ describe('CLI init command', () => {
       const content = fs.readFileSync(projectsPath, 'utf-8');
       const parsed = JSON.parse(content);
 
-      expect(parsed).toHaveProperty('config');
       expect(parsed).toHaveProperty('projects');
       expect(Array.isArray(parsed.projects)).toBe(true);
+      expect(parsed).not.toHaveProperty('config'); // Config is now in separate file
     });
 
     it('should create minimal content when minimal option is true', async () => {
@@ -199,7 +199,7 @@ describe('CLI init command', () => {
     it('should overwrite existing files when force is true', async () => {
       // Create existing files
       const projectsPath = path.join(tempDir, 'projects.yaml');
-      const configPath = path.join(tempDir, 'projection.config.js');
+      const configPath = path.join(tempDir, 'projection.config.json');
       const gitignorePath = path.join(tempDir, '.gitignore');
       const readmePath = path.join(tempDir, 'README.md');
       
@@ -221,8 +221,10 @@ describe('CLI init command', () => {
       expect(configContent).not.toBe('old config');
       expect(gitignoreContent).not.toBe('old gitignore');
       expect(readmeContent).not.toBe('old readme');
-      expect(projectsContent).toContain('config:');
-      expect(configContent).toContain('module.exports');
+      expect(projectsContent).toContain('projects:');
+      expect(projectsContent).not.toContain('config:'); // Config is now in separate file
+      const config = JSON.parse(configContent);
+      expect(config).toHaveProperty('title');
       expect(gitignoreContent).toContain('dist/');
       expect(readmeContent).toContain('# My Portfolio');
     });
@@ -230,7 +232,7 @@ describe('CLI init command', () => {
     it('should not prompt when force is true and files exist', async () => {
       // Create existing files
       fs.writeFileSync(path.join(tempDir, 'projects.yaml'), 'old content');
-      fs.writeFileSync(path.join(tempDir, 'projection.config.js'), 'old config');
+      fs.writeFileSync(path.join(tempDir, 'projection.config.json'), 'old config');
       fs.writeFileSync(path.join(tempDir, '.gitignore'), 'old gitignore');
       fs.writeFileSync(path.join(tempDir, 'README.md'), 'old readme');
 
@@ -289,21 +291,24 @@ describe('CLI init command', () => {
       await init({ force: true });
 
       const projectsContent = fs.readFileSync(projectsPath, 'utf-8');
-      expect(projectsContent).toContain('config:');
+      expect(projectsContent).toContain('projects:');
+      expect(projectsContent).not.toContain('config:'); // Config is now in separate file
       
-      const configPath = path.join(tempDir, 'projection.config.js');
+      const configPath = path.join(tempDir, 'projection.config.json');
       expect(fs.existsSync(configPath)).toBe(true);
     });
 
-    it('should overwrite only projection.config.js when only it exists', async () => {
+    it('should overwrite only projection.config.json when only it exists', async () => {
       // Create only config file
-      const configPath = path.join(tempDir, 'projection.config.js');
+      const configPath = path.join(tempDir, 'projection.config.json');
       fs.writeFileSync(configPath, 'old config');
 
       await init({ force: true });
 
       const configContent = fs.readFileSync(configPath, 'utf-8');
-      expect(configContent).toContain('module.exports');
+      const config = JSON.parse(configContent);
+      expect(config).toHaveProperty('title');
+      expect(config).toHaveProperty('baseUrl');
       
       const projectsPath = path.join(tempDir, 'projects.yaml');
       expect(fs.existsSync(projectsPath)).toBe(true);
@@ -335,11 +340,10 @@ describe('CLI init command', () => {
       expect(() => JSON.parse(content)).not.toThrow();
       
       const parsed = JSON.parse(content);
-      expect(parsed.config).toBeDefined();
-      expect(parsed.config.title).toBe('My Projects');
       expect(parsed.projects).toBeDefined();
       expect(Array.isArray(parsed.projects)).toBe(true);
       expect(parsed.projects.length).toBeGreaterThan(0);
+      expect(parsed.config).toBeUndefined(); // Config is now in separate file
     });
 
     it('should default to yaml when format is not specified', async () => {
@@ -392,14 +396,14 @@ describe('CLI init command', () => {
     it('should include all config options in config template', async () => {
       await init();
 
-      const configPath = path.join(tempDir, 'projection.config.js');
+      const configPath = path.join(tempDir, 'projection.config.json');
       const content = fs.readFileSync(configPath, 'utf-8');
+      const config = JSON.parse(content);
 
-      expect(content).toContain('title:');
-      expect(content).toContain('description:');
-      expect(content).toContain('baseUrl:');
-      expect(content).toContain('itemsPerPage:');
-      expect(content).toContain('dynamicBackgrounds:');
+      expect(config).toHaveProperty('title');
+      expect(config).toHaveProperty('description');
+      expect(config).toHaveProperty('baseUrl');
+      expect(config).toHaveProperty('dynamicBackgrounds');
     });
 
     it('should create valid date format in minimal template', async () => {
@@ -427,11 +431,12 @@ describe('CLI init command', () => {
 
       await init();
 
-      const configPath = path.join(tempDir, 'projection.config.js');
+      const configPath = path.join(tempDir, 'projection.config.json');
       const content = fs.readFileSync(configPath, 'utf-8');
+      const config = JSON.parse(content);
 
       // Should have baseUrl set to repository name
-      expect(content).toContain('baseUrl: "/test-repo/"');
+      expect(config.baseUrl).toBe('/test-repo/');
     });
 
     it('should use default baseUrl when no Git remote is configured', async () => {
@@ -440,21 +445,23 @@ describe('CLI init command', () => {
 
       await init();
 
-      const configPath = path.join(tempDir, 'projection.config.js');
+      const configPath = path.join(tempDir, 'projection.config.json');
       const content = fs.readFileSync(configPath, 'utf-8');
+      const config = JSON.parse(content);
 
       // Should use default relative baseUrl
-      expect(content).toContain('baseUrl: "./"');
+      expect(config.baseUrl).toBe('./');
     });
 
     it('should use default baseUrl when not a Git repository', async () => {
       await init();
 
-      const configPath = path.join(tempDir, 'projection.config.js');
+      const configPath = path.join(tempDir, 'projection.config.json');
       const content = fs.readFileSync(configPath, 'utf-8');
+      const config = JSON.parse(content);
 
       // Should use default relative baseUrl
-      expect(content).toContain('baseUrl: "./"');
+      expect(config.baseUrl).toBe('./');
     });
 
     it('should extract repository name from HTTPS URL', async () => {
@@ -463,10 +470,11 @@ describe('CLI init command', () => {
 
       await init();
 
-      const configPath = path.join(tempDir, 'projection.config.js');
+      const configPath = path.join(tempDir, 'projection.config.json');
       const content = fs.readFileSync(configPath, 'utf-8');
+      const config = JSON.parse(content);
 
-      expect(content).toContain('baseUrl: "/my-portfolio/"');
+      expect(config.baseUrl).toBe('/my-portfolio/');
     });
 
     it('should extract repository name from SSH URL', async () => {
@@ -475,10 +483,11 @@ describe('CLI init command', () => {
 
       await init();
 
-      const configPath = path.join(tempDir, 'projection.config.js');
+      const configPath = path.join(tempDir, 'projection.config.json');
       const content = fs.readFileSync(configPath, 'utf-8');
+      const config = JSON.parse(content);
 
-      expect(content).toContain('baseUrl: "/awesome-projects/"');
+      expect(config.baseUrl).toBe('/awesome-projects/');
     });
 
     it('should handle repository URL without .git extension', async () => {
@@ -487,10 +496,11 @@ describe('CLI init command', () => {
 
       await init();
 
-      const configPath = path.join(tempDir, 'projection.config.js');
+      const configPath = path.join(tempDir, 'projection.config.json');
       const content = fs.readFileSync(configPath, 'utf-8');
+      const config = JSON.parse(content);
 
-      expect(content).toContain('baseUrl: "/no-extension/"');
+      expect(config.baseUrl).toBe('/no-extension/');
     });
   });
 });

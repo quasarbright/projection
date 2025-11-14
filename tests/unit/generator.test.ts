@@ -22,9 +22,6 @@ describe('Generator', () => {
   describe('loadProjectData', () => {
     it('should load projects from projects.yaml', async () => {
       const projectsYaml = `
-config:
-  title: Test Projects
-  description: Test description
 projects:
   - id: test-project
     title: Test Project
@@ -35,6 +32,14 @@ projects:
     pageLink: https://example.com
 `;
       fs.writeFileSync(path.join(tempDir, 'projects.yaml'), projectsYaml);
+      
+      // Create config file
+      const config = {
+        title: 'Test Projects',
+        description: 'Test description',
+        baseUrl: './'
+      };
+      fs.writeFileSync(path.join(tempDir, 'projection.config.json'), JSON.stringify(config));
 
       const generator = await Generator.create({ cwd: tempDir });
       const projectsData = await generator['loadProjectData']();
@@ -76,10 +81,6 @@ projects:
   describe('generate', () => {
     it('should generate complete site with all assets', async () => {
       const projectsYaml = `
-config:
-  title: Test Site
-  description: Test description
-  baseUrl: ./
 projects:
   - id: test-project
     title: Test Project
@@ -90,6 +91,14 @@ projects:
     pageLink: https://example.com
 `;
       fs.writeFileSync(path.join(tempDir, 'projects.yaml'), projectsYaml);
+      
+      // Create config file
+      const config = {
+        title: 'Test Site',
+        description: 'Test description',
+        baseUrl: './'
+      };
+      fs.writeFileSync(path.join(tempDir, 'projection.config.json'), JSON.stringify(config));
 
       // Create mock template directories (since bundled templates don't exist yet - task 8)
       const stylesDir = path.join(tempDir, 'styles');

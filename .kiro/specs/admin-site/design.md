@@ -855,7 +855,7 @@ project-root/
 │   ├── project-2.jpg
 │   └── project-3.webp
 ├── projects.yaml
-└── projection.config.js
+└── projection.config.json
 ```
 
 **Filename Convention:**
