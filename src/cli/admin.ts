@@ -20,6 +20,46 @@ export interface AdminOptions {
   projects?: string;
   /** Path to config file */
   config?: string;
+  /** Show help */
+  help?: boolean;
+}
+
+/**
+ * Display help for the admin command
+ */
+function showAdminHelp(): void {
+  console.log(`
+Projection Admin - Project Management Interface
+
+USAGE:
+  projection admin [options]
+
+DESCRIPTION:
+  Starts a web-based admin interface for managing your projects.
+  Provides a visual editor with live preview of your portfolio site.
+
+OPTIONS:
+  --port <number>       Server port (default: 3000)
+  --no-open             Don't open browser automatically
+  --projects <path>     Path to projects file
+  --config <path>       Path to config file
+  --help                Show this help message
+
+EXAMPLES:
+  projection admin                          # Start on port 3000
+  projection admin --port 3001              # Use custom port
+  projection admin --no-open                # Don't open browser
+  projection admin --projects data.yaml     # Custom projects file
+
+FEATURES:
+  • Visual project editor with form validation
+  • Live preview of your portfolio site
+  • Image upload and management
+  • Tag management
+  • Configuration editor
+  • Deploy to GitHub Pages
+
+`);
 }
 
 /**
@@ -52,6 +92,11 @@ function openBrowser(url: string): void {
  * Admin command - starts the admin server for managing projects
  */
 export async function admin(options: AdminOptions = {}): Promise<void> {
+  if (options.help) {
+    showAdminHelp();
+    return;
+  }
+  
   try {
     const cwd = process.cwd();
     

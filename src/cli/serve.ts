@@ -14,12 +14,50 @@ export interface ServeOptions {
   open?: boolean;
   /** Directory to serve (default: dist) */
   dir?: string;
+  /** Show help */
+  help?: boolean;
+}
+
+/**
+ * Display help for the serve command
+ */
+function showServeHelp(): void {
+  console.log(`
+Projection Serve - Serve Built Site
+
+USAGE:
+  projection serve [options]
+
+DESCRIPTION:
+  Serves the generated site with a local HTTP server.
+  Use this to preview the built site before deployment.
+
+OPTIONS:
+  --port <number>   Server port (default: 8080)
+  --open            Open browser automatically
+  --dir <path>      Directory to serve (default: dist)
+  --help            Show this help message
+
+EXAMPLES:
+  projection serve                  # Serve on port 8080
+  projection serve --port 3000      # Use custom port
+  projection serve --open           # Open browser automatically
+  projection serve --dir public     # Serve custom directory
+
+NOTE:
+  Run 'projection build' first to generate the site.
+
+`);
 }
 
 /**
  * Serve command - serves the generated dist directory with a local HTTP server
  */
 export async function serve(options: ServeOptions = {}): Promise<void> {
+  if (options.help) {
+    showServeHelp();
+    return;
+  }
   const requestedPort = options.port || 8080;
   const userSuppliedPort = options.port !== undefined;
   const dir = options.dir || 'dist';

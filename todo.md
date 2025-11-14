@@ -1,4 +1,3 @@
-- [ ] reorganize help. shorten it, add subcommand helps, and move their helps into there
 - [ ] publish npm package
 - [ ] build system with caching?
 - [ ] markdown in description
@@ -26,3 +25,4 @@
 - [x] deploy to gh pages button
 - [x] config management in admin ui, including backgrounds
 - [x] update readme. and shorten it.
+- [x] reorganize help. shorten it, add subcommand helps, and move their helps into there

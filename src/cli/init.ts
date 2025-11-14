@@ -9,12 +9,52 @@ interface InitOptions {
   force?: boolean;
   format?: 'yaml' | 'json';
   minimal?: boolean;
+  help?: boolean;
+}
+
+/**
+ * Display help for the init command
+ */
+function showInitHelp(): void {
+  console.log(`
+Projection Init - Initialize a New Project
+
+USAGE:
+  projection init [options]
+
+DESCRIPTION:
+  Creates a new Projection project in the current directory with
+  sample project data, configuration, and documentation.
+
+OPTIONS:
+  --force           Overwrite existing files without prompting
+  --format <fmt>    Choose data format: yaml or json (default: yaml)
+  --minimal         Create minimal example instead of full sample
+  --help            Show this help message
+
+EXAMPLES:
+  projection init                    # Initialize with YAML format
+  projection init --format json      # Initialize with JSON format
+  projection init --minimal          # Create minimal example
+  projection init --force            # Overwrite existing files
+
+CREATED FILES:
+  projects.yaml (or .json)    Project data file
+  projection.config.json      Site configuration
+  .gitignore                  Git ignore patterns
+  README.md                   Project documentation
+
+`);
 }
 
 /**
  * Initialize a new Projection project in the current directory
  */
 export async function init(options: InitOptions = {}): Promise<void> {
+  if (options.help) {
+    showInitHelp();
+    return;
+  }
   const cwd = process.cwd();
   const format = options.format || 'yaml';
   const projectsFileName = format === 'yaml' ? 'projects.yaml' : 'projects.json';

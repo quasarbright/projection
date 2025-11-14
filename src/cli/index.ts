@@ -54,6 +54,11 @@ export class CLI {
     // Parse options for the command
     const options = this.parseOptions(rest);
 
+    // Check if help is requested for this command
+    if (options.help || options.h) {
+      options.help = true;
+    }
+
     // Execute command
     try {
       await handler(options);
@@ -132,78 +137,14 @@ OPTIONS:
   -h, --help        Show this help message
   -v, --version     Show version number
 
-COMMAND OPTIONS:
-
-  projection init [options]
-    --force         Overwrite existing files without prompting
-    --format <fmt>  Choose data format: yaml or json (default: yaml)
-    --minimal       Create minimal example instead of full sample
-
-  projection build [options]
-    --config <path> Path to custom config file
-    --output <path> Custom output directory (default: dist)
-    --clean         Clean output directory before build
-
-  projection dev [options]
-    --config <path> Path to custom config file
-    --output <path> Custom output directory (default: dist)
-    --port <number> Server port (default: 8080)
-    --no-open       Don't open browser automatically
-
-  projection serve [options]
-    --port <number> Server port (default: 8080)
-    --open          Open browser automatically
-    --dir <path>    Directory to serve (default: dist)
-
-  projection admin [options]
-    --port <number> Server port (default: 3000)
-    --no-open       Don't open browser automatically
-    --projects <path> Path to projects file
-    --config <path> Path to config file
-
-  projection deploy [options]
-    -b, --branch <branch>   Target branch (default: gh-pages)
-    -m, --message <message> Custom commit message
-    -r, --remote <remote>   Git remote (default: origin)
-    -d, --dir <dir>         Build directory (default: dist)
-    --no-build              Skip build step
-    --dry-run               Simulate deployment without pushing
-    --force                 Force push to remote
-    --help                  Show detailed deploy help
+Run 'projection <command> --help' for detailed information about a command.
 
 EXAMPLES:
-  # Initialize a new project
-  projection init
-
-  # Build with custom config
-  projection build --config my-config.json
-
-  # Start dev server on port 3000
-  projection dev --port 3000
-
-  # Serve the generated site
-  projection serve --open
-
-  # Start admin interface
-  projection admin
-
-  # Start admin on custom port
-  projection admin --port 3001
-
-  # Deploy to GitHub Pages
-  projection deploy
-
-  # Show detailed deployment help
-  projection deploy --help
-
-  # Deploy with custom branch and message
-  projection deploy --branch main --message "Update site"
-
-  # Deploy without building (use existing dist)
-  projection deploy --no-build
-
-  # Simulate deployment (dry run)
-  projection deploy --dry-run
+  projection init                    # Initialize a new project
+  projection build                   # Build the site
+  projection dev                     # Start development server
+  projection admin                   # Start admin interface
+  projection deploy                  # Deploy to GitHub Pages
 
 DOCUMENTATION:
   https://github.com/quasarbright/projection

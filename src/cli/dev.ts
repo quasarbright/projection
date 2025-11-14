@@ -18,12 +18,55 @@ export interface DevOptions {
   port?: number;
   /** Don't open browser automatically */
   noOpen?: boolean;
+  /** Show help */
+  help?: boolean;
+}
+
+/**
+ * Display help for the dev command
+ */
+function showDevHelp(): void {
+  console.log(`
+Projection Dev - Development Server
+
+USAGE:
+  projection dev [options]
+
+DESCRIPTION:
+  Starts a development server with live reload. Automatically rebuilds
+  and refreshes the browser when project files change.
+
+OPTIONS:
+  --config <path>   Path to custom config file
+  --output <path>   Custom output directory (default: dist)
+  --port <number>   Server port (default: 8080)
+  --no-open         Don't open browser automatically
+  --help            Show this help message
+
+EXAMPLES:
+  projection dev                    # Start dev server on port 8080
+  projection dev --port 3000        # Use custom port
+  projection dev --no-open          # Don't open browser
+
+WATCHED FILES:
+  projects.yaml / projects.yml / projects.json
+  projection.config.json
+  styles/
+  scripts/
+
+The server will automatically rebuild when any of these files change.
+
+`);
 }
 
 /**
  * Dev command - starts development server with file watching and live reload
  */
 export async function dev(options: DevOptions = {}): Promise<void> {
+  if (options.help) {
+    showDevHelp();
+    return;
+  }
   const port = options.port || 8080;
   const shouldOpen = !options.noOpen;
   const cwd = process.cwd();
