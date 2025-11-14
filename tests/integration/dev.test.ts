@@ -123,7 +123,7 @@ module.exports = {
 };
 `;
       
-      const configPath = path.join(tempDir, 'custom.config.js');
+      const configPath = path.join(tempDir, 'custom.config.json');
       fs.writeFileSync(configPath, configContent, 'utf-8');
       
       expect(fs.existsSync(configPath)).toBe(true);
@@ -139,7 +139,7 @@ module.exports = {
       await expect(dev({ 
         port: 8093, 
         noOpen: true,
-        config: 'nonexistent.config.js' 
+        config: 'nonexistent.config.json' 
       })).rejects.toThrow('Process.exit');
       
       expect(exitSpy).toHaveBeenCalledWith(1);

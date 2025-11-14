@@ -192,7 +192,7 @@ export class ImageManager {
    * Save a temporary image file for a project being edited
    * @param projectId The project ID
    * @param file The uploaded file with buffer and mimetype
-   * @returns The relative path to the saved temporary image
+   * @returns The relative path to the saved temporary image with admin:// prefix
    */
   async saveTempImage(
     projectId: string,
@@ -215,8 +215,8 @@ export class ImageManager {
     // Save the temp file
     await writeFile(filePath, file.buffer);
 
-    // Return the relative path
-    return `screenshots/${filename}`;
+    // Return the relative path with admin:// prefix
+    return `admin://${filename}`;
   }
 
   /**
@@ -297,10 +297,10 @@ export class ImageManager {
    * Get the relative path for a thumbnail
    * @param projectId The project ID
    * @param extension The file extension (including the dot)
-   * @returns The relative path (e.g., "screenshots/project-id.png")
+   * @returns The relative path with admin:// prefix (e.g., "admin://project-id.png")
    */
   getRelativePath(projectId: string, extension: string): string {
-    return `screenshots/${projectId}${extension}`;
+    return `admin://${projectId}${extension}`;
   }
 
   /**

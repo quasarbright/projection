@@ -273,4 +273,104 @@ describe('AssetCopier', () => {
       expect(cssContent).toBe('body { color: red; }');
     });
   });
+
+  describe('copyAdminScreenshots', () => {
+    it('should copy admin:// prefixed screenshots from screenshots/ to images/', async () => {
+      // Create screenshots directory with admin-uploaded files
+      const screenshotsDir = path.join(tempDir, 'screenshots');
+      fs.mkdirSync(screenshotsDir);
+      fs.writeFileSync(path.join(screenshotsDir, 'project-123.png'), 'admin screenshot 1');
+      fs.writeFileSync(path.join(screenshotsDir, 'project-456.jpg'), 'admin screenshot 2');
+
+      // Create minimal required directories
+      const stylesDir = path.join(tempDir, 'styles');
+      const scriptsDir = path.join(tempDir, 'scripts');
+      fs.mkdirSync(stylesDir);
+      fs.mkdirSync(scriptsDir);
+      fs.writeFileSync(path.join(stylesDir, 'main.css'), '/* css */');
+      fs.writeFileSync(path.join(scriptsDir, 'main.js'), '// js');
+
+      // Pass thumbnails with admin:// prefix
+      const thumbnails = ['admin://project-123.png', 'admin://project-456.jpg'];
+      await assetCopier.copyAssets(mockConfig, thumbnails);
+
+      // Verify files were copied to images/ directory
+      const outputImagesDir = path.join(outputDir, 'images');
+      expect(fs.existsSync(outputImagesDir)).toBe(true);
+      expect(fs.existsSync(path.join(outputImagesDir, 'project-123.png'))).toBe(true);
+      expect(fs.existsSync(path.join(outputImagesDir, 'project-456.jpg'))).toBe(true);
+
+      // Verify content
+      const content1 = fs.readFileSync(path.join(outputImagesDir, 'project-123.png'), 'utf-8');
+      expect(content1).toBe('admin screenshot 1');
+    });
+
+    it('should not copy non-admin:// prefixed thumbnails', async () => {
+      // Create screenshots directory
+      const screenshotsDir = path.join(tempDir, 'screenshots');
+      fs.mkdirSync(screenshotsDir);
+      fs.writeFileSync(path.join(screenshotsDir, 'regular.png'), 'regular screenshot');
+
+      // Create minimal required directories
+      const stylesDir = path.join(tempDir, 'styles');
+      const scriptsDir = path.join(tempDir, 'scripts');
+      fs.mkdirSync(stylesDir);
+      fs.mkdirSync(scriptsDir);
+      fs.writeFileSync(path.join(stylesDir, 'main.css'), '/* css */');
+      fs.writeFileSync(path.join(scriptsDir, 'main.js'), '// js');
+
+      // Pass thumbnails without admin:// prefix
+      const thumbnails = ['screenshots/regular.png', 'images/other.jpg'];
+      await assetCopier.copyAssets(mockConfig, thumbnails);
+
+      // Verify images directory was not created (or is empty)
+      const outputImagesDir = path.join(outputDir, 'images');
+      if (fs.existsSync(outputImagesDir)) {
+        expect(fs.existsSync(path.join(outputImagesDir, 'regular.png'))).toBe(false);
+      }
+    });
+
+    it('should handle missing source files gracefully', async () => {
+      // Create screenshots directory but don't create the file
+      const screenshotsDir = path.join(tempDir, 'screenshots');
+      fs.mkdirSync(screenshotsDir);
+
+      // Create minimal required directories
+      const stylesDir = path.join(tempDir, 'styles');
+      const scriptsDir = path.join(tempDir, 'scripts');
+      fs.mkdirSync(stylesDir);
+      fs.mkdirSync(scriptsDir);
+      fs.writeFileSync(path.join(stylesDir, 'main.css'), '/* css */');
+      fs.writeFileSync(path.join(scriptsDir, 'main.js'), '// js');
+
+      // Pass thumbnail that doesn't exist
+      const thumbnails = ['admin://nonexistent.png'];
+      
+      // Should not throw error
+      await expect(assetCopier.copyAssets(mockConfig, thumbnails)).resolves.not.toThrow();
+    });
+
+    it('should handle temp files with admin:// prefix', async () => {
+      // Create screenshots directory with temp file
+      const screenshotsDir = path.join(tempDir, 'screenshots');
+      fs.mkdirSync(screenshotsDir);
+      fs.writeFileSync(path.join(screenshotsDir, 'project-123.temp.png'), 'temp screenshot');
+
+      // Create minimal required directories
+      const stylesDir = path.join(tempDir, 'styles');
+      const scriptsDir = path.join(tempDir, 'scripts');
+      fs.mkdirSync(stylesDir);
+      fs.mkdirSync(scriptsDir);
+      fs.writeFileSync(path.join(stylesDir, 'main.css'), '/* css */');
+      fs.writeFileSync(path.join(scriptsDir, 'main.js'), '// js');
+
+      // Pass temp thumbnail with admin:// prefix
+      const thumbnails = ['admin://project-123.temp.png'];
+      await assetCopier.copyAssets(mockConfig, thumbnails);
+
+      // Verify temp file was copied to images/
+      const outputImagesDir = path.join(outputDir, 'images');
+      expect(fs.existsSync(path.join(outputImagesDir, 'project-123.temp.png'))).toBe(true);
+    });
+  });
 });

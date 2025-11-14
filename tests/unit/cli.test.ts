@@ -145,10 +145,10 @@ describe('CLI', () => {
     });
 
     it('should handle multiple options', async () => {
-      await cli.run(['build', '--config', 'my.config.js', '--output', 'public', '--clean']);
+      await cli.run(['build', '--config', 'my.config.json', '--output', 'public', '--clean']);
 
       expect(build).toHaveBeenCalledWith({
-        config: 'my.config.js',
+        config: 'my.config.json',
         output: 'public',
         clean: true
       });
@@ -171,12 +171,12 @@ describe('CLI', () => {
     });
 
     it('should parse admin command with multiple options', async () => {
-      await cli.run(['admin', '--port', '3001', '--projects', 'data/projects.yaml', '--config', 'custom.config.js']);
+      await cli.run(['admin', '--port', '3001', '--projects', 'data/projects.yaml', '--config', 'custom.config.json']);
 
       expect(admin).toHaveBeenCalledWith({
         port: '3001',
         projects: 'data/projects.yaml',
-        config: 'custom.config.js'
+        config: 'custom.config.json'
       });
     });
 

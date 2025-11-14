@@ -23,7 +23,7 @@ export class AssetCopier {
   /**
    * Copy all assets (styles, scripts, static assets) to output directory
    */
-  async copyAssets(config: Config): Promise<void> {
+  async copyAssets(config: Config, projectThumbnails?: string[]): Promise<void> {
     // Ensure output directory exists
     this.ensureDirectoryExists(this.outputDir);
 
@@ -38,6 +38,11 @@ export class AssetCopier {
 
     // Copy user asset directories (images, screenshots, etc.)
     await this.copyUserAssetDirectories();
+
+    // Copy admin-uploaded screenshots to images/ directory
+    if (projectThumbnails && projectThumbnails.length > 0) {
+      await this.copyAdminScreenshots(projectThumbnails);
+    }
   }
 
   /**
@@ -276,5 +281,32 @@ export class AssetCopier {
     }
 
     return path.join(this.packageRoot, 'lib/templates/default/scripts');
+  }
+
+  /**
+   * Copy admin-uploaded screenshots from screenshots/ to images/ directory
+   * This handles thumbnails with the admin:// prefix
+   */
+  private async copyAdminScreenshots(thumbnails: string[]): Promise<void> {
+    const screenshotsDir = path.join(this.cwd, 'screenshots');
+    const imagesDir = path.join(this.outputDir, 'images');
+
+    // Ensure images directory exists
+    this.ensureDirectoryExists(imagesDir);
+
+    // Filter for admin:// prefixed thumbnails
+    const adminThumbnails = thumbnails.filter(t => t && t.startsWith('admin://'));
+
+    for (const thumbnail of adminThumbnails) {
+      // Remove admin:// prefix to get filename
+      const filename = thumbnail.substring(8);
+      const sourcePath = path.join(screenshotsDir, filename);
+      const destPath = path.join(imagesDir, filename);
+
+      // Only copy if source file exists
+      if (fs.existsSync(sourcePath)) {
+        this.copyFile(sourcePath, destPath);
+      }
+    }
   }
 }

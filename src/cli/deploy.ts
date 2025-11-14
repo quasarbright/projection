@@ -77,14 +77,14 @@ ${'\x1b[1m'}EXAMPLES:${'\x1b[0m'}
 
 ${'\x1b[1m'}CONFIGURATION:${'\x1b[0m'}
 
-  You can configure deployment settings in your projection.config.js:
+  You can configure deployment settings in your projection.config.json:
 
-  ${'\x1b[2m'}module.exports = {
+  ${'\x1b[2m'}{
     title: "My Portfolio",
-    baseUrl: "/my-repo/",           // Required for GitHub Pages
-    homepage: "portfolio.example.com", // Optional: custom domain
-    deployBranch: "gh-pages"        // Optional: default branch
-  };${'\x1b[0m'}
+    baseUrl: "/my-repo/",
+    homepage: "portfolio.example.com",
+    deployBranch: "gh-pages"
+  }${'\x1b[0m'}
 
   ${'\x1b[1m'}baseUrl:${'\x1b[0m'}      The URL path where your site will be hosted
                  For project sites: /repository-name/
@@ -113,7 +113,7 @@ ${'\x1b[1m'}FIRST-TIME SETUP:${'\x1b[0m'}
   2. Add your GitHub repository as remote:
      ${'\x1b[2m'}git remote add origin https://github.com/username/repo.git${'\x1b[0m'}
 
-  3. Configure baseUrl in projection.config.js:
+  3. Configure baseUrl in projection.config.json:
      ${'\x1b[2m'}baseUrl: "/repo/"${'\x1b[0m'}
 
   4. Deploy your site:
@@ -163,7 +163,7 @@ ${'\x1b[1m'}TROUBLESHOOTING:${'\x1b[0m'}
 
   ${'\x1b[1m'}Problem:${'\x1b[0m'} Custom domain not working
   ${'\x1b[1m'}Solution:${'\x1b[0m'} Ensure homepage is set in config and DNS is configured:
-           1. Add homepage: "yourdomain.com" to projection.config.js
+           1. Add homepage: "yourdomain.com" to projection.config.json
            2. Configure DNS records with your domain provider
            3. Enable HTTPS in GitHub Pages settings
 

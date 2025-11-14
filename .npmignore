@@ -2,7 +2,6 @@
 src/
 tests/
 tsconfig.json
-jest.config.js
 
 # Archive
 archive/

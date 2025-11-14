@@ -270,6 +270,24 @@ export class Validator {
       return warnings;
     }
 
+    // Skip if it's an admin:// prefixed path (admin-uploaded screenshots)
+    if (filePath.startsWith('admin://')) {
+      // Validate that the file exists in screenshots/ directory
+      const filename = filePath.substring(8); // Remove 'admin://' prefix
+      const screenshotsPath = path.join(this.cwd, 'screenshots', filename);
+      
+      if (!fs.existsSync(screenshotsPath)) {
+        warnings.push({
+          projectId,
+          projectIndex: index,
+          field,
+          message: `Admin-uploaded file not found: "${filePath}" (expected at: screenshots/${filename})`
+        });
+      }
+      
+      return warnings;
+    }
+
     // It's a local relative path - check if it exists
     let resolvedPath: string;
 

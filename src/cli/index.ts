@@ -176,7 +176,7 @@ EXAMPLES:
   projection init
 
   # Build with custom config
-  projection build --config my-config.js
+  projection build --config my-config.json
 
   # Start dev server on port 3000
   projection dev --port 3000

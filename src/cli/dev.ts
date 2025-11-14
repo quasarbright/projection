@@ -91,7 +91,6 @@ export async function dev(options: DevOptions = {}): Promise<void> {
       path.join(cwd, 'projects.yaml'),
       path.join(cwd, 'projects.yml'),
       path.join(cwd, 'projects.json'),
-      path.join(cwd, 'projection.config.js'),
       path.join(cwd, 'projection.config.json'),
       path.join(cwd, 'styles'),
       path.join(cwd, 'scripts')

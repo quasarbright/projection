@@ -56,8 +56,16 @@ export async function build(options: BuildOptions = {}): Promise<void> {
       if (error.details) {
         if (error.details.errors && Array.isArray(error.details.errors)) {
           Logger.error('Errors:');
-          error.details.errors.forEach((err: string) => {
-            Logger.dim(`  • ${err}`);
+          error.details.errors.forEach((err: any) => {
+            // Handle both string errors and structured validation errors
+            if (typeof err === 'string') {
+              Logger.dim(`  • ${err}`);
+            } else if (err.message) {
+              const projectInfo = err.projectId ? `[${err.projectId}]` : `[Project ${err.projectIndex}]`;
+              Logger.dim(`  • ${projectInfo} ${err.field}: ${err.message}`);
+            } else {
+              Logger.dim(`  • ${JSON.stringify(err)}`);
+            }
           });
           Logger.newline();
         } else if (error.details.message) {

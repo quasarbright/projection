@@ -84,6 +84,38 @@ describe('HTMLBuilder', () => {
       
       expect(result).toBe('https://example.comimages/project.png');
     });
+
+    it('should resolve admin:// prefix to images/ directory', () => {
+      const result = htmlBuilder.resolveThumbnailPath('admin://project-123.png', './');
+      
+      expect(result).toBe('./images/project-123.png');
+    });
+
+    it('should resolve admin:// prefix with different baseUrl', () => {
+      const result = htmlBuilder.resolveThumbnailPath('admin://screenshot.jpg', 'https://example.com/');
+      
+      expect(result).toBe('https://example.com/images/screenshot.jpg');
+    });
+
+    it('should handle admin:// prefix with temp files', () => {
+      const result = htmlBuilder.resolveThumbnailPath('admin://project-123.temp.png', './');
+      
+      expect(result).toBe('./images/project-123.temp.png');
+    });
+
+    it('should resolve admin:// prefix to /screenshots/ in admin mode', () => {
+      const adminBuilder = new HTMLBuilder(config, { adminMode: true });
+      const result = adminBuilder.resolveThumbnailPath('admin://project-123.png', './');
+      
+      expect(result).toBe('/screenshots/project-123.png');
+    });
+
+    it('should resolve admin:// prefix to /screenshots/ in admin mode regardless of baseUrl', () => {
+      const adminBuilder = new HTMLBuilder(config, { adminMode: true });
+      const result = adminBuilder.resolveThumbnailPath('admin://screenshot.jpg', 'https://example.com/');
+      
+      expect(result).toBe('/screenshots/screenshot.jpg');
+    });
   });
 
   describe('resolvePageLink', () => {

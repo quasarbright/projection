@@ -124,7 +124,10 @@ export class Generator {
 
       // 6. Copy assets
       Logger.step('Copying assets...');
-      await this.assetCopier.copyAssets(this.config);
+      const thumbnails = projectsData.projects
+        .map(p => p.thumbnailLink)
+        .filter((t): t is string => !!t);
+      await this.assetCopier.copyAssets(this.config, thumbnails);
       Logger.success('Assets copied');
 
       Logger.newline();

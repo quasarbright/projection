@@ -23,7 +23,7 @@ projection deploy
 ```
 .
 ├── projects.yaml              # Your project data
-├── projection.config.js       # Site configuration
+├── projection.config.jso      # Site configuration
 ├── dist/                      # Generated site (gitignored)
 ├── screenshots/               # Project thumbnails (optional)
 └── README.md                  # This file

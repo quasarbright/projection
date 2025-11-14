@@ -1,5 +1,6 @@
 import React, { useState, useRef, DragEvent, ChangeEvent, useEffect } from 'react';
 import { uploadThumbnail, deleteThumbnail } from '../services/api';
+import { resolveAdminPath } from '../utils/pathResolver';
 import './ImageUpload.css';
 
 interface ImageUploadProps {
@@ -37,7 +38,9 @@ export const ImageUpload: React.FC<ImageUploadProps> = ({
 
   // Update preview when currentThumbnail changes
   useEffect(() => {
-    setPreviewUrl(currentThumbnail || null);
+    // Resolve admin:// paths to actual URLs
+    const resolvedPath = resolveAdminPath(currentThumbnail);
+    setPreviewUrl(resolvedPath);
   }, [currentThumbnail]);
 
   const validateFile = (file: File): string | null => {

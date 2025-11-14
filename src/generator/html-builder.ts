@@ -191,11 +191,24 @@ export class HTMLBuilder {
 
   /**
    * Resolves a thumbnail path based on the base URL
-   * Handles absolute URLs, relative paths, and domain-absolute paths
+   * Handles absolute URLs, relative paths, domain-absolute paths, and admin:// prefix
    */
   resolveThumbnailPath(thumbnailLink: string | undefined, baseUrl: string): string {
     if (!thumbnailLink) {
       return baseUrl + 'images/magnet pendulum.PNG';
+    }
+
+    // If it starts with 'admin://', resolve based on mode
+    if (thumbnailLink.startsWith('admin://')) {
+      const filename = thumbnailLink.substring(8); // Remove 'admin://' prefix
+      
+      // In admin mode (preview), resolve to /screenshots/ for live preview
+      if (this.adminMode) {
+        return '/screenshots/' + filename;
+      }
+      
+      // In production build, resolve to images/ directory with baseUrl
+      return baseUrl + 'images/' + filename;
     }
 
     // If it's already an absolute URL (http/https), return as-is

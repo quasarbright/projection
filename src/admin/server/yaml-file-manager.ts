@@ -1,6 +1,30 @@
-import { parseDocument, Document } from 'yaml';
+import { parseDocument, Document, Scalar, isScalar } from 'yaml';
 import * as fs from 'fs';
 import { Project, ProjectsData } from '../../types';
+
+/**
+ * Helper function to recursively quote date strings in YAML nodes
+ */
+function quoteDateStrings(node: any): void {
+  if (!node) return;
+  
+  if (isScalar(node)) {
+    // If it's a scalar that looks like a date (YYYY-MM-DD), quote it
+    if (typeof node.value === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(node.value)) {
+      node.type = 'QUOTE_DOUBLE';
+    }
+  } else if (node.items) {
+    // It's a collection (array or object)
+    for (const item of node.items) {
+      if (item && item.value) {
+        quoteDateStrings(item.value);
+      }
+      if (item && item.key) {
+        quoteDateStrings(item.key);
+      }
+    }
+  }
+}
 
 /**
  * YAML file manager that preserves comments and formatting
@@ -57,9 +81,22 @@ export class YAMLFileManager {
       throw new Error(`Project with id "${projectId}" not found`);
     }
 
+    // Ensure creationDate is a string (not a Date object)
+    const projectToSave = {
+      ...updatedProject,
+      creationDate: typeof updatedProject.creationDate === 'string' 
+        ? updatedProject.creationDate 
+        : (updatedProject.creationDate as Date).toISOString().split('T')[0]
+    };
+
     // Replace the project node with updated data
     // This preserves comments around the project
-    projects.items[projectIndex] = this.doc.createNode(updatedProject);
+    const newNode = this.doc.createNode(projectToSave);
+    
+    // Force date strings to be quoted
+    quoteDateStrings(newNode);
+    
+    projects.items[projectIndex] = newNode;
 
     // Write back to file
     await fs.promises.writeFile(this.filePath, this.doc.toString(), 'utf-8');
@@ -74,18 +111,31 @@ export class YAMLFileManager {
       throw new Error('Document not loaded. Call readProjects() first.');
     }
 
+    // Ensure creationDate is a string (not a Date object)
+    const projectToSave = {
+      ...project,
+      creationDate: typeof project.creationDate === 'string' 
+        ? project.creationDate 
+        : (project.creationDate as Date).toISOString().split('T')[0]
+    };
+
     let projects = this.doc.get('projects') as any;
     
     // If projects doesn't exist, create it with the new project
     if (!projects) {
-      this.doc.set('projects', [project]);
+      this.doc.set('projects', [projectToSave]);
     } else if (projects.items) {
       // If projects exists and has items, add to it
-      projects.items.push(this.doc.createNode(project));
+      const newNode = this.doc.createNode(projectToSave);
+      
+      // Force date strings to be quoted
+      quoteDateStrings(newNode);
+      
+      projects.items.push(newNode);
     } else {
       // Fallback: recreate projects array with new project
       const existingProjects = this.doc.toJS().projects || [];
-      this.doc.set('projects', [...existingProjects, project]);
+      this.doc.set('projects', [...existingProjects, projectToSave]);
     }
 
     // Write back to file

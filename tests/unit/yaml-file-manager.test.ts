@@ -277,4 +277,62 @@ projects:
       ).rejects.toThrow('Document not loaded');
     });
   });
+
+  describe('date quoting', () => {
+    it('should quote dates when adding a project', async () => {
+      const yamlContent = `projects: []
+`;
+      fs.writeFileSync(testFilePath, yamlContent);
+      manager = new YAMLFileManager(testFilePath);
+
+      await manager.readProjects();
+      await manager.addProject(sampleProject);
+
+      const content = fs.readFileSync(testFilePath, 'utf-8');
+      
+      // Check that the date is quoted
+      expect(content).toMatch(/creationDate:\s*["']2024-01-01["']/);
+    });
+
+    it('should quote dates when updating a project', async () => {
+      const yamlContent = `projects:
+  - id: test-project
+    title: Old Title
+    description: Old description
+    creationDate: 2023-01-01
+    tags: []
+    pageLink: https://old.com
+`;
+      fs.writeFileSync(testFilePath, yamlContent);
+      manager = new YAMLFileManager(testFilePath);
+
+      await manager.readProjects();
+      await manager.updateProject('test-project', sampleProject);
+
+      const content = fs.readFileSync(testFilePath, 'utf-8');
+      
+      // Check that the date is quoted
+      expect(content).toMatch(/creationDate:\s*["']2024-01-01["']/);
+    });
+
+    it('should handle Date objects by converting to string', async () => {
+      const yamlContent = `projects: []
+`;
+      fs.writeFileSync(testFilePath, yamlContent);
+      manager = new YAMLFileManager(testFilePath);
+
+      const projectWithDateObject = {
+        ...sampleProject,
+        creationDate: new Date('2024-01-01') as any
+      };
+
+      await manager.readProjects();
+      await manager.addProject(projectWithDateObject);
+
+      const content = fs.readFileSync(testFilePath, 'utf-8');
+      
+      // Check that the date is quoted and in YYYY-MM-DD format
+      expect(content).toMatch(/creationDate:\s*["']2024-01-01["']/);
+    });
+  });
 });

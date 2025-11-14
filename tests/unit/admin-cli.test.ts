@@ -153,11 +153,11 @@ describe('Admin CLI Command', () => {
     });
 
     it('should use custom config file path', async () => {
-      await admin({ config: 'custom.config.js' });
+      await admin({ config: 'custom.config.json' });
 
       expect(startAdminServer).toHaveBeenCalledWith(
         expect.objectContaining({
-          configFilePath: path.resolve('/test/project', 'custom.config.js')
+          configFilePath: path.resolve('/test/project', 'custom.config.json')
         })
       );
     });
