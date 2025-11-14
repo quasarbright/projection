@@ -1,6 +1,5 @@
 - [ ] update readme. and shorten it.
 - [ ] publish npm package
-- [ ] config management in admin ui, including backgrounds
 - [ ] build system with caching?
 - [ ] markdown in description
 - [ ] let dynamic background see mouse movements
@@ -25,3 +24,4 @@
   - [x] make another repo that uses it as a SSG, and do something like react-github-pages or what you do for your racket blog, or tbh just commit dist
   - [x] update package.json and links to the homepage and projects.yaml entry for projection
 - [x] deploy to gh pages button
+- [x] config management in admin ui, including backgrounds

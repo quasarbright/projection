@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import type { Config } from '../../../../types';
 import { ConfigForm } from './ConfigForm';
 import { AdvancedConfigForm } from './AdvancedConfigForm';
+import { DynamicBackgroundManager } from './DynamicBackgroundManager';
 import './SettingsModal.css';
 
 interface SettingsModalProps {
@@ -143,7 +144,10 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
 
           {activeTab === 'backgrounds' && (
             <div className="tab-content">
-              <p>Dynamic backgrounds management will be implemented in task 16</p>
+              <DynamicBackgroundManager
+                backgrounds={formData.dynamicBackgrounds || []}
+                onChange={(backgrounds) => handleChange({ dynamicBackgrounds: backgrounds })}
+              />
             </div>
           )}
 

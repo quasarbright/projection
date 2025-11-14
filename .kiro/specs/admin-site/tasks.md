@@ -507,7 +507,7 @@
   - Refresh config in context after successful save
   - _Requirements: 12.1, 12.5_
 
-- [ ] 16. Implement dynamic backgrounds management
+- [x] 16. Implement dynamic backgrounds management
   - Create DynamicBackgroundManager component
   - Create BackgroundPreviewCard component
   - Create BackgroundPreviewModal component
@@ -515,7 +515,7 @@
   - Add live iframe previews with status indicators
   - _Requirements: 13.1, 13.2, 13.3, 13.4, 13.5, 14.1, 14.2, 14.3, 14.4, 15.1, 15.2, 15.3, 15.4, 15.5_
 
-- [ ] 16.1 Create DynamicBackgroundManager component
+- [x] 16.1 Create DynamicBackgroundManager component
   - Write `src/admin/client/src/components/DynamicBackgroundManager.tsx`
   - Add input field for new background URL
   - Add "Add" button to add URL to list
@@ -525,7 +525,7 @@
   - Update parent config state when backgrounds change
   - _Requirements: 13.1, 13.2, 13.3_
 
-- [ ] 16.2 Create BackgroundPreviewCard component
+- [x] 16.2 Create BackgroundPreviewCard component
   - Write `src/admin/client/src/components/BackgroundPreviewCard.tsx`
   - Display iframe preview (250x200px) with URL appended with "?background=true"
   - Add iframe sandbox attributes for security
@@ -537,7 +537,7 @@
   - Add drag handle for reordering
   - _Requirements: 13.2, 14.1, 14.2, 14.4, 15.1, 15.2, 15.4_
 
-- [ ] 16.3 Implement drag-and-drop reordering
+- [x] 16.3 Implement drag-and-drop reordering
   - Add drag event handlers to BackgroundPreviewCard
   - Implement HTML5 drag-and-drop API
   - Update backgrounds array order during drag
@@ -545,7 +545,7 @@
   - Update parent state with new order
   - _Requirements: 13.5, 15.3_
 
-- [ ] 16.4 Create BackgroundPreviewModal component
+- [x] 16.4 Create BackgroundPreviewModal component
   - Write `src/admin/client/src/components/BackgroundPreviewModal.tsx`
   - Display modal overlay with large iframe preview (800x600px)
   - Show full URL above preview
@@ -554,14 +554,14 @@
   - Use same iframe security settings as preview card
   - _Requirements: 15.3_
 
-- [ ] 16.5 Integrate DynamicBackgroundManager with SettingsModal
+- [x] 16.5 Integrate DynamicBackgroundManager with SettingsModal
   - Add DynamicBackgroundManager to "Dynamic Backgrounds" tab
   - Pass dynamicBackgrounds array from config
   - Update config state when backgrounds change
   - Save updated backgrounds array with config on save
   - _Requirements: 13.1, 13.2_
 
-- [ ] 16.6 Add styling for background components
+- [x] 16.6 Add styling for background components
   - Style preview cards with grid layout
   - Add responsive breakpoints (1 column on mobile, 2-3 on desktop)
   - Style iframe previews with loading states
