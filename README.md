@@ -42,6 +42,12 @@ And its source code: https://github.com/quasarbright/portfolio
 
 - Node.js 14.0.0 or higher
 
+### Install from npm
+
+```bash
+npm install -g @quasarbright/projection
+```
+
 ### Install from Source
 
 ```bash
