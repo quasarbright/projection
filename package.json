@@ -1,7 +1,7 @@
 {
-  "name": "projection",
-  "version": "2.0.0",
-  "description": "A static site generator that creates a beautiful, interactive gallery to showcase your coding projects. Features search, filtering, dark theme, and responsive design.",
+  "name": "@quasarbright/projection",
+  "version": "1.0.0",
+  "description": "A static site generator that creates a beautiful, interactive gallery to showcase your coding projects. Features search, filtering, tags, responsive design, and an admin UI.",
   "main": "lib/index.js",
   "types": "lib/index.d.ts",
   "bin": {
@@ -42,7 +42,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/quasarbright/projection"
+    "url": "git+https://github.com/quasarbright/projection.git"
   },
   "homepage": "https://quasarbright.github.io/projection/",
   "engines": {
@@ -73,5 +73,12 @@
     "ts-jest": "^29.1.1",
     "ts-node": "^10.9.2",
     "typescript": "^5.3.3"
+  },
+  "directories": {
+    "lib": "lib",
+    "test": "tests"
+  },
+  "bugs": {
+    "url": "https://github.com/quasarbright/projection/issues"
   }
 }
