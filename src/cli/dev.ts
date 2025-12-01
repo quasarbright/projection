@@ -80,7 +80,8 @@ export async function dev(options: DevOptions = {}): Promise<void> {
     const generatorOptions: GeneratorOptions = {
       cwd,
       configPath: options.config,
-      outputDir: options.output
+      outputDir: options.output,
+      baseUrl: './' // Force relative paths for dev server
     };
 
     // Create generator instance
@@ -103,9 +104,14 @@ export async function dev(options: DevOptions = {}): Promise<void> {
     // Initialize browser-sync
     const bs = browserSync.create();
 
-    // Start browser-sync server
+    // Start browser-sync server with middleware to serve screenshots
     bs.init({
-      server: outputDir,
+      server: {
+        baseDir: outputDir,
+        routes: {
+          '/screenshots': path.join(cwd, 'screenshots')
+        }
+      },
       port,
       open: shouldOpen,
       notify: false,

@@ -25,6 +25,8 @@ export interface GeneratorOptions {
   clean?: boolean;
   /** Enable admin mode with edit/delete controls (for preview only) */
   adminMode?: boolean;
+  /** Override baseUrl (useful for dev server) */
+  baseUrl?: string;
 }
 
 /**
@@ -69,6 +71,11 @@ export class Generator {
     // Override output directory if specified in options
     if (options.outputDir) {
       config.output = options.outputDir;
+    }
+
+    // Override baseUrl if specified in options (useful for dev server)
+    if (options.baseUrl !== undefined) {
+      config.baseUrl = options.baseUrl;
     }
 
     // Pass adminMode to constructor (defaults to false for production builds)

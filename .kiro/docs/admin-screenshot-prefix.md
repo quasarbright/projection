@@ -225,3 +225,59 @@ Comprehensive tests added in:
 - `tests/unit/html-builder.test.ts` - Build-time path resolution tests
 - `tests/unit/asset-copier.test.ts` - File copying tests
 - `tests/integration/admin-screenshot-upload.test.ts` - End-to-end integration tests
+
+
+## Dev Server Support
+
+### Problem
+
+When running `projection dev` with a production `baseUrl` (e.g., `https://example.com/`), the generated HTML would reference production URLs for images, causing them not to load from the local dev server.
+
+### Solution
+
+The dev server now:
+
+1. **Overrides baseUrl**: Forces `baseUrl: './'` for local development via `GeneratorOptions`
+2. **Serves screenshots**: Configures browser-sync to serve the `screenshots/` directory
+3. **Uses relative paths**: All images load from `./images/` regardless of production config
+
+### Implementation
+
+**Generator Options** (`src/generator/index.ts`):
+```typescript
+export interface GeneratorOptions {
+  // ... other options
+  baseUrl?: string;  // Override baseUrl (useful for dev server)
+}
+```
+
+**Dev Command** (`src/cli/dev.ts`):
+```typescript
+const generatorOptions: GeneratorOptions = {
+  cwd,
+  configPath: options.config,
+  outputDir: options.output,
+  baseUrl: './'  // Force relative paths for dev server
+};
+```
+
+**Browser-Sync Configuration**:
+```typescript
+bs.init({
+  server: {
+    baseDir: outputDir,
+    routes: {
+      '/screenshots': path.join(cwd, 'screenshots')
+    }
+  },
+  // ...
+});
+```
+
+### Result
+
+Now `projection dev` works correctly regardless of your production `baseUrl` configuration:
+
+- **Production config**: `baseUrl: https://example.com/portfolio/`
+- **Dev server HTML**: Uses `./images/project.png` (relative paths)
+- **Production build HTML**: Uses `https://example.com/portfolio/images/project.png`
