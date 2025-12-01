@@ -1,9 +1,9 @@
 import { GitHelper } from '../utils/git-helper';
 import { DeploymentConfigLoader, DeployOptions } from '../utils/deployment-config';
 import { ProjectFileFinder } from '../utils/project-file-finder';
+import { BuildHelper } from '../utils/build-helper';
 import { Logger } from '../utils/logger';
 import { ProjectionError, ErrorCodes } from '../utils/errors';
-import { Generator } from '../generator';
 import * as fs from 'fs';
 import * as path from 'path';
 import * as ghpages from 'gh-pages';
@@ -307,67 +307,17 @@ export async function deploy(options: DeployOptions = {}): Promise<void> {
       Logger.newline();
 
       try {
-        // Clean build directory before building
-        const buildDirPath = path.isAbsolute(config.buildDir)
-          ? config.buildDir
-          : path.join(cwd, config.buildDir);
-
-        if (fs.existsSync(buildDirPath)) {
-          Logger.step('Cleaning build directory...');
-          fs.rmSync(buildDirPath, { recursive: true, force: true });
-          Logger.success('Build directory cleaned');
-        }
-
-        // Create generator with baseUrl from deployment config
-        Logger.step('Initializing generator...');
-        const generator = await Generator.create({
+        // Use shared build helper
+        await BuildHelper.runBuild({
           cwd,
           outputDir: config.buildDir,
-          clean: false // Already cleaned above
+          clean: true
         });
-
-        // Override baseUrl in config for deployment
-        const generatorConfig = generator.getConfig();
-        generatorConfig.baseUrl = config.baseUrl;
-
-        Logger.success('Generator initialized');
-
-        // Run the build
-        Logger.step('Generating site...');
-        await generator.generate();
-        Logger.success('Site generated successfully');
-
-        Logger.newline();
-        Logger.icon('✨', 'Build complete!', '\x1b[32m');
-        Logger.keyValue('Output directory', buildDirPath);
-        Logger.newline();
 
       } catch (error) {
         Logger.newline();
-        Logger.error('Build failed');
-        Logger.newline();
-
-        if (error instanceof ProjectionError) {
-          Logger.dim(error.message);
-          
-          if (error.details) {
-            if (error.details.errors && Array.isArray(error.details.errors)) {
-              Logger.newline();
-              Logger.error('Errors:');
-              error.details.errors.forEach((err: string) => {
-                Logger.dim(`  • ${err}`);
-              });
-            } else if (error.details.message) {
-              Logger.newline();
-              Logger.dim(error.details.message);
-            }
-          }
-        } else {
-          Logger.dim((error as Error).message);
-        }
-
-        Logger.newline();
         Logger.error('Deployment aborted due to build failure');
+        Logger.newline();
         
         throw new ProjectionError(
           'Build failed',

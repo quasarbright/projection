@@ -2,7 +2,7 @@ import * as fs from 'fs';
 import * as path from 'path';
 import * as chokidar from 'chokidar';
 import * as browserSync from 'browser-sync';
-import { Generator, GeneratorOptions } from '../generator';
+import { BuildHelper } from '../utils/build-helper';
 import { ProjectionError } from '../utils/errors';
 import { Logger } from '../utils/logger';
 
@@ -76,22 +76,17 @@ export async function dev(options: DevOptions = {}): Promise<void> {
   Logger.newline();
 
   try {
-    // Prepare generator options
-    const generatorOptions: GeneratorOptions = {
-      cwd,
-      configPath: options.config,
-      outputDir: options.output,
-      baseUrl: './' // Force relative paths for dev server
-    };
-
-    // Create generator instance
-    let generator = await Generator.create(generatorOptions);
-    const outputDir = generator.getOutputDir();
-
-    // Perform initial build
+    // Perform initial build using shared helper
     Logger.step('Performing initial build...');
     Logger.newline();
-    await generator.generate();
+    
+    let result = await BuildHelper.runBuild({
+      cwd,
+      configPath: options.config,
+      outputDir: options.output
+    });
+    
+    const outputDir = result.outputDir;
 
     // Check if dist directory exists after build
     if (!fs.existsSync(outputDir)) {
@@ -177,9 +172,13 @@ export async function dev(options: DevOptions = {}): Promise<void> {
       try {
         Logger.icon('🔄', 'Change detected, rebuilding...', '\x1b[33m');
         
-        // Recreate generator to pick up config changes
-        generator = await Generator.create(generatorOptions);
-        await generator.generate();
+        // Rebuild using shared helper
+        result = await BuildHelper.runBuild({
+          cwd,
+          configPath: options.config,
+          outputDir: options.output,
+          silent: true // Don't show full build logs on rebuild
+        });
         
         Logger.success('Rebuild complete');
         Logger.newline();

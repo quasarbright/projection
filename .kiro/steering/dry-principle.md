@@ -153,3 +153,73 @@ When you see duplication:
 
 - [DRY Principle - Wikipedia](https://en.wikipedia.org/wiki/Don%27t_repeat_yourself)
 - [The Pragmatic Programmer](https://pragprog.com/titles/tpp20/the-pragmatic-programmer-20th-anniversary-edition/)
+
+
+## Build Logic Consolidation
+
+### Problem Identified
+
+The `build`, `dev`, and `deploy` commands all had duplicated build logic:
+- Each command created its own `Generator` instance
+- Each command called `generator.generate()` separately
+- Each command had its own error handling for build failures
+- Inconsistent behavior between commands (e.g., `dev` forced `baseUrl: './'` but others didn't)
+
+This violated DRY and caused bugs where `projection build` and `projection deploy` generated different output.
+
+### Solution: BuildHelper Utility
+
+Created `src/utils/build-helper.ts` with a shared `BuildHelper.runBuild()` method that:
+- Centralizes all build logic in one place
+- Provides consistent error handling
+- Supports all build options (baseUrl override, clean, silent mode, etc.)
+- Returns a `BuildResult` with the output directory and generator instance
+
+### Usage
+
+**Before (duplicated in each command):**
+```typescript
+// In build.ts
+const generator = await Generator.create({ cwd, configPath, outputDir, clean });
+await generator.generate();
+
+// In dev.ts  
+const generator = await Generator.create({ cwd, configPath, outputDir, baseUrl: './' });
+await generator.generate();
+
+// In deploy.ts
+const generator = await Generator.create({ cwd, outputDir, clean: false });
+await generator.generate();
+```
+
+**After (shared helper):**
+```typescript
+// All commands use the same helper
+const result = await BuildHelper.runBuild({
+  cwd,
+  configPath,
+  outputDir,
+  clean,
+  baseUrl, // Optional override
+  silent   // Optional for rebuilds
+});
+```
+
+### Benefits
+
+1. **Single source of truth** - Build logic exists in one place
+2. **Consistent behavior** - All commands generate identical output
+3. **Easier maintenance** - Fix bugs once, applies everywhere
+4. **Better testing** - Test the helper once instead of each command
+5. **Clearer intent** - Commands focus on their specific concerns (serving, deploying) not build details
+
+### Files Modified
+
+- Created: `src/utils/build-helper.ts`
+- Updated: `src/cli/build.ts` - Now uses `BuildHelper.runBuild()`
+- Updated: `src/cli/dev.ts` - Now uses `BuildHelper.runBuild()` with `baseUrl: './'`
+- Updated: `src/cli/deploy.ts` - Now uses `BuildHelper.runBuild()`
+
+### Result
+
+Now `projection build`, `projection dev`, and `projection deploy` all use the exact same build logic, ensuring consistent output and behavior across all commands.

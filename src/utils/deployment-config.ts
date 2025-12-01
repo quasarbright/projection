@@ -69,12 +69,8 @@ export class DeploymentConfigLoader {
     const repoName = this.extractRepoName(repositoryUrl);
     const githubPagesUrl = this.generateGitHubPagesUrl(repositoryUrl);
 
-    // Determine baseUrl (from config or auto-generated)
-    let baseUrl = projectionConfig.baseUrl;
-    if (!baseUrl || baseUrl === './') {
-      // Auto-generate baseUrl from repository name
-      baseUrl = `/${repoName}/`;
-    }
+    // Use baseUrl from config (don't override it)
+    const baseUrl = projectionConfig.baseUrl;
 
     // Get homepage from config (for custom domains)
     const homepage = (projectionConfig as any).homepage || null;
