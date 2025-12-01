@@ -2,6 +2,7 @@
 - [ ] build system with caching?
 - [ ] markdown in description
 - [ ] let dynamic background see mouse movements
+- [ ] build, deploy, and dev all have different build logic and path resolution? the other two should literally just call build.
 - [x] admin site?
 - [x] more convenient build + run script
 - [x] generalize to all projects, not just web. add other projects. blog?
