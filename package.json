@@ -1,6 +1,6 @@
 {
   "name": "@quasarbright/projection",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "description": "A static site generator that creates a beautiful, interactive gallery to showcase your coding projects. Features search, filtering, tags, responsive design, and an admin UI.",
   "main": "lib/index.js",
   "types": "lib/index.d.ts",
