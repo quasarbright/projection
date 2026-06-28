@@ -3,10 +3,14 @@
  * Provides deployment capabilities for the admin interface
  */
 
+import { execFile } from 'child_process';
+import { promisify } from 'util';
 import { GitHelper, GitValidationResult } from '../../utils/git-helper';
 import { DeploymentConfigLoader, DeployOptions } from '../../utils/deployment-config';
 import { ProjectFileFinder } from '../../utils/project-file-finder';
 import { deploy as cliDeploy } from '../../cli/deploy';
+
+const execFileAsync = promisify(execFile);
 
 /**
  * Response from deployment status check
@@ -179,15 +183,24 @@ export class DeploymentService {
       process.chdir(cwd);
 
       try {
+        // Record time just before push so we can identify the triggered run
+        const pushTime = new Date();
+
         // Execute the CLI deploy function
         await cliDeploy(deployOptions);
-
-        // Calculate duration
-        const duration = Date.now() - startTime;
 
         // Load config to get deployment URL
         const config = await DeploymentConfigLoader.load(cwd, {});
         const url = config.homepage || DeploymentConfigLoader.generateGitHubPagesUrl(config.repositoryUrl);
+
+        // If gh CLI is available, wait for GitHub Pages to finish building
+        const ownerRepo = DeploymentService.extractOwnerRepo(config.repositoryUrl);
+        if (ownerRepo && await DeploymentService.isGhCliAvailable()) {
+          await DeploymentService.waitForPagesDeployment(ownerRepo, pushTime);
+        }
+
+        // Calculate duration
+        const duration = Date.now() - startTime;
 
         return {
           success: true,
@@ -267,5 +280,76 @@ export class DeploymentService {
         }
       };
     }
+  }
+
+  static async isGhCliAvailable(): Promise<boolean> {
+    try {
+      await execFileAsync('gh', ['--version']);
+      return true;
+    } catch {
+      return false;
+    }
+  }
+
+  static extractOwnerRepo(repositoryUrl: string): string | null {
+    const match = repositoryUrl.match(/github\.com[/:]([^/]+)\/([^/.]+)/);
+    if (match) {
+      return `${match[1]}/${match[2]}`;
+    }
+    return null;
+  }
+
+  static async waitForPagesDeployment(ownerRepo: string, pushedAt: Date, timeoutMs = 180000): Promise<void> {
+    const pollInterval = 5000;
+    const deadline = Date.now() + timeoutMs;
+
+    // First, wait for a pages-build-deployment run triggered after our push
+    let runId: number | null = null;
+    while (Date.now() < deadline) {
+      try {
+        const { stdout } = await execFileAsync('gh', [
+          'run', 'list',
+          '--repo', ownerRepo,
+          '--workflow', 'pages-build-deployment',
+          '--limit', '5',
+          '--json', 'databaseId,status,conclusion,createdAt',
+        ]);
+        const runs: Array<{ databaseId: number; status: string; conclusion: string; createdAt: string }> = JSON.parse(stdout);
+        const triggered = runs.find(r => new Date(r.createdAt) >= pushedAt);
+        if (triggered) {
+          if (triggered.status === 'completed') {
+            return; // already done by the time we checked
+          }
+          runId = triggered.databaseId;
+          break;
+        }
+      } catch {
+        // gh not authed or API call failed — fall through to timeout
+      }
+      await new Promise<void>(resolve => setTimeout(resolve, pollInterval));
+    }
+
+    if (!runId) {
+      return; // Timed out waiting for run to appear — push succeeded, treat as done
+    }
+
+    // Now poll the specific run until it completes
+    while (Date.now() < deadline) {
+      await new Promise<void>(resolve => setTimeout(resolve, pollInterval));
+      try {
+        const { stdout } = await execFileAsync('gh', [
+          'run', 'view', String(runId),
+          '--repo', ownerRepo,
+          '--json', 'status,conclusion',
+        ]);
+        const run: { status: string; conclusion: string } = JSON.parse(stdout);
+        if (run.status === 'completed') {
+          return;
+        }
+      } catch {
+        // Keep polling on transient errors
+      }
+    }
+    // Timed out — push succeeded so treat as done
   }
 }
