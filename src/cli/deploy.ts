@@ -3,6 +3,7 @@ import { DeploymentConfigLoader, DeployOptions } from '../utils/deployment-confi
 import { ProjectFileFinder } from '../utils/project-file-finder';
 import { BuildHelper } from '../utils/build-helper';
 import { Logger } from '../utils/logger';
+import { PagesWaiter } from '../utils/pages-waiter';
 import { ProjectionError, ErrorCodes } from '../utils/errors';
 import * as fs from 'fs';
 import * as path from 'path';
@@ -387,6 +388,9 @@ export async function deploy(options: DeployOptions = {}): Promise<void> {
       Logger.dim(`Remote: ${config.remote}`);
       Logger.newline();
 
+      // Record time just before push so we can identify the triggered Pages run
+      const pushTime = new Date();
+
       // Publish to gh-pages
       await new Promise<void>((resolve, reject) => {
         ghpages.publish(buildDirPath, ghPagesOptions, (err) => {
@@ -398,15 +402,29 @@ export async function deploy(options: DeployOptions = {}): Promise<void> {
         });
       });
 
+      Logger.success(`Pushed to ${config.branch}`);
+
+      // Wait for the Pages build so "done" means the site is live
+      Logger.step('Waiting for GitHub Pages to build...');
+      const waitResult = await PagesWaiter.waitForDeployment(config.repositoryUrl, pushTime);
+      if (waitResult.status === 'completed' && waitResult.conclusion === 'success') {
+        Logger.success('GitHub Pages build finished');
+      } else if (waitResult.status === 'completed') {
+        Logger.warn(`GitHub Pages build finished with conclusion: ${waitResult.conclusion}`);
+      } else if (waitResult.status === 'timeout') {
+        Logger.warn('Timed out waiting for the GitHub Pages build; it may still be running');
+      } else {
+        Logger.dim('Skipped (needs the gh CLI and a GitHub remote)');
+      }
+
       // Display success message
       Logger.newline();
       Logger.icon('🎉', 'Deployment successful!', '\x1b[32m');
       Logger.newline();
 
       // Generate GitHub Pages URL
-      const repoName = DeploymentConfigLoader.extractRepoName(config.repositoryUrl);
       const githubPagesUrl = config.homepage || DeploymentConfigLoader.generateGitHubPagesUrl(config.repositoryUrl);
-      
+
       Logger.keyValue('Site URL', githubPagesUrl);
       Logger.keyValue('Branch', config.branch);
       if (ghPagesOptions.message) {
@@ -414,8 +432,12 @@ export async function deploy(options: DeployOptions = {}): Promise<void> {
       }
       Logger.newline();
 
-      Logger.info('Your site has been deployed to GitHub Pages!');
-      Logger.dim('Note: It may take a few minutes for GitHub Pages to update.');
+      if (waitResult.status === 'completed' && waitResult.conclusion === 'success') {
+        Logger.info('Your site is live on GitHub Pages!');
+      } else {
+        Logger.info('Your site has been deployed to GitHub Pages!');
+        Logger.dim('Note: It may take a few minutes for GitHub Pages to update.');
+      }
       Logger.newline();
 
       // Provide instructions for enabling GitHub Pages if needed

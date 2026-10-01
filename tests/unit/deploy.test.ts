@@ -14,6 +14,9 @@ jest.mock('../../src/utils/project-file-finder');
 jest.mock('../../src/generator');
 jest.mock('fs');
 jest.mock('gh-pages');
+jest.mock('../../src/utils/pages-waiter', () => ({
+  PagesWaiter: { waitForDeployment: jest.fn().mockResolvedValue({ status: 'skipped' }) }
+}));
 
 describe('deploy command', () => {
   let consoleLogSpy: jest.SpyInstance;

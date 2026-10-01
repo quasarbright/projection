@@ -12,6 +12,11 @@ jest.mock('gh-pages', () => ({
   })
 }));
 
+// Don't poll GitHub for a Pages build that will never happen
+jest.mock('../../src/utils/pages-waiter', () => ({
+  PagesWaiter: { waitForDeployment: jest.fn().mockResolvedValue({ status: 'skipped' }) }
+}));
+
 describe('CLI deploy command integration', () => {
   let tempDir: string;
   let originalCwd: string;
