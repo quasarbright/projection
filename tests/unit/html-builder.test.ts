@@ -716,6 +716,10 @@ describe('HTMLBuilder', () => {
       
       expect(html).toContain('id="dynamic-background"');
       expect(html).toContain('<iframe');
+      // the body class turns on pointer pass-through to the background (main.css)
+      expect(html).toContain('<body class="has-dynamic-background">');
+      // a background can't take over the page by going fullscreen
+      expect(html).toContain(`allow="fullscreen 'none'"`);
     });
 
     it('should not include dynamic background iframe when not configured', () => {
@@ -726,6 +730,7 @@ describe('HTMLBuilder', () => {
       const html = htmlBuilder.generateHTML(projectsData);
       
       expect(html).not.toContain('id="dynamic-background"');
+      expect(html).not.toContain('has-dynamic-background');
     });
 
     it('should include stats section with project counts', () => {

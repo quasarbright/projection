@@ -294,6 +294,18 @@ Your background pages should:
 2. **Work in an iframe** - Not blocked by X-Frame-Options
 3. **Be performant** - Lightweight animations that don't slow down the site
 
+#### Mouse interaction
+
+Wherever no card, link, or control is on top, the page lets the pointer through, so the background gets native mouse and pointer events, clicks included. That works for a background on any domain.
+
+Over a card or control, Projection re-sends each move inside the background as a synthetic `pointermove` and `mousemove` at the same spot, so a sketch that follows the cursor (p5's `mouseX`, for example) keeps following it. This only reaches a background on the same origin as the portfolio. A full URL on the same host already counts (a portfolio at `https://you.github.io/portfolio/` with a background at `https://you.github.io/sketch/`). You can also list a same-site background by path (`/sketch/`), which keeps it same-origin wherever the site is served, including a local server that proxies to your live site; the admin settings form only accepts full URLs, so add paths in `projection.config.json`.
+
+A background on another origin only gets those moves if it listens for the `postMessage` fallback, `{ type: 'mousemove', x, y, pageX, pageY }`.
+
+`projection dev` serves on localhost, which is cross-origin with live sketch URLs, so forwarding over cards won't show up there unless you serve the site behind a proxy.
+
+For a same-origin background, Projection also sets `overflow: hidden` on its document so that scrolling over it scrolls the portfolio. The iframe isn't allowed to go fullscreen.
+
 #### Best Practices
 
 1. **Test performance** - Ensure backgrounds don't slow down your site

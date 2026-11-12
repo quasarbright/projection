@@ -409,7 +409,7 @@ export class HTMLBuilder {
 
     // Generate dynamic background iframe if configured
     const dynamicBackgroundHTML = mergedConfig.dynamicBackgrounds && mergedConfig.dynamicBackgrounds.length > 0
-      ? `<iframe id="dynamic-background" src="" frameborder="0" tabindex="-1" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -1;"></iframe>`
+      ? `<iframe id="dynamic-background" src="" frameborder="0" tabindex="-1" title="Background" allow="fullscreen 'none'"></iframe>`
       : '';
 
     // Generate admin features if in admin mode
@@ -430,7 +430,7 @@ export class HTMLBuilder {
   <link rel="stylesheet" href="styles/cards.css">
   <!-- <link rel="stylesheet" href="styles/modal.css"> Modal styles not currently used -->${adminStyles}
 </head>
-<body>
+<body${dynamicBackgroundHTML ? ' class="has-dynamic-background"' : ''}>
   ${dynamicBackgroundHTML}
   <header class="site-header">
     <div class="container">
