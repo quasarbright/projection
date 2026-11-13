@@ -152,6 +152,25 @@
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+  min-width: 0;
+}
+
+.url-display .page-title,
+.url-display .page-url {
+  display: block;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.url-display .page-title {
+  color: #e8e8e8;
+  font-weight: 600;
+  font-size: 0.9rem;
+}
+
+.url-display .page-url {
+  font-size: 0.75rem;
+  color: #8a8a8a;
 }
 
 /* Card Actions */

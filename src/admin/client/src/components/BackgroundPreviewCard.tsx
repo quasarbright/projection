@@ -11,6 +11,27 @@ interface BackgroundPreviewCardProps {
 
 type LoadState = 'loading' | 'loaded' | 'error';
 
+export function frozenFrameUrl(url: string): string {
+  try {
+    const u = new URL(url);
+    const query = new URLSearchParams(u.search);
+    query.set('background', 'true');
+    return `/api/background-frame/${encodeURIComponent(u.origin + u.pathname)}?${query.toString()}`;
+  } catch {
+    return url;
+  }
+}
+
+// The end of the path, which tells backgrounds on the same site apart: "p5js/boids"
+function shortPath(url: string): string {
+  try {
+    const parts = new URL(url).pathname.split('/').filter(Boolean);
+    return parts.slice(-2).join('/') || new URL(url).hostname;
+  } catch {
+    return url;
+  }
+}
+
 export const BackgroundPreviewCard: React.FC<BackgroundPreviewCardProps> = ({
   url,
   onDelete,
@@ -18,13 +39,14 @@ export const BackgroundPreviewCard: React.FC<BackgroundPreviewCardProps> = ({
   isPaused = false,
 }) => {
   const [loadState, setLoadState] = useState<LoadState>('loading');
+  const [pageTitle, setPageTitle] = useState('');
   const iframeRef = useRef<HTMLIFrameElement>(null);
 
-  // Append ?background=true to URL
-  const previewUrl = url.includes('?')
-    ? `${url}&background=true`
-    : `${url}?background=true`;
-  
+  // The admin server serves the page from this origin and freezes it after 60 frames, so a grid
+  // of backgrounds shows still frames instead of all running at once. The page's own query
+  // string rides along, plus background=true.
+  const previewUrl = frozenFrameUrl(url);
+
   // When paused, use empty src to unload iframe
   const iframeSrc = isPaused ? '' : previewUrl;
 
@@ -51,6 +73,11 @@ export const BackgroundPreviewCard: React.FC<BackgroundPreviewCardProps> = ({
   // Handle iframe load
   const handleLoad = () => {
     setLoadState('loaded');
+    try {
+      setPageTitle(iframeRef.current?.contentDocument?.title?.trim() || '');
+    } catch {
+      setPageTitle('');
+    }
   };
 
   // Handle iframe error
@@ -112,7 +139,12 @@ div>
           )}
         </div>
         <div className="url-display" title={url}>
-          {truncateUrl(url)}
+          {loadState === 'loaded' ? (
+            <>
+              <span className="page-title">{pageTitle || shortPath(url)}</span>
+              <span className="page-url">{pageTitle ? shortPath(url) : new URL(url).hostname}</span>
+            </>
+          ) : truncateUrl(url)}
         </div>
       </div>
 

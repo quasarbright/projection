@@ -18,6 +18,56 @@ import { HTMLBuilder } from '../../generator/html-builder';
 import { Project } from '../../types';
 
 /**
+ * Injected first into a background page served by /api/background-frame: lets it draw 60
+ * frames, then pauses its animation and timer loops so the last frame stays on screen and the
+ * page stops using CPU and GPU. Frames are counted with a loop of our own, so a page that
+ * schedules several callbacks a frame doesn't freeze early.
+ *
+ * Paused callbacks are held, not dropped. When the frame is resized (resizing usually clears a
+ * canvas) the page runs 10 more frames to redraw at the new size, then pauses again.
+ */
+const BACKGROUND_FREEZE_SCRIPT = `(function () {
+  var FIRST = 60, AFTER_RESIZE = 10, left = FIRST, frozen = false, counting = false;
+  var raf = window.requestAnimationFrame.bind(window);
+  var setTimeout0 = window.setTimeout.bind(window), setInterval0 = window.setInterval.bind(window);
+  var heldFrames = [], heldTimers = [];
+  window.requestAnimationFrame = function (cb) {
+    if (frozen) { heldFrames.push(cb); return 0; }
+    return raf(function (t) { if (frozen) heldFrames.push(cb); else cb(t); });
+  };
+  window.setTimeout = function (fn) {
+    if (typeof fn !== 'function') return setTimeout0.apply(window, arguments);
+    var args = Array.prototype.slice.call(arguments, 2);
+    var run = function () { if (frozen) heldTimers.push(run); else fn.apply(window, args); };
+    return setTimeout0(run, arguments[1]);
+  };
+  window.setInterval = function (fn) {
+    if (typeof fn !== 'function') return setInterval0.apply(window, arguments);
+    var args = Array.prototype.slice.call(arguments, 2);
+    return setInterval0(function () { if (!frozen) fn.apply(window, args); }, arguments[1]);
+  };
+  function count() {
+    if (--left > 0) { raf(count); return; }
+    counting = false;
+    frozen = true;
+    document.querySelectorAll('video, audio').forEach(function (m) { try { m.pause(); } catch (e) {} });
+  }
+  function run(frames) {
+    left = Math.max(left, frames);
+    if (frozen) {
+      frozen = false;
+      var f = heldFrames; heldFrames = [];
+      f.forEach(function (cb) { raf(cb); });
+      var t = heldTimers; heldTimers = [];
+      t.forEach(function (cb) { setTimeout0(cb, 0); });
+    }
+    if (!counting) { counting = true; raf(count); }
+  }
+  window.addEventListener('resize', function () { run(AFTER_RESIZE); });
+  run(FIRST);
+})();`;
+
+/**
  * Admin server class that provides a web interface for managing projects
  */
 export class AdminServer {
@@ -415,6 +465,47 @@ export class AdminServer {
           error: 'Failed to update configuration',
           message: error.message
         });
+      }
+    });
+
+    // GET /api/background-frame/<encoded url>?<the page's own query> - a dynamic background page
+    // served from this origin, frozen after 60 frames. Settings shows a dozen of these at once and
+    // running them all live makes the admin crawl. The page keeps its own query string (so
+    // ?background still works) and gets a <base> pointing at its real address so its scripts,
+    // styles and fetches load from there. Same-origin also lets the settings card read its title.
+    this.app.get('/api/background-frame/:encoded', async (req: Request, res: Response) => {
+      const fetchFn = (globalThis as any).fetch;
+      let target: URL;
+      try {
+        target = new URL(req.params.encoded); // Express has already decoded it
+        if (target.protocol !== 'http:' && target.protocol !== 'https:') throw new Error();
+      } catch {
+        res.status(400).send('Invalid background URL');
+        return;
+      }
+      if (!fetchFn) {
+        res.status(501).send('Background previews need Node 18 or newer');
+        return;
+      }
+      const query = req.url.includes('?') ? req.url.slice(req.url.indexOf('?')) : '';
+      target.search = query;
+      try {
+        const upstream = await fetchFn(target.toString(), { redirect: 'follow' });
+        if (!upstream.ok) {
+          res.status(502).send(`Background returned ${upstream.status}`);
+          return;
+        }
+        const html: string = await upstream.text();
+        const base = upstream.url || target.toString();
+        const inject = `<base href="${base.replace(/"/g, '&quot;')}"><script>${BACKGROUND_FREEZE_SCRIPT}</script>`;
+        const withHead = /<head[^>]*>/i.test(html)
+          ? html.replace(/<head[^>]*>/i, m => m + inject)
+          : inject + html;
+        res.setHeader('Content-Type', 'text/html; charset=utf-8');
+        res.setHeader('Cache-Control', 'no-store');
+        res.send(withHead);
+      } catch (error: any) {
+        res.status(502).send(`Could not load background: ${error.message}`);
       }
     });
 
