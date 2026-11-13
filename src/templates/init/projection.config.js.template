@@ -3,11 +3,17 @@
 // If both exist, this file takes precedence
 
 module.exports = {
-  // Site title displayed in the browser tab and header
+  // Site title, shown in the browser tab and as the first part of the top bar ("title / heading")
   title: "My Projects",
 
-  // Site description for SEO and social sharing
+  // Site description for SEO and social sharing (not shown on the page)
   description: "A showcase of my coding projects",
+
+  // Optional: the big heading on the page, also the second part of the top bar (default: "Projects")
+  // heading: "Coding Projects",
+
+  // Optional: makes the title in the top bar a link, e.g. to your home page
+  // homeUrl: "https://example.com/",
 
   // Base URL for your site
   // Use "./" for relative paths (recommended for most cases)
