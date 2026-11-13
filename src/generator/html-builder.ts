@@ -383,6 +383,7 @@ export class HTMLBuilder {
           <button id="clear-search" aria-label="Clear search">Clear</button>
         </div>
         <div class="sort-controls">
+          <svg class="sort-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m3 8 4-4 4 4"></path><path d="M7 4v16"></path><path d="m21 16-4 4-4-4"></path><path d="M17 20V4"></path></svg>
           <label for="sort-select">Sort</label>
           <select id="sort-select">
             <option value="date">Date (Newest)</option>

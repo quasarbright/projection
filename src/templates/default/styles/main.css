@@ -87,7 +87,7 @@ body.has-dynamic-background :is(a, button, input, select, textarea, label, summa
 /* Header: a top bar like the blog's, then a short hero over the background, which is only
    lightly dimmed here and darkens into the main section's scrim */
 .site-header {
-  background: linear-gradient(to bottom, rgba(7, 8, 13, 0.15), rgba(7, 8, 13, 0.74));
+  background: linear-gradient(to bottom, rgba(7, 8, 13, 0.1), rgba(7, 8, 13, 0.5));
 }
 
 .topbar {
@@ -194,7 +194,7 @@ body.has-dynamic-background :is(a, button, input, select, textarea, label, summa
 /* Main: the background darkens behind the content so cards stay readable */
 .page-main {
   padding-bottom: 24px;
-  background: linear-gradient(to bottom, rgba(7, 8, 13, 0.74), rgba(7, 8, 13, 0.9) 240px, rgba(7, 8, 13, 0.93));
+  background: linear-gradient(to bottom, rgba(7, 8, 13, 0.5), rgba(7, 8, 13, 0.7) 240px, rgba(7, 8, 13, 0.74));
 }
 
 h2 {
@@ -292,6 +292,17 @@ h2 {
   display: flex;
   align-items: center;
   gap: 8px;
+}
+
+.sort-icon {
+  flex: none;
+  color: var(--soft);
+  filter: drop-shadow(0 0 3px rgba(7, 8, 13, 0.9));
+}
+
+/* section headings and counts sit straight on the dimmed background */
+.section-head {
+  text-shadow: 0 1px 8px rgba(7, 8, 13, 0.9);
 }
 
 /* the select's own text says what it sorts by, so its label is for screen readers only */

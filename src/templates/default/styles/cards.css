@@ -50,6 +50,12 @@
   overflow-wrap: anywhere;
 }
 
+/* card text sits on the lightly dimmed background, so it gets a dark halo */
+.card-info,
+.feature-info {
+  text-shadow: 0 0 2px rgba(7, 8, 13, 0.9), 0 1px 8px rgba(7, 8, 13, 0.9);
+}
+
 .card-info {
   padding: 12px 2px 0;
 }
@@ -83,7 +89,7 @@
 .project-date {
   flex: none;
   font: 400 13px var(--ui);
-  color: var(--faint);
+  color: var(--muted);
 }
 
 .project-description {
@@ -112,13 +118,13 @@
 
 /* Tags on cards read as a plain comma list; each one still filters the grid when clicked */
 .tag {
-  color: var(--faint);
+  color: var(--muted);
   cursor: pointer;
 }
 
 .tag:not(:last-child)::after {
   content: ", ";
-  color: var(--faint);
+  color: var(--muted);
 }
 
 .tag:hover {
@@ -203,7 +209,7 @@
 .feature-title time {
   flex: none;
   font: 400 13px var(--ui);
-  color: var(--faint);
+  color: var(--muted);
 }
 
 .feature-card:hover .feature-title {
