@@ -1,0 +1,138 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Projects · Timeline</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Red+Hat+Display:wght@400;500;700;900&family=Red+Hat+Mono:wght@400;500&display=swap">
+<style>
+:root {
+  --bg: #0b1014; --panel: #121a20; --panel-2: #19232b; --border: #22303a;
+  --text: #e3ecef; --muted: #8597a0; --faint: #4d5d66;
+  --amber: #f5b44a; --teal: #4fd1c5;
+  --display: "Red Hat Display", ui-sans-serif, system-ui, sans-serif;
+  --mono: "Red Hat Mono", ui-monospace, monospace;
+  --gutter: clamp(16px, 3.5vw, 48px);
+}
+* { box-sizing: border-box; }
+html { -webkit-text-size-adjust: 100%; text-size-adjust: 100%; }
+body { margin: 0; background: var(--bg); color: var(--text); font: 15px/1.5 var(--display); }
+a { color: inherit; text-decoration: none; }
+
+/* the background sim gets a letterboxed window instead of covering the page */
+.band { position: relative; height: 40vh; min-height: 260px; overflow: hidden; border-bottom: 1px solid var(--border); }
+.bg-frame { position: absolute; inset: 0; width: 100%; height: 100%; border: 0; }
+.band .over { position: absolute; inset: auto 0 0 0; padding: 60px var(--gutter) 22px; display: flex; justify-content: space-between; align-items: flex-end;
+  background: linear-gradient(transparent, rgba(11,16,20,.9)); pointer-events: none; }
+.band h1 { margin: 0; font-weight: 900; font-size: clamp(36px, 5vw, 64px); line-height: 1; letter-spacing: -0.02em; }
+.band h1 span { display: block; font-size: 16px; font-weight: 500; color: var(--muted); letter-spacing: 0; margin-bottom: 8px; }
+.now { pointer-events: auto; text-align: right; font-size: 14px; color: var(--muted); }
+.now a { color: var(--teal); font-weight: 700; }
+.now button { font: 500 13px var(--display); color: var(--text); background: rgba(18,26,32,.8); border: 1px solid var(--border); border-radius: 6px; padding: 5px 10px; margin-left: 8px; cursor: pointer; }
+
+/* histogram of projects per year; bars show matches over a ghost of the total */
+.hist { display: flex; gap: 6px; align-items: flex-end; height: 92px; padding: 18px var(--gutter) 0; }
+.bar { flex: 1; display: flex; flex-direction: column; justify-content: flex-end; height: 100%; position: relative; cursor: pointer; }
+.bar .ghost { position: absolute; left: 0; right: 0; bottom: 20px; background: var(--panel-2); border-radius: 3px 3px 0 0; }
+.bar .fill { position: relative; background: var(--amber); border-radius: 3px 3px 0 0; transition: height .25s; }
+.bar .yr { font: 400 11px var(--mono); color: var(--muted); text-align: center; height: 20px; padding-top: 4px; }
+.bar:hover .fill { background: #ffd08a; }
+
+.tools { position: sticky; top: 0; z-index: 5; display: flex; gap: 10px; align-items: center; padding: 12px var(--gutter);
+  background: rgba(11,16,20,.92); backdrop-filter: blur(10px); border-bottom: 1px solid var(--border); }
+.tools input, .tools select { font: 500 14px var(--display); color: var(--text); background: var(--panel); border: 1px solid var(--border); border-radius: 8px; padding: 8px 12px; }
+.tools input { width: 240px; }
+.tools input:focus, .tools select:focus { outline: 2px solid var(--teal); outline-offset: 1px; }
+.tools .n { margin-left: auto; font: 400 13px var(--mono); color: var(--muted); }
+
+.year { display: grid; grid-template-columns: 150px 1fr; gap: 24px; padding: 34px var(--gutter) 10px; border-bottom: 1px solid var(--border); }
+.year h2 { margin: 0; position: sticky; top: 76px; align-self: start; font-weight: 900; font-size: 56px; line-height: .9;
+  color: transparent; -webkit-text-stroke: 1.5px var(--amber); }
+.year h2 small { display: block; -webkit-text-stroke: 0; color: var(--muted); font: 400 12px var(--mono); margin-top: 10px; }
+.cards { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 22px 18px; }
+.c { display: block; }
+.c .th { aspect-ratio: 16/10; border-radius: 6px; overflow: hidden; background: var(--panel); border: 1px solid var(--border); }
+.c .th img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.c .th.no { display: grid; place-items: center; padding: 12px; text-align: center; color: var(--faint); font: 400 12px var(--mono); }
+.c .row { display: flex; justify-content: space-between; gap: 8px; margin-top: 8px; }
+.c b { font-weight: 700; font-size: 15px; }
+.c:hover b { color: var(--amber); }
+.c time { font: 400 12px var(--mono); color: var(--muted); padding-top: 2px; }
+.c p { margin: 2px 0 0; color: var(--muted); font-size: 13px; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+.c.f .th { border-color: var(--amber); }
+
+.m-footer { text-align: center; color: var(--muted); font-size: 13px; padding: 40px 0; }
+.m-footer a { color: var(--amber); }
+
+@media (max-width: 720px) {
+  .band { height: 34vh; min-height: 220px; }
+  .band .over { flex-direction: column; align-items: flex-start; gap: 10px; }
+  .now { text-align: left; }
+  .hist { height: 64px; gap: 3px; }
+  .bar .yr { font-size: 9px; }
+  .tools input { flex: 1; width: auto; }
+  .tools .n { display: none; }
+  .year { grid-template-columns: 1fr; gap: 14px; padding-top: 20px; }
+  .year h2 { position: static; font-size: 40px; display: flex; align-items: baseline; gap: 12px; }
+  .year h2 small { margin: 0; }
+  .cards { grid-template-columns: 1fr 1fr; gap: 16px 12px; }
+  .c p { display: none; }
+  .c b { font-size: 14px; }
+}
+</style>
+</head>
+<body>
+<section class="band" id="band">
+  <div class="over">
+    <h1><span>Mike Delmonaco</span>Projects, 2017 to now</h1>
+    <div class="now">Running behind this: <a id="bglink" href="#"></a><button id="shuffle">Shuffle</button></div>
+  </div>
+</section>
+<div class="hist" id="hist"></div>
+<div class="tools">
+  <input id="q" type="search" placeholder="Search" aria-label="Search projects">
+  <select id="tag" aria-label="Tag"></select>
+  <span class="n" id="n"></span>
+</div>
+<main id="years"></main>
+<div id="foot"></div>
+<script src="data.js"></script>
+<script src="common.js"></script>
+<script>
+const band = document.getElementById('band');
+const bg = M.background(band, 2);
+band.insertBefore(bg.el, band.firstChild);
+const link = document.getElementById('bglink');
+const setName = () => { link.textContent = bg.name(); link.href = bg.url().replace(/\?background.*/, ''); };
+setName(); bg.onchange = setName;
+document.getElementById('shuffle').onclick = () => bg.shuffle();
+document.getElementById('foot').innerHTML = M.footer;
+
+const tagSel = document.getElementById('tag');
+tagSel.innerHTML = `<option value="all">All tags</option><option value="featured">Featured</option>` + M.browseTags.map(t => `<option value="${t}">${t} (${M.tagCounts[t]})</option>`).join('');
+const years = [...new Set(M.P.map(M.year))].sort();
+const totals = Object.fromEntries(years.map(y => [y, M.P.filter(p => M.year(p) === y).length]));
+const max = Math.max(...Object.values(totals));
+
+function render() {
+  const list = M.filter(document.getElementById('q').value.trim(), tagSel.value);
+  document.getElementById('n').textContent = `${list.length} of ${M.P.length}`;
+  const by = {}; list.forEach(p => (by[M.year(p)] ||= []).push(p));
+  document.getElementById('hist').innerHTML = years.map(y => `<div class="bar" data-y="${y}" title="${y}: ${(by[y] || []).length} projects">
+    <div class="ghost" style="height:calc(${totals[y] / max} * (100% - 20px))"></div>
+    <div class="fill" style="height:calc(${(by[y] || []).length / max} * (100% - 20px))"></div><div class="yr">${y.slice(2)}</div></div>`).join('');
+  document.getElementById('years').innerHTML = years.slice().reverse().filter(y => by[y]).map(y => `<section class="year" id="y${y}">
+    <h2>${y}<small>${by[y].length} project${by[y].length > 1 ? 's' : ''}</small></h2>
+    <div class="cards">${by[y].map(p => `<a class="c${p.f ? ' f' : ''}" href="${p.link}">
+      <div class="th${p.img ? '' : ' no'}">${p.img ? `<img loading="lazy" src="${p.img}" alt="">` : p.tags.join(' · ')}</div>
+      <div class="row"><b>${M.esc(p.t)}</b><time>${M.month(p)}</time></div><p>${M.esc(p.d)}</p></a>`).join('')}</div></section>`).join('');
+}
+document.getElementById('q').oninput = render;
+tagSel.onchange = render;
+document.getElementById('hist').onclick = e => { const b = e.target.closest('.bar'); const s = b && document.getElementById('y' + b.dataset.y); if (s) s.scrollIntoView({ behavior: 'smooth' }); };
+render();
+</script>
+</body>
+</html>

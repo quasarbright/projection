@@ -1,0 +1,115 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Projects · Riso</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Syne:wght@600;700;800&family=Rethink+Sans:wght@400;500;600&display=swap">
+<style>
+:root {
+  --paper: #161834; --paper-2: #1e2146; --line: #2f335f;
+  --text: #eef0ff; --muted: #9ea3cf;
+  --pink: #ff48b0; --yellow: #ffe14d; --blue: #3fa2ff;
+  --display: "Syne", ui-sans-serif, system-ui, sans-serif;
+  --ui: "Rethink Sans", ui-sans-serif, system-ui, sans-serif;
+  --gutter: clamp(16px, 3.5vw, 52px);
+}
+* { box-sizing: border-box; }
+html { -webkit-text-size-adjust: 100%; text-size-adjust: 100%; }
+body { margin: 0; background: var(--paper); color: var(--text); font: 15px/1.5 var(--ui); }
+a { color: inherit; text-decoration: none; }
+
+/* the background sim, printed in one ink: grayscale it, then multiply a pink layer over it */
+.hero { position: relative; height: 70vh; min-height: 420px; overflow: hidden; }
+.bg-frame { position: absolute; inset: 0; width: 100%; height: 100%; border: 0; filter: grayscale(1) contrast(1.5) brightness(1.1); }
+.ink { position: absolute; inset: 0; background: var(--pink); mix-blend-mode: multiply; pointer-events: none; }
+.hero .fade { position: absolute; inset: 0; background: linear-gradient(transparent 45%, var(--paper)); pointer-events: none; }
+.title { position: absolute; left: var(--gutter); bottom: 30px; pointer-events: none; }
+.title h1 { margin: 0; position: relative; font: 800 clamp(72px, 15vw, 230px)/.82 var(--display); letter-spacing: -0.05em; color: var(--yellow); }
+.title h1::after { content: attr(data-t); position: absolute; left: 6px; top: 5px; color: var(--blue); mix-blend-mode: screen; }
+.title p { margin: 16px 0 0; font-size: 17px; color: var(--text); max-width: 40ch; }
+.title p a { pointer-events: auto; text-decoration: underline; text-decoration-color: var(--pink); text-underline-offset: 3px; text-decoration-thickness: 2px; }
+
+.bar { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; padding: 22px var(--gutter); }
+.bar input { font: 500 15px var(--ui); color: var(--text); background: var(--paper-2); border: 2px solid var(--line); border-radius: 999px; padding: 8px 16px; width: 220px; margin-right: 8px; }
+.bar input:focus { outline: none; border-color: var(--yellow); }
+.bar button { font: 600 14px var(--ui); color: var(--c); background: none; border: 2px solid var(--c); border-radius: 999px; padding: 5px 13px; cursor: pointer; }
+.bar button.on { background: var(--c); color: var(--paper); }
+
+.wall { columns: 4 260px; column-gap: 18px; padding: 0 var(--gutter); }
+.card { display: inline-block; width: 100%; break-inside: avoid; margin-bottom: 26px; }
+.pic { background: var(--c); border-radius: 4px; overflow: hidden; }
+.pic img { width: 100%; display: block; filter: grayscale(1) contrast(1.25); mix-blend-mode: multiply; transition: filter .25s; }
+.card:hover .pic img { filter: none; mix-blend-mode: normal; }
+.pic.no { padding: 22px 18px 26px; color: var(--paper); font: 800 30px/1 var(--display); letter-spacing: -0.03em; }
+.card h3 { margin: 10px 0 0; font: 700 21px/1.1 var(--display); letter-spacing: -0.02em; }
+.card:hover h3 { color: var(--c); }
+.card p { margin: 4px 0 0; color: var(--muted); font-size: 14px; }
+.card .tg { margin-top: 6px; font-size: 13px; color: var(--c); font-weight: 600; }
+.card.f h3::before { content: "★ "; color: var(--c); }
+
+.m-footer { text-align: center; color: var(--muted); font-size: 13px; padding: 40px 0; }
+.m-footer a { color: var(--yellow); }
+
+@media (max-width: 720px) {
+  .hero { height: 52vh; min-height: 340px; }
+  .title h1 { font-size: 14vw; }
+  .title h1::after { left: 3px; top: 3px; }
+  .bar { flex-wrap: nowrap; overflow-x: auto; scrollbar-width: none; }
+  .bar input { flex: none; width: 170px; }
+  .bar button { flex: none; }
+  .wall { columns: 2; column-gap: 12px; }
+  .card h3 { font-size: 16px; }
+  .card p, .card .tg { display: none; }
+  .pic.no { font-size: 20px; padding: 16px 12px 20px; }
+}
+</style>
+</head>
+<body>
+<section class="hero" id="hero">
+  <div class="ink"></div><div class="fade"></div>
+  <div class="title"><h1 data-t="Projects">Projects</h1>
+    <p>Mike Delmonaco's simulations, games and languages. That's <a href="#" id="bgname"></a> behind this. <a href="#" id="shuffle">Print another</a></p></div>
+</section>
+<div class="bar" id="bar"></div>
+<main class="wall" id="wall"></main>
+<div id="foot"></div>
+<script src="data.js"></script>
+<script src="common.js"></script>
+<script>
+const INKS = ['var(--pink)', 'var(--yellow)', 'var(--blue)'];
+const inkOf = t => INKS[M.hash(t) % 3];
+const hero = document.getElementById('hero');
+const bg = M.background(hero, 5);
+hero.insertBefore(bg.el, hero.firstChild);
+const nm = document.getElementById('bgname');
+const setName = () => { nm.textContent = bg.name(); nm.href = bg.url().replace(/\?background.*/, ''); };
+setName(); bg.onchange = setName;
+document.getElementById('shuffle').onclick = e => { e.preventDefault(); bg.shuffle(); };
+document.getElementById('foot').innerHTML = M.footer;
+
+let tag = 'all';
+const bar = document.getElementById('bar');
+bar.innerHTML = `<input id="q" type="search" placeholder="Search" aria-label="Search projects">` +
+  ['all', 'featured', ...M.browseTags.slice(0, 16)].map(t => `<button data-t="${t}" style="--c:${t === 'all' || t === 'featured' ? 'var(--text)' : inkOf(t)}">${t === 'all' ? 'All' : t}</button>`).join('');
+bar.onclick = e => { const b = e.target.closest('button'); if (b) { tag = b.dataset.t; render(); } };
+document.getElementById('q').oninput = render;
+
+function render() {
+  bar.querySelectorAll('button').forEach(b => b.classList.toggle('on', b.dataset.t === tag));
+  const list = M.filter(document.getElementById('q').value.trim(), tag);
+  list.sort((a, b) => (b.f - a.f) || b.date.localeCompare(a.date));
+  document.getElementById('wall').innerHTML = list.slice(0, 48).map(p => {
+    const tags = p.tags.filter(t => t !== 'web' && t !== 'mobile-friendly');
+    const c = inkOf(tags[0] || p.t);
+    return `<a class="card${p.f ? ' f' : ''}" href="${p.link}" style="--c:${c}">
+      <div class="pic${p.img ? '' : ' no'}">${p.img ? `<img src="${p.img}" alt="">` : M.esc(p.t)}</div>
+      <h3>${M.esc(p.t)}</h3><p>${M.esc(p.d)}</p><div class="tg">${tags.slice(0, 3).join('  ')}</div></a>`;
+  }).join('');
+}
+render();
+</script>
+</body>
+</html>

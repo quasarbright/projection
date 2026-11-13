@@ -1,0 +1,127 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Projects · Shelves</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Unbounded:wght@500;700;800&family=Onest:wght@400;500;600&display=swap">
+<style>
+:root {
+  --bg: #0f1012; --panel: #18191d; --panel-2: #212328; --border: #2b2d33;
+  --text: #ececee; --muted: #8e9099; --faint: #55575f;
+  --display: "Unbounded", ui-sans-serif, system-ui, sans-serif;
+  --ui: "Onest", ui-sans-serif, system-ui, sans-serif;
+  --gutter: clamp(16px, 3.5vw, 52px);
+}
+* { box-sizing: border-box; }
+html { -webkit-text-size-adjust: 100%; text-size-adjust: 100%; }
+body { margin: 0; background: var(--bg); color: var(--text); font: 15px/1.5 var(--ui); overflow-x: hidden; }
+a { color: inherit; text-decoration: none; }
+
+.hero { position: relative; height: 66vh; min-height: 380px; overflow: hidden; }
+.bg-frame { position: absolute; inset: 0; width: 100%; height: 100%; border: 0; }
+.hero::after { content: ""; position: absolute; inset: 0; pointer-events: none;
+  background: linear-gradient(to top, var(--bg), transparent 55%), linear-gradient(to right, rgba(15,16,18,.75), transparent 60%); }
+.hero .in { position: absolute; z-index: 1; left: var(--gutter); right: var(--gutter); bottom: 36px; display: flex; justify-content: space-between; align-items: flex-end; gap: 24px; pointer-events: none; }
+.hero h1 { margin: 0; font: 800 clamp(34px, 5.4vw, 76px)/1 var(--display); letter-spacing: -0.03em; max-width: 12ch; }
+.hero p { margin: 14px 0 0; color: var(--muted); font-size: 17px; max-width: 42ch; }
+.hero p a { color: var(--text); text-decoration: underline; text-underline-offset: 3px; pointer-events: auto; }
+.search { pointer-events: auto; font: 500 16px var(--ui); color: var(--text); width: 300px; background: rgba(24,25,29,.85);
+  border: 1px solid var(--border); border-radius: 999px; padding: 12px 20px; backdrop-filter: blur(8px); }
+.search:focus { outline: 2px solid #8b99ff; outline-offset: 2px; }
+
+.shelf { padding: 26px 0 8px; }
+.shelf header { display: flex; align-items: baseline; gap: 14px; padding: 0 var(--gutter); margin-bottom: 14px; }
+.shelf h2 { margin: 0; font: 700 22px var(--display); letter-spacing: -0.02em; color: var(--c); }
+.shelf header span { color: var(--muted); font-size: 14px; }
+.shelf header button { margin-left: auto; font: 500 14px var(--ui); color: var(--muted); background: none; border: 0; cursor: pointer; }
+.shelf header button:hover { color: var(--text); }
+.row { display: flex; gap: 14px; overflow-x: auto; scroll-snap-type: x mandatory; scroll-padding: 0 var(--gutter); padding: 4px var(--gutter) 18px; scrollbar-width: none; }
+.row::-webkit-scrollbar { display: none; }
+.card { flex: none; width: 300px; scroll-snap-align: start; position: relative; border-radius: 14px; overflow: hidden; aspect-ratio: 4/3;
+  background: var(--panel); transition: transform .2s ease; }
+.card:hover { transform: translateY(-4px); }
+.card img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.card .cap { position: absolute; inset: auto 0 0 0; padding: 40px 16px 14px; background: linear-gradient(transparent, rgba(0,0,0,.88)); }
+.card b { display: block; font: 700 15px var(--display); letter-spacing: -0.01em; }
+.card small { color: #b6b8c0; font-size: 13px; display: -webkit-box; -webkit-line-clamp: 1; -webkit-box-orient: vertical; overflow: hidden; }
+.card.no { background: color-mix(in srgb, var(--c) 16%, var(--panel)); }
+.card.no .cap { background: none; inset: 0; display: flex; flex-direction: column; justify-content: space-between; padding: 18px; }
+.card.no b { font-size: 22px; line-height: 1.1; color: var(--c); }
+.card.no small { -webkit-line-clamp: 3; color: var(--muted); }
+.card.f::before { content: "Featured"; position: absolute; top: 10px; left: 10px; z-index: 1; font: 600 12px var(--ui); color: #111;
+  background: var(--c); padding: 3px 9px; border-radius: 999px; }
+
+.flat { display: none; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 16px; padding: 26px var(--gutter); }
+.flat .card { width: auto; }
+body.filtering .shelf { display: none; }
+body.filtering .flat { display: grid; }
+
+.m-footer { text-align: center; color: var(--muted); font-size: 13px; padding: 40px 0; }
+.m-footer a { color: #8b99ff; }
+
+@media (max-width: 720px) {
+  .hero { height: 58vh; min-height: 0; }
+  .hero .in { flex-direction: column; align-items: stretch; bottom: 22px; }
+  .search { width: 100%; }
+  .hero p { font-size: 15px; }
+  .shelf h2 { font-size: 16px; }
+  .shelf header button { white-space: nowrap; }
+  .card { width: 72vw; }
+  .flat { grid-template-columns: 1fr 1fr; gap: 10px; }
+  .flat .card b { font-size: 13px; }
+  .flat .card small { display: none; }
+}
+</style>
+</head>
+<body>
+<section class="hero" id="hero">
+  <div class="in">
+    <div>
+      <h1>Things I've made</h1>
+      <p>Playing behind this: <a href="#" id="bgname"></a>. <a href="#" id="shuffle">Show me another</a></p>
+    </div>
+    <input class="search" id="q" type="search" placeholder="Search 136 projects" aria-label="Search projects">
+  </div>
+</section>
+<main id="shelves"></main>
+<div class="flat" id="flat"></div>
+<div id="foot"></div>
+<script src="data.js"></script>
+<script src="common.js"></script>
+<script>
+const hero = document.getElementById('hero');
+const bg = M.background(hero, 4);
+hero.insertBefore(bg.el, hero.firstChild);
+const nm = document.getElementById('bgname');
+const setName = () => { nm.textContent = bg.name(); nm.href = bg.url().replace(/\?background.*/, ''); };
+setName(); bg.onchange = setName;
+document.getElementById('shuffle').onclick = e => { e.preventDefault(); bg.shuffle(); };
+document.getElementById('foot').innerHTML = M.footer;
+
+const COLORS = { 'Games': '#f2a65a', 'Image and video effects': '#ee90ba', 'Simulations': '#5fcfa6',
+  'Languages and compilers': '#8b99ff', 'AI and bots': '#e8cf5c', 'Tools and everything else': '#7fd4ea' };
+const card = p => {
+  const c = COLORS[M.kind(p)];
+  return `<a class="card${p.img ? '' : ' no'}${p.f ? ' f' : ''}" href="${p.link}" style="--c:${c}">
+    ${p.img ? `<img loading="lazy" src="${p.img}" alt="">` : ''}<div class="cap"><b>${M.esc(p.t)}</b><small>${M.esc(p.d)}</small></div></a>`;
+};
+const featuredShelf = `<section class="shelf" style="--c:#ececee"><header><h2>Featured</h2><span>${M.featured.length}</span></header>
+  <div class="row">${M.featured.slice().sort((a, b) => !a.img - !b.img).map(card).join('')}</div></section>`;
+document.getElementById('shelves').innerHTML = featuredShelf + M.KINDS.map(k => {
+  const ps = M.P.filter(p => M.kind(p) === k);
+  ps.sort((a, b) => (!a.img - !b.img) || b.date.localeCompare(a.date));
+  return `<section class="shelf" style="--c:${COLORS[k]}"><header><h2>${k}</h2><span>${ps.length}</span><button>See all</button></header>
+    <div class="row">${ps.map(card).join('')}</div></section>`;
+}).join('');
+
+document.getElementById('q').oninput = e => {
+  const q = e.target.value.trim();
+  document.body.classList.toggle('filtering', !!q);
+  document.getElementById('flat').innerHTML = q ? M.filter(q).map(card).join('') : '';
+};
+</script>
+</body>
+</html>

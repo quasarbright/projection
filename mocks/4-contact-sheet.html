@@ -1,0 +1,121 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Projects · Contact sheet</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo+Narrow:wght@400;600;700&family=Courier+Prime:wght@400;700&display=swap">
+<style>
+:root {
+  --light: #e9eef2; --light-hi: #f8fbfd; --film: #161514; --edge: #ef8a2b; --grease: #d4242e;
+  --ink: #15171a; --muted: #5d6670;
+  --ui: "Archivo Narrow", ui-sans-serif, system-ui, sans-serif;
+  --edgefont: "Courier Prime", ui-monospace, monospace;
+  --gutter: clamp(16px, 3vw, 44px);
+}
+* { box-sizing: border-box; }
+html { -webkit-text-size-adjust: 100%; text-size-adjust: 100%; }
+body { margin: 0; color: var(--ink); font: 16px/1.4 var(--ui);
+  background: radial-gradient(90% 70% at 50% 30%, var(--light-hi), var(--light) 70%) fixed, var(--light); }
+a { color: inherit; text-decoration: none; }
+
+header { padding: 30px var(--gutter) 10px; display: flex; justify-content: space-between; align-items: flex-end; gap: 20px; flex-wrap: wrap; }
+h1 { margin: 0; font-weight: 700; font-size: clamp(44px, 6vw, 84px); line-height: .9; letter-spacing: -0.01em; }
+h1 small { display: block; font: 400 15px var(--edgefont); color: var(--edge); letter-spacing: 0; margin-bottom: 10px; }
+.search { font: 400 16px var(--edgefont); color: var(--ink); background: transparent; border: 0; border-bottom: 2px solid var(--ink); padding: 6px 2px; width: 260px; }
+.search:focus { outline: none; border-color: var(--grease); }
+
+.tags { padding: 12px var(--gutter) 26px; display: flex; flex-wrap: wrap; gap: 4px 16px; font-size: 17px; }
+.tags button { font: 600 17px var(--ui); color: var(--muted); background: none; border: 0; padding: 2px 0; cursor: pointer; position: relative; }
+.tags button:hover { color: var(--ink); }
+.tags button.on { color: var(--ink); }
+.tags button.on::after { content: ""; position: absolute; left: -4px; right: -4px; bottom: -2px; height: 8px;
+  background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 8' preserveAspectRatio='none'%3E%3Cpath d='M2 5 C 30 2, 60 7, 98 3' stroke='%23d4242e' stroke-width='3' fill='none' stroke-linecap='round'/%3E%3C/svg%3E") center / 100% 100% no-repeat; }
+
+/* frames sit edge to edge so each row of the grid reads as one strip of film */
+.sheet { display: grid; grid-template-columns: repeat(auto-fill, minmax(210px, 1fr)); row-gap: 30px; padding: 0 var(--gutter); }
+.fr { display: block; position: relative; }
+.film { background: var(--film); padding: 20px 7px; position: relative; }
+.film::before, .film::after { content: ""; position: absolute; left: 0; right: 0; height: 9px;
+  background: repeating-linear-gradient(to right, transparent 0 7px, var(--light) 7px 15px, transparent 15px 22px); }
+.film::before { top: 6px; }
+.film::after { bottom: 6px; }
+.pic { aspect-ratio: 3/2; overflow: hidden; background: #000; border-radius: 2px; }
+.pic img, .pic iframe { width: 100%; height: 100%; object-fit: cover; display: block; border: 0; }
+.fr:hover .pic img { filter: brightness(1.12); }
+.pic.blank { display: grid; place-items: center; padding: 12px; background: #23211f; color: #a39c92; font: 700 16px var(--edgefont); text-align: center; }
+.code { position: absolute; left: 10px; right: 10px; bottom: -1px; height: 20px; display: flex; justify-content: space-between; align-items: center;
+  font: 700 10px var(--edgefont); color: var(--edge); pointer-events: none; z-index: 1; }
+.code span { background: var(--film); padding: 0 4px; }
+.cap { padding: 8px 6px 0; }
+.cap b { font-weight: 700; font-size: 17px; }
+.cap p { margin: 1px 0 0; color: var(--muted); font-size: 14px; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+/* featured frames get circled in grease pencil */
+.loop { position: absolute; inset: -6px -10px auto -10px; height: calc(100% - 52px); pointer-events: none; overflow: visible; z-index: 2; }
+.loop path { fill: none; stroke: var(--grease); stroke-width: 3.2; stroke-linecap: round; opacity: .88; }
+.live .code span:first-child { color: #ffd2a0; }
+
+.m-footer { text-align: center; color: var(--muted); font-size: 14px; padding: 48px 0; }
+.m-footer a { color: var(--grease); font-weight: 700; }
+
+@media (max-width: 720px) {
+  header { padding-top: 20px; }
+  .search { width: 100%; }
+  .tags { flex-wrap: nowrap; overflow-x: auto; scrollbar-width: none; padding-bottom: 20px; }
+  .tags button { flex: none; }
+  .sheet { grid-template-columns: 1fr 1fr; row-gap: 22px; }
+  .film { padding: 16px 5px; }
+  .film::before { top: 4px; } .film::after { bottom: 4px; }
+  .cap b { font-size: 15px; }
+  .cap p { display: none; }
+  .code { font-size: 9px; }
+}
+</style>
+</head>
+<body>
+<header>
+  <h1><small id="roll"></small>Mike Delmonaco's projects</h1>
+  <input class="search" id="q" type="search" placeholder="search the roll" aria-label="Search projects">
+</header>
+<nav class="tags" id="tags"></nav>
+<main class="sheet" id="sheet"></main>
+<div id="foot"></div>
+<script src="data.js"></script>
+<script src="common.js"></script>
+<script>
+document.getElementById('roll').textContent = `${M.P.length} frames, 2017 to 2026`;
+document.getElementById('foot').innerHTML = M.footer;
+const LOOP = '<svg class="loop" viewBox="0 0 100 70" preserveAspectRatio="none"><path vector-effect="non-scaling-stroke" d="M8 30 C 6 8, 40 1, 62 3 C 90 5, 99 22, 96 40 C 93 62, 60 70, 38 67 C 14 64, 1 50, 5 30 C 7 18, 18 10, 30 7"/></svg>';
+let tag = 'all';
+const tagsEl = document.getElementById('tags');
+tagsEl.innerHTML = ['all', 'featured', ...M.browseTags.slice(0, 22)].map(t => `<button data-t="${t}">${t === 'all' ? 'all frames' : t}</button>`).join('');
+tagsEl.onclick = e => { const b = e.target.closest('button'); if (b) { tag = b.dataset.t; render(); } };
+document.getElementById('q').oninput = render;
+
+let bgFrame;
+function render() {
+  tagsEl.querySelectorAll('button').forEach(b => b.classList.toggle('on', b.dataset.t === tag));
+  const list = M.filter(document.getElementById('q').value.trim(), tag);
+  const total = M.P.length;
+  const live = `<div class="fr live"><div class="film"><div class="pic" id="livepic"></div>
+    <div class="code"><span>▸ 00 LIVE</span><span id="livename"></span></div></div>
+    <div class="cap"><b>Running right now</b><p>The live background, one of my simulations. <a href="#" id="shuffle" style="text-decoration:underline">Swap it</a></p></div></div>`;
+  document.getElementById('sheet').innerHTML = live + list.map(p => {
+    const n = total - M.P.indexOf(p); // frame number = order made, oldest is 1
+    return `<a class="fr" href="${p.link}"><div class="film">
+      <div class="pic${p.img ? '' : ' blank'}">${p.img ? `<img loading="lazy" src="${p.img}" alt="">` : M.esc(p.t)}</div>
+      <div class="code"><span>▸ ${n}</span><span>${p.date.replace(/-/g, ' ')}</span></div></div>
+      <div class="cap"><b>${M.esc(p.t)}</b><p>${M.esc(p.d)}</p></div>${p.f ? LOOP : ''}</a>`;
+  }).join('');
+  const pic = document.getElementById('livepic');
+  if (!bgFrame) { bgFrame = M.background(pic, 3); } else pic.appendChild(bgFrame.el);
+  document.getElementById('livename').textContent = bgFrame.name().toUpperCase();
+  bgFrame.onchange = n => (document.getElementById('livename').textContent = n.toUpperCase());
+  document.getElementById('shuffle').onclick = e => { e.preventDefault(); bgFrame.shuffle(); };
+}
+render();
+</script>
+</body>
+</html>

@@ -1,0 +1,107 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Projection facelift</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Instrument+Sans:wght@400;500;600;700&display=swap">
+<style>
+:root { --bg: #0b0c11; --panel: #13151d; --border: #252836; --text: #e6e8ef; --muted: #8a8fa3; --accent: #8b99ff; }
+* { box-sizing: border-box; }
+html, body { height: 100%; }
+body { margin: 0; display: grid; grid-template-columns: 330px 1fr; background: var(--bg); color: var(--text); font: 14px/1.5 "Instrument Sans", system-ui, sans-serif; }
+aside { border-right: 1px solid var(--border); padding: 22px 20px; overflow-y: auto; }
+h1 { font-size: 18px; margin: 0 0 4px; }
+.sub { color: var(--muted); margin: 0 0 18px; }
+nav button { display: block; width: 100%; text-align: left; font: inherit; color: var(--muted); background: none; border: 1px solid transparent;
+  border-radius: 8px; padding: 9px 12px; margin-bottom: 4px; cursor: pointer; }
+nav button b { color: var(--text); font-weight: 600; margin-right: 6px; }
+nav button:hover { background: var(--panel); }
+nav button.on { background: var(--panel); border-color: var(--accent); }
+.notes { margin-top: 18px; border-top: 1px solid var(--border); padding-top: 16px; }
+.notes h2 { font-size: 20px; margin: 0 0 10px; }
+.notes h3 { font-size: 13px; color: var(--muted); font-weight: 600; margin: 16px 0 4px; }
+.notes p { margin: 0 0 8px; }
+.notes a { color: var(--accent); }
+.stage { position: relative; overflow: hidden; display: flex; gap: 28px; align-items: center; justify-content: center; padding: 24px; }
+.frame { position: relative; flex: none; border-radius: 10px; overflow: hidden; border: 1px solid var(--border); background: #000; }
+.frame iframe { border: 0; transform-origin: 0 0; display: block; }
+.frame.phone { border-radius: 28px; border: 8px solid #20232e; }
+.label { position: absolute; top: -22px; left: 0; color: var(--muted); font-size: 12px; }
+.wrap { position: relative; }
+@media (max-width: 900px) { body { grid-template-columns: 1fr; height: auto; } .stage { flex-direction: column; } }
+</style>
+</head>
+<body>
+<aside>
+  <h1>Projection facelift</h1>
+  <p class="sub">Six directions, all rendered from the real projects.yaml. Search, tags and the background shuffle work in each one. Click a direction, or use ← →.</p>
+  <nav id="nav"></nav>
+  <div class="notes" id="notes"></div>
+</aside>
+<section class="stage" id="stage">
+  <div class="wrap"><span class="label">Desktop, 1440 × 900</span><div class="frame" id="dframe"><iframe id="d"></iframe></div></div>
+  <div class="wrap"><span class="label">Phone, 375 × 812</span><div class="frame phone" id="pframe"><iframe id="p"></iframe></div></div>
+</section>
+<script>
+const D = [
+  { file: '1-sibling', name: 'Sibling',
+    going: `Make the portfolio look like it belongs with the new home page and blog. Same fonts (Bricolage Grotesque headings, Instrument Sans text), the same near-black, and the home page's periwinkle "Coding Projects" color as the accent. The breadcrumb bar copies the blog's "Mike Delmonaco / Blog", and the background pill copies the home page's. The sim runs full strength behind a big hero and darkens behind the grid. Cards lose their boxes: a screenshot with the title, date and two lines under it. Projects with no screenshot get a colored title tile instead of a bare text card.`,
+    cost: `Smallest of the six. A rewrite of main.css and cards.css, a new header in html-builder.ts, a featured block with one big card, and the filter chips turn into one scrolling row. filter.js, search.js, modal.js and the background script stay as they are. About a day.`,
+    tradeoff: `Safest pick. It's the least surprising, so it won't stand out as its own thing.` },
+  { file: '2-index', name: 'Index',
+    going: `Type does all the work. Every project is one big condensed title in a long list over the live sim, and its screenshot follows your cursor when you hover the row. The search box is the headline ("136 projects") and the tags are a word cloud with counts, each in one of the home page's section colors. On a phone the screenshot becomes a small square on each row. It reads more like an index than a gallery, which suits 136 projects of which 60 have no screenshot.`,
+    cost: `Medium-small. A new row template in html-builder.ts, about 40 lines of JS for the cursor preview, the tag cloud replaces the chips, and the headline input reuses search.js. Pagination could go away since rows are short.`,
+    tradeoff: `On desktop you don't see screenshots until you hover, so it's weaker for skimming visually. It's the boldest look here.` },
+  { file: '3-timeline', name: 'Timeline',
+    going: `Organized by year, since "since 2017" is already the story the header tells. The background sim gets its own letterboxed window at the top with a link to the project it is, instead of covering the whole page. Under it, a bar chart of projects per year that shows how many match the current search or tag (click a bar to jump to that year). Each year is a section with a big outlined year that sticks while you scroll through it. Red Hat Display, a teal-black page, amber for years.`,
+    cost: `Medium. Group by year in the generator or client side, a small histogram script, and dynamic-background.js gets simpler because the iframe no longer sits behind everything (no more pointer-events juggling). Year sections replace pagination.`,
+    tradeoff: `Featured projects only get an amber border, so "best stuff first" is weaker than it is now.` },
+  { file: '4-contact-sheet', name: 'Contact sheet',
+    going: `A photographer's contact sheet on a lightbox. Each row of the grid is a strip of film with sprocket holes, frames are numbered in the order I made them, and the orange edge print carries the date. Featured projects are circled in red grease pencil, the one bold thing on the page. Projects with no screenshot show up as dark, unexposed frames with the title on them. The live background plays in frame 00. This is the only light theme here, which breaks the dark-by-default rule on purpose, because the lightbox is the theme.`,
+    cost: `Medium, mostly CSS. The film strip is pure CSS gradients, the grease pencil loop is one inline SVG, and the background script points at frame 00 instead of the page. No data changes.`,
+    tradeoff: `It won't sit next to the home page and blog. It's a one-off identity, like Clanker Court.` },
+  { file: '5-shelves', name: 'Shelves',
+    going: `Projects grouped onto shelves by what kind of thing they are: games, image and video effects, simulations, languages and compilers, AI and bots, tools. Each shelf scrolls sideways and has its own color (the home page's palette again). A big hero with the live sim says which project is playing behind it. Typing in the search collapses the shelves into one grid of results. Unbounded for headings, Onest for text.`,
+    cost: `Medium-large, because it needs a "kind" for each project. The mock guesses it from tags; to do it properly I'd add a category field to projects.yaml, the validator and the admin form. Rows and the search fallback are a new layout in html-builder.ts.`,
+    tradeoff: `Good for a visitor who wants "show me the games". Worse for finding something by date.` },
+  { file: '6-riso', name: 'Riso print',
+    going: `Looks printed on a risograph. Three inks (fluorescent pink, yellow, blue) on dark navy paper. Every screenshot is printed in one ink, chosen by its first tag, and turns full color on hover. The background sim is printed in pink too, by grayscaling the iframe and multiplying a pink layer over it. The huge "Projects" title is two inks slightly out of register. Masonry columns so screenshots keep their own shapes. Syne for headings.`,
+    cost: `Small-medium, mostly CSS: blend modes for the duotone and a filter on the iframe. CSS columns fill top to bottom, so newest-first order runs down each column; a real build would want a small JS masonry. The iframe filter costs some GPU, so it stays in the hero.`,
+    tradeoff: `The most fun and the most themed. The duotone hides what screenshots actually look like until you hover.` },
+];
+const nav = document.getElementById('nav');
+nav.innerHTML = D.map((d, i) => `<button data-i="${i}"><b>${i + 1}. ${d.name}</b></button>`).join('');
+let cur = 0;
+function show(i) {
+  cur = (i + D.length) % D.length;
+  const d = D[cur];
+  nav.querySelectorAll('button').forEach((b, j) => b.classList.toggle('on', j === cur));
+  document.getElementById('notes').innerHTML = `<h2>${d.name}</h2><h3>What it's going for</h3><p>${d.going}</p>
+    <h3>Cost to build in projection</h3><p>${d.cost}</p><h3>Trade-off</h3><p>${d.tradeoff}</p>
+    <p><a href="${d.file}.html" target="_blank">Open full size</a></p>`;
+  document.getElementById('d').src = d.file + '.html';
+  document.getElementById('p').src = d.file + '.html';
+  history.replaceState(null, '', '#' + d.file);
+  fit();
+}
+function fit() {
+  const st = document.getElementById('stage').getBoundingClientRect();
+  const avH = st.height - 70, avW = st.width - 48 - 28;
+  const ps = Math.min(avH / 828, 1);
+  const s = Math.min(avH / 900, (avW - (375 * ps + 16)) / 1440, 1);
+  const d = document.getElementById('d'), p = document.getElementById('p');
+  d.style.width = '1440px'; d.style.height = '900px'; d.style.transform = `scale(${s})`;
+  document.getElementById('dframe').style.cssText = `width:${1440 * s}px;height:${900 * s}px`;
+  p.style.width = '375px'; p.style.height = '812px'; p.style.transform = `scale(${ps})`;
+  document.getElementById('pframe').style.cssText = `width:${375 * ps + 16}px;height:${812 * ps + 16}px`;
+}
+nav.onclick = e => { const b = e.target.closest('button'); if (b) show(+b.dataset.i); };
+addEventListener('keydown', e => { if (e.key === 'ArrowRight') show(cur + 1); if (e.key === 'ArrowLeft') show(cur - 1); });
+addEventListener('resize', fit);
+show(Math.max(0, D.findIndex(d => '#' + d.file === location.hash)));
+</script>
+</body>
+</html>

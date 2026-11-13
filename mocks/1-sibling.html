@@ -1,0 +1,177 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Projects · Sibling</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500..800&family=Instrument+Sans:wght@400;500;600&display=swap">
+<style>
+:root {
+  --bg: #07080d; --panel: #10121a; --panel-2: #181b26; --border: #23273a;
+  --text: #e6e8ef; --soft: #c9ccd8; --muted: #8a8fa3; --faint: #5b6072;
+  --accent: #8b99ff; --accent-hi: #a9b3ff;
+  --display: "Bricolage Grotesque", ui-sans-serif, system-ui, sans-serif;
+  --ui: "Instrument Sans", ui-sans-serif, system-ui, sans-serif;
+  --gutter: clamp(16px, 4vw, 56px);
+}
+* { box-sizing: border-box; }
+html { -webkit-text-size-adjust: 100%; text-size-adjust: 100%; }
+body { margin: 0; background: var(--bg); color: var(--text); font: 15px/1.5 var(--ui); }
+a { color: inherit; text-decoration: none; }
+
+.bg { position: fixed; inset: 0; z-index: 0; }
+.bg-frame { width: 100%; height: 100%; border: 0; display: block; }
+/* the sim is at full strength in the hero, then a scrim fades in behind the grid */
+.scrim { position: fixed; inset: 0; z-index: 1; pointer-events: none;
+  background: linear-gradient(to bottom, rgba(7,8,13,.15), rgba(7,8,13,.35) 40%, rgba(7,8,13,.92) 100%); }
+.page { position: relative; z-index: 2; }
+
+.topbar { display: flex; align-items: center; justify-content: space-between; padding: 18px var(--gutter); }
+.crumb { font-family: var(--display); font-size: 17px; color: var(--muted); }
+.crumb b { color: var(--accent); font-weight: 700; }
+.crumb span { margin: 0 8px; color: var(--faint); }
+.bgpill { display: flex; align-items: center; gap: 10px; padding: 5px 5px 5px 14px; border-radius: 999px;
+  background: rgba(16,18,26,.7); border: 1px solid var(--border); backdrop-filter: blur(8px); font-size: 13px; }
+.bgpill em { color: var(--muted); font-style: normal; }
+.bgpill button { font: inherit; color: var(--text); background: var(--panel-2); border: 0; border-radius: 999px; padding: 5px 12px; cursor: pointer; }
+
+.hero { min-height: 62vh; display: flex; flex-direction: column; justify-content: flex-end; padding: 0 var(--gutter) 40px; }
+.hero h1 { font-family: var(--display); font-weight: 800; font-size: clamp(56px, 10vw, 150px); line-height: .9;
+  letter-spacing: -0.04em; margin: 0; color: var(--accent); text-shadow: 0 2px 30px rgba(7,8,13,.6); }
+.hero p { margin: 18px 0 0; font-size: clamp(16px, 1.6vw, 20px); color: var(--soft); max-width: 38ch; }
+
+.tools { position: sticky; top: 0; z-index: 5; padding: 14px var(--gutter); display: flex; gap: 14px; align-items: center;
+  background: rgba(7,8,13,.82); backdrop-filter: blur(12px); border-bottom: 1px solid var(--border); }
+.search { flex: 0 0 260px; font: inherit; color: var(--text); background: var(--panel); border: 1px solid var(--border);
+  border-radius: 10px; padding: 9px 14px; }
+.search:focus { outline: 2px solid var(--accent); outline-offset: 1px; }
+.tags { flex: 1; display: flex; gap: 4px; overflow-x: auto; scrollbar-width: none; mask-image: linear-gradient(to right, #000 92%, transparent); }
+.tags button { flex: none; font: 500 14px var(--ui); color: var(--muted); background: none; border: 0; padding: 7px 10px; border-radius: 8px; cursor: pointer; }
+.tags button sup { font-size: 10px; color: var(--faint); margin-left: 2px; }
+.tags button:hover { color: var(--text); }
+.tags button.on { color: var(--bg); background: var(--accent); }
+.tags button.on sup { color: var(--bg); }
+.sort { font: 500 14px var(--ui); color: var(--soft); background: none; border: 0; }
+
+main { padding: 32px var(--gutter) 24px; }
+h2 { font-family: var(--display); font-weight: 700; font-size: 26px; letter-spacing: -0.02em; margin: 8px 0 18px; }
+h2 small { font: 400 15px var(--ui); color: var(--muted); margin-left: 10px; letter-spacing: 0; }
+
+.featured { display: grid; grid-template-columns: 2fr 1fr 1fr; grid-template-rows: auto auto; gap: 20px; margin-bottom: 56px; }
+.featured .card:first-child { grid-row: span 2; }
+.featured .card:first-child .t { font-size: 30px; }
+.grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 32px 20px; }
+
+.card { display: block; }
+.thumb { aspect-ratio: 4 / 3; border-radius: 12px; overflow: hidden; background: var(--panel); position: relative;
+  outline: 1px solid rgba(255,255,255,.06); outline-offset: -1px; }
+.featured .card:first-child .thumb { aspect-ratio: auto; height: calc(100% - 64px); min-height: 300px; }
+.thumb img { width: 100%; height: 100%; object-fit: cover; display: block; transition: transform .4s ease; }
+.card:hover .thumb img { transform: scale(1.04); }
+/* projects without a screenshot get a typographic tile instead of the old default image */
+.thumb.noimg { display: flex; align-items: flex-end; padding: 16px; background:
+  radial-gradient(120% 90% at 100% 0%, hsl(var(--h) 60% 30% / .55), transparent 60%), var(--panel); }
+.thumb.noimg span { font-family: var(--display); font-weight: 800; font-size: 28px; line-height: 1; letter-spacing: -0.03em; color: hsl(var(--h) 80% 82%); }
+.meta { padding: 12px 2px 0; }
+.t { font-family: var(--display); font-weight: 700; font-size: 19px; letter-spacing: -0.01em; display: flex; justify-content: space-between; gap: 10px; }
+.card:hover .t { color: var(--accent-hi); }
+.t time { font: 400 13px var(--ui); color: var(--faint); white-space: nowrap; padding-top: 4px; }
+.d { margin: 4px 0 0; color: var(--muted); font-size: 14px; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+.ct { margin-top: 6px; font-size: 13px; color: var(--faint); }
+
+.more { display: block; margin: 48px auto 0; font: 600 15px var(--ui); color: var(--text); background: var(--panel-2);
+  border: 1px solid var(--border); border-radius: 10px; padding: 12px 22px; cursor: pointer; }
+.m-footer { text-align: center; color: var(--muted); font-size: 13px; padding: 40px 0; }
+.m-footer a { color: var(--accent); }
+
+@media (max-width: 720px) {
+  .topbar { padding-top: 14px; }
+  .bgpill em { display: none; }
+  .hero { min-height: 48vh; padding-bottom: 28px; }
+  .tools { flex-wrap: wrap; gap: 8px; }
+  .search { flex: 1 1 100%; }
+  .sort { display: none; }
+  .featured { grid-template-columns: 1fr 1fr; gap: 14px; }
+  .featured .card:first-child { grid-column: span 2; grid-row: auto; }
+  .featured .card:first-child .thumb { height: auto; min-height: 0; aspect-ratio: 4/3; }
+  .featured .card:first-child .t { font-size: 22px; }
+  .grid { grid-template-columns: 1fr 1fr; gap: 22px 14px; }
+  .t { font-size: 16px; }
+  .t time, .ct { display: none; }
+  .d { font-size: 13px; }
+  .thumb.noimg span { font-size: 20px; }
+}
+</style>
+</head>
+<body>
+<div class="bg" id="bg"></div>
+<div class="scrim"></div>
+<div class="page">
+  <header class="topbar">
+    <a class="crumb" href="#">Mike Delmonaco<span>/</span><b>Projects</b></a>
+    <div class="bgpill"><em>Background</em><strong id="bgname"></strong><button id="shuffle">Shuffle</button></div>
+  </header>
+  <section class="hero">
+    <h1>Coding Projects</h1>
+    <p id="lede"></p>
+  </section>
+  <div class="tools">
+    <input class="search" id="q" type="search" placeholder="Search projects" aria-label="Search projects">
+    <div class="tags" id="tags"></div>
+    <select class="sort" aria-label="Sort"><option>Newest</option><option>Oldest</option><option>A–Z</option></select>
+  </div>
+  <main>
+    <section id="feat-wrap"><h2>Featured</h2><div class="featured" id="feat"></div></section>
+    <h2 id="all-h">Everything <small id="count"></small></h2>
+    <div class="grid" id="grid"></div>
+    <button class="more">Show 96 more</button>
+  </main>
+  <div id="foot"></div>
+</div>
+<script src="data.js"></script>
+<script src="common.js"></script>
+<script>
+const bg = M.background(document.getElementById('bg'), 0);
+const nameEl = document.getElementById('bgname');
+nameEl.textContent = bg.name();
+bg.onchange = n => (nameEl.textContent = n);
+document.getElementById('shuffle').onclick = () => bg.shuffle();
+document.getElementById('lede').textContent = `${M.P.length} things I've made since 2017: simulations, games, languages and little tools.`;
+document.getElementById('foot').innerHTML = M.footer;
+
+function card(p) {
+  const h = M.hash(p.tags[0] || p.t) % 360;
+  const thumb = p.img
+    ? `<div class="thumb"><img loading="lazy" src="${p.img}" alt=""></div>`
+    : `<div class="thumb noimg" style="--h:${h}"><span>${M.esc(p.t)}</span></div>`;
+  return `<a class="card" href="${p.link}">${thumb}<div class="meta">
+    <div class="t">${M.esc(p.t)}<time>${M.fmt(p)}</time></div>
+    <p class="d">${M.esc(p.d)}</p>
+    <div class="ct">${p.tags.filter(t => t !== 'web' && t !== 'mobile-friendly').join(', ')}</div></div></a>`;
+}
+
+let tag = 'all';
+const tagsEl = document.getElementById('tags');
+tagsEl.innerHTML = ['all', ...M.browseTags].map(t =>
+  `<button data-t="${t}" class="${t === tag ? 'on' : ''}">${t === 'all' ? 'All' : t}${t === 'all' ? '' : `<sup>${M.tagCounts[t]}</sup>`}</button>`).join('');
+tagsEl.onclick = e => { const b = e.target.closest('button'); if (!b) return; tag = b.dataset.t; render(); };
+document.getElementById('q').oninput = render;
+
+function render() {
+  const q = document.getElementById('q').value.trim();
+  tagsEl.querySelectorAll('button').forEach(b => b.classList.toggle('on', b.dataset.t === tag));
+  const list = M.filter(q, tag);
+  const filtering = q || tag !== 'all';
+  document.getElementById('feat-wrap').style.display = filtering ? 'none' : '';
+  document.getElementById('feat').innerHTML = M.featured.filter(p => p.img).slice(0, 5).map(card).join('');
+  document.getElementById('grid').innerHTML = list.slice(0, 40).map(card).join('');
+  document.getElementById('count').textContent = `${list.length} projects`;
+  document.querySelector('.more').style.display = list.length > 40 ? '' : 'none';
+  document.querySelector('.more').textContent = `Show ${list.length - 40} more`;
+}
+render();
+</script>
+</body>
+</html>
