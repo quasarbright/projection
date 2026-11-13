@@ -69,7 +69,14 @@ class ProjectFilter {
         this.layoutTags();
       });
       phone.addEventListener('change', () => this.layoutTags());
-      window.addEventListener('resize', () => this.layoutTags());
+      // Only a width change can move tags between rows. Phones fire resize on every scroll that
+      // shows or hides the address bar, so ignore height-only changes.
+      let lastWidth = window.innerWidth;
+      window.addEventListener('resize', () => {
+        if (window.innerWidth === lastWidth) return;
+        lastWidth = window.innerWidth;
+        this.layoutTags();
+      });
       document.fonts?.ready.then(() => this.layoutTags());
       this.layoutTags();
     }

@@ -58,11 +58,16 @@ button, input, select {
    The iframe sits under the page with pointer events on. Over it, the page lets the pointer
    through everywhere except cards and controls, so the background gets real mouse events.
    Over a card or control, scripts/dynamic-background.js forwards the move into the iframe. */
+/* Sized to the largest viewport (100lvh), not the window: on phones the window gets shorter
+   whenever the address bar slides back in, and a resized iframe makes most sketches reset
+   their canvas mid-scroll. */
 #dynamic-background {
   position: fixed;
-  inset: 0;
+  top: 0;
+  left: 0;
   width: 100%;
-  height: 100%;
+  height: 100vh;
+  height: 100lvh;
   z-index: 0;
   border: none;
   background: transparent;
