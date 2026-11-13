@@ -54,6 +54,41 @@ export const ConfigForm: React.FC<ConfigFormProps> = ({
           placeholder="My Projects"
         />
         {errors.title && <span className="error-message">{errors.title}</span>}
+        <small className="help-text">
+          Shown in the browser tab and as the first part of the top bar ("title / heading")
+        </small>
+      </div>
+
+      <div className="form-group">
+        <label htmlFor="heading">Page Heading</label>
+        <input
+          id="heading"
+          type="text"
+          value={config.heading || ''}
+          onChange={(e) => handleInputChange('heading', e.target.value || undefined)}
+          className={errors.heading ? 'error' : ''}
+          placeholder="Projects"
+        />
+        <small className="help-text">
+          The big heading on the page, also the second part of the top bar. Leave empty for "Projects"
+        </small>
+        {errors.heading && <span className="error-message">{errors.heading}</span>}
+      </div>
+
+      <div className="form-group">
+        <label htmlFor="homeUrl">Home URL</label>
+        <input
+          id="homeUrl"
+          type="text"
+          value={config.homeUrl || ''}
+          onChange={(e) => handleInputChange('homeUrl', e.target.value || undefined)}
+          className={errors.homeUrl ? 'error' : ''}
+          placeholder="https://example.com/"
+        />
+        <small className="help-text">
+          Makes the site title in the top bar a link, e.g. to your home page. Leave empty for plain text
+        </small>
+        {errors.homeUrl && <span className="error-message">{errors.homeUrl}</span>}
       </div>
 
       <div className="form-group">

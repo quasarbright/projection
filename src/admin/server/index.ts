@@ -342,6 +342,12 @@ export class AdminServer {
         if (!newConfig.description || typeof newConfig.description !== 'string' || newConfig.description.trim() === '') {
           errors.push('description is required and must be a non-empty string');
         }
+
+        for (const field of ['heading', 'homeUrl']) {
+          if (newConfig[field] !== undefined && typeof newConfig[field] !== 'string') {
+            errors.push(`${field} must be a string`);
+          }
+        }
         
         if (!newConfig.baseUrl || typeof newConfig.baseUrl !== 'string' || newConfig.baseUrl.trim() === '') {
           errors.push('baseUrl is required and must be a non-empty string');
