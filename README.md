@@ -209,8 +209,10 @@ JSON format configuration file:
 
 | Option | Type | Default | Description |
 |--------|------|---------|-------------|
-| `title` | string | "My Projects" | Site title displayed in header |
-| `description` | string | "A showcase of my coding projects" | Site description and meta description |
+| `title` | string | "My Projects" | Page title, and the first part of the top bar ("title / heading") |
+| `description` | string | "A showcase of my coding projects" | Meta description |
+| `heading` | string | "Projects" | Big heading in the hero, and the second part of the top bar |
+| `homeUrl` | string | none | Where the title in the top bar links to, e.g. your home page |
 | `baseUrl` | string | "./" | Base URL for resolving relative paths |
 | `dynamicBackgrounds` | string[] | [] | Array of background URLs (see [Dynamic Backgrounds](#-dynamic-backgrounds)) |
 | `customStyles` | string | null | Path to custom styles directory |

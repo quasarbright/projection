@@ -22,6 +22,14 @@
     return url + (url.includes('?') ? '&' : '?') + 'background=true';
   }
 
+  // A readable name from the URL's last path segment: ".../p5js/hex-random-walk/?background" -> "Hex random walk"
+  function backgroundName(url) {
+    const path = url.split(/[?#]/)[0].replace(/\/+$/, '');
+    const slug = decodeURIComponent(path.slice(path.lastIndexOf('/') + 1)).replace(/\.html?$/, '');
+    const words = slug.replace(/[-_]+/g, ' ').trim();
+    return words.charAt(0).toUpperCase() + words.slice(1);
+  }
+
   // The iframe's window and document, or null when it is cross-origin (or not loaded yet).
   function sameOriginFrame(iframe) {
     try {
@@ -84,8 +92,19 @@
       (frame.doc.head || frame.doc.documentElement).append(style);
     });
 
-    const picked = backgrounds[Math.floor(Math.random() * backgrounds.length)];
-    iframe.src = withBackgroundParam(picked);
+    // The pill in the top bar names the background, and Shuffle loads a different one
+    const nameEl = document.getElementById('bg-name');
+    let current = Math.floor(Math.random() * backgrounds.length);
+    function load(index) {
+      current = index;
+      iframe.src = withBackgroundParam(backgrounds[index]);
+      if (nameEl) nameEl.textContent = backgroundName(backgrounds[index]);
+    }
+    load(current);
+    document.getElementById('bg-shuffle')?.addEventListener('click', () => {
+      const next = (current + 1 + Math.floor(Math.random() * (backgrounds.length - 1))) % backgrounds.length;
+      load(next);
+    });
 
     // This only fires where the page is on top (cards and controls); elsewhere the event
     // goes to the iframe directly.

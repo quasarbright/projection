@@ -39,6 +39,49 @@ class ProjectFilter {
     this.clearFiltersBtn.addEventListener('click', () => {
       this.clearAllFilters();
     });
+
+    // On phones the tag list starts collapsed to All, featured and whatever is selected
+    const tagsToggle = document.getElementById('tags-toggle');
+    const filterSection = document.getElementById('filter-section');
+    if (tagsToggle && filterSection) {
+      const hidden = [...this.tagFilters].filter(b => b.dataset.tag !== 'all' && b.dataset.tag !== 'featured').length;
+      const label = () => {
+        const open = filterSection.classList.contains('tags-open');
+        tagsToggle.textContent = open ? 'Fewer tags' : `${hidden} more tags`;
+        tagsToggle.setAttribute('aria-expanded', String(open));
+      };
+      label();
+      tagsToggle.addEventListener('click', () => {
+        filterSection.classList.toggle('tags-open');
+        label();
+      });
+    }
+
+    // "See all" in the featured section filters the grid to featured projects
+    const seeAll = document.getElementById('see-all-featured');
+    if (seeAll) {
+      seeAll.addEventListener('click', () => {
+        this.activeFilters.clear();
+        this.activeFilters.add('featured');
+        this.updateFilterUI();
+        this.applyFilters();
+        document.getElementById('filter-section')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      });
+    }
+  }
+
+  // While a tag or search narrows the grid, hide the featured section and show the match count
+  updateState() {
+    const filtering = this.searchActive || !this.activeFilters.has('all');
+    document.body.classList.toggle('is-filtering', filtering);
+    const title = document.getElementById('all-title');
+    if (title) title.textContent = filtering ? 'Results' : 'Everything';
+    const count = document.getElementById('result-count');
+    if (count) {
+      const visible = Array.from(this.projectsGrid.querySelectorAll('.project-card'))
+        .filter(card => card.style.display !== 'none').length;
+      count.textContent = `${visible} project${visible === 1 ? '' : 's'}`;
+    }
   }
   
   toggleTagFilter(tag) {
@@ -114,7 +157,8 @@ class ProjectFilter {
     
     // Show/hide no results message
     this.toggleNoResults(visibleCount === 0);
-    
+    this.updateState();
+
     // Update URL with active filters
     this.updateURL();
   }

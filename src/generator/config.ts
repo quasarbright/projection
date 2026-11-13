@@ -133,6 +133,14 @@ export class ConfigLoader {
       }
     }
 
+    if (config.heading !== undefined && typeof config.heading !== 'string') {
+      errors.push('heading must be a string');
+    }
+
+    if (config.homeUrl !== undefined && typeof config.homeUrl !== 'string') {
+      errors.push('homeUrl must be a string');
+    }
+
     if (config.customStyles !== undefined && typeof config.customStyles !== 'string') {
       errors.push('customStyles must be a string');
     }

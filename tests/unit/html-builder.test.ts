@@ -168,7 +168,7 @@ describe('HTMLBuilder', () => {
       expect(html).toContain('data-project-id="test-project"');
       expect(html).toContain('Test Project');
       expect(html).toContain('A test project description');
-      expect(html).toMatch(/January 1[45], 2024/); // Account for timezone differences
+      expect(html).toMatch(/(Jan 2024|Dec 2023)/); // Account for timezone differences
     });
 
     it('should include featured class for featured projects', () => {
@@ -186,18 +186,21 @@ describe('HTMLBuilder', () => {
       expect(html).not.toContain('class="project-card featured"');
     });
 
-    it('should include background style when thumbnailLink is provided', () => {
+    it('should include the thumbnail image when thumbnailLink is provided', () => {
       const project = createValidProject({ thumbnailLink: 'https://example.com/thumb.png' });
       const html = htmlBuilder.generateProjectCard(project);
       
-      expect(html).toContain('style="background-image: url(\'https://example.com/thumb.png\');"');
+      expect(html).toContain('<img src="https://example.com/thumb.png"');
+      expect(html).not.toContain('no-thumb');
     });
 
-    it('should not include background style when thumbnailLink is missing', () => {
+    it('should show a title tile instead of an image when thumbnailLink is missing', () => {
       const project = createValidProject({ thumbnailLink: undefined });
       const html = htmlBuilder.generateProjectCard(project);
       
-      expect(html).not.toContain('background-image');
+      expect(html).not.toContain('<img');
+      expect(html).toContain('class="card-thumb no-thumb"');
+      expect(html).toContain('<span>Test Project</span>');
     });
 
     it('should generate tags excluding featured tag', () => {
@@ -213,7 +216,7 @@ describe('HTMLBuilder', () => {
       const project = createValidProject({ sourceLink: 'https://github.com/user/repo' });
       const html = htmlBuilder.generateProjectCard(project);
       
-      expect(html).toContain('Source Code');
+      expect(html).toContain('Source code');
       expect(html).toContain('href="https://github.com/user/repo"');
     });
 
@@ -221,7 +224,7 @@ describe('HTMLBuilder', () => {
       const project = createValidProject({ sourceLink: undefined });
       const html = htmlBuilder.generateProjectCard(project);
       
-      expect(html).not.toContain('Source Code');
+      expect(html).not.toContain('Source code');
       expect(html).not.toContain('card-actions');
     });
 
@@ -232,8 +235,8 @@ describe('HTMLBuilder', () => {
       expect(html).toContain('href="./projects/test"');
     });
 
-    it('should include external link icon', () => {
-      const project = createValidProject();
+    it('should include external link icon on the source link', () => {
+      const project = createValidProject({ sourceLink: 'https://github.com/user/repo' });
       const html = htmlBuilder.generateProjectCard(project);
       
       expect(html).toContain('<svg');
@@ -244,7 +247,7 @@ describe('HTMLBuilder', () => {
       const project = createValidProject({ creationDate: '2023-12-25' });
       const html = htmlBuilder.generateProjectCard(project);
       
-      expect(html).toMatch(/December 2[45], 2023/); // Account for timezone differences
+      expect(html).toMatch(/Dec 2023/);
     });
 
     it('should handle multiple tags', () => {
@@ -594,7 +597,7 @@ describe('HTMLBuilder', () => {
       expect(html).toContain('</html>');
     });
 
-    it('should include config title in head and header', () => {
+    it('should include config title in head and the top bar', () => {
       const projectsData: ProjectsData = {
         projects: [createValidProject()],
         config: {}
@@ -602,7 +605,18 @@ describe('HTMLBuilder', () => {
       const html = htmlBuilder.generateHTML(projectsData);
       
       expect(html).toContain('<title>Test Portfolio</title>');
-      expect(html).toContain('<h1>Test Portfolio</h1>');
+      expect(html).toContain('<span>Test Portfolio</span><span class="crumb-sep">/</span>');
+    });
+
+    it('should use the heading config in the hero and top bar, defaulting to Projects', () => {
+      const projectsData: ProjectsData = { projects: [createValidProject()], config: {} };
+      expect(htmlBuilder.generateHTML(projectsData)).toContain('<h1>Projects</h1>');
+
+      const custom = new HTMLBuilder({ ...config, heading: 'Coding Projects', homeUrl: 'https://example.com/' });
+      const html = custom.generateHTML(projectsData);
+      expect(html).toContain('<h1>Coding Projects</h1>');
+      expect(html).toContain('<b>Coding Projects</b>');
+      expect(html).toContain('<a href="https://example.com/">Test Portfolio</a>');
     });
 
     it('should include config description in meta and header', () => {
@@ -613,7 +627,6 @@ describe('HTMLBuilder', () => {
       const html = htmlBuilder.generateHTML(projectsData);
       
       expect(html).toContain('<meta name="description" content="A test portfolio site">');
-      expect(html).toContain('<p class="site-description">A test portfolio site</p>');
     });
 
     it('should include stylesheet links', () => {
@@ -745,7 +758,7 @@ describe('HTMLBuilder', () => {
       const html = htmlBuilder.generateHTML(projectsData);
       
       expect(html).toContain('3 projects');
-      expect(html).toContain('2 featured');
+      expect(html).toContain('See all 2');
     });
 
     it('should include earliest project year in stats', () => {
@@ -759,7 +772,7 @@ describe('HTMLBuilder', () => {
       };
       const html = htmlBuilder.generateHTML(projectsData);
       
-      expect(html).toContain('Since 2018');
+      expect(html).toContain('since 2018');
     });
 
     it('should embed projects data as JSON in script tag', () => {
@@ -786,7 +799,7 @@ describe('HTMLBuilder', () => {
       
       // Builder config (from constructor) should take precedence
       expect(html).toContain('<title>Test Portfolio</title>');
-      expect(html).toContain('<h1>Test Portfolio</h1>');
+      expect(html).toContain('<span>Test Portfolio</span>');
       expect(html).toContain('<meta name="description" content="A test portfolio site">');
     });
 

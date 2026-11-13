@@ -60,6 +60,7 @@ class ProjectSearch {
     } else if (window.projectFilter) {
       window.projectFilter.searchActive = false;
     }
+    window.projectFilter?.updateState();
   }
   
   sortSearchResults() {

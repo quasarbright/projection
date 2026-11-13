@@ -8,6 +8,10 @@ export interface Config {
   description: string;
   /** Base URL for path resolution */
   baseUrl: string;
+  /** Page heading shown in the hero and the top bar, e.g. "Coding Projects" (default: "Projects") */
+  heading?: string;
+  /** Where the site title in the top bar links to, e.g. your home page. Not a link when unset. */
+  homeUrl?: string;
   /** Array of background iframe URLs for dynamic backgrounds */
   dynamicBackgrounds?: string[];
   /** Path to custom styles directory */

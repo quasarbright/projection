@@ -184,9 +184,33 @@ export class HTMLBuilder {
     const date = new Date(dateString);
     return date.toLocaleDateString('en-US', {
       year: 'numeric',
-      month: 'long',
-      day: 'numeric'
+      month: 'short'
     });
+  }
+
+  /**
+   * A stable hue (0-359) for a string, used to tint the title tile of projects without a thumbnail
+   */
+  private hueFor(text: string): number {
+    let h = 0;
+    for (const c of text) h = (h * 31 + c.charCodeAt(0)) | 0;
+    return Math.abs(h) % 360;
+  }
+
+  private escapeAttr(text: string): string {
+    return text.replace(/&/g, '&amp;').replace(/"/g, '&quot;').replace(/</g, '&lt;');
+  }
+
+  /**
+   * The thumbnail area of a card: the screenshot, or a tinted tile with the title when there is none
+   */
+  private generateThumb(project: Project): string {
+    if (project.thumbnailLink) {
+      const src = this.resolveThumbnailPath(project.thumbnailLink, this.config.baseUrl);
+      return `<div class="card-thumb"><img src="${this.escapeAttr(src)}" alt="" loading="lazy" decoding="async"></div>`;
+    }
+    const hue = this.hueFor(project.tags[0] || project.title);
+    return `<div class="card-thumb no-thumb" style="--hue: ${hue}"><span>${project.title}</span></div>`;
   }
 
   /**
@@ -279,11 +303,6 @@ export class HTMLBuilder {
       .join('');
     const featuredClass = project.featured ? ' featured' : '';
 
-    // Use thumbnail as background image if it exists
-    const backgroundStyle = project.thumbnailLink
-      ? ` style="background-image: url('${this.resolveThumbnailPath(project.thumbnailLink, this.config.baseUrl)}');"`
-      : '';
-
     // Resolve the page link for the title hyperlink
     const resolvedPageLink = this.resolvePageLink(project.pageLink, this.config.baseUrl);
 
@@ -291,23 +310,19 @@ export class HTMLBuilder {
     const adminControls = this.generateAdminControls(project.id);
 
     return `
-    <div class="project-card${featuredClass}" data-project-id="${project.id}"${backgroundStyle}>
+    <div class="project-card${featuredClass}" data-project-id="${project.id}">
       ${adminControls}
-      <div class="card-content">
-        <div class="card-info">
-          <h3 class="project-title">
-            <a href="${resolvedPageLink}" target="_blank" rel="noopener noreferrer" class="title-link">
-              ${project.title}
-              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="display: inline; margin-left: 6px;"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h6"></path><polyline points="15,3 21,3 21,9"></polyline><line x1="10" y1="14" x2="21" y2="3"></line></svg>
-            </a>
-          </h3>
-          <p class="project-date">${formattedDate}</p>
-          <p class="project-description">${project.description}</p>
-        </div>
+      ${this.generateThumb(project)}
+      <div class="card-info">
+        <h3 class="project-title">
+          <a href="${resolvedPageLink}" target="_blank" rel="noopener noreferrer" class="title-link">${project.title}</a>
+          <time class="project-date" datetime="${project.creationDate}">${formattedDate}</time>
+        </h3>
+        <p class="project-description">${project.description}</p>
         <div class="card-bottom">
           <div class="project-tags">${tags}</div>
           ${project.sourceLink ? `<div class="card-actions">
-            <a href="${project.sourceLink}" class="btn-secondary" target="_blank" rel="noopener">Source Code <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="display: inline; margin-left: 4px;"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h6"></path><polyline points="15,3 21,3 21,9"></polyline><line x1="10" y1="14" x2="21" y2="3"></line></svg></a>
+            <a href="${project.sourceLink}" class="source-link" target="_blank" rel="noopener">Source code<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h6"></path><polyline points="15,3 21,3 21,9"></polyline><line x1="10" y1="14" x2="21" y2="3"></line></svg></a>
           </div>` : ''}
         </div>
       </div>
@@ -315,34 +330,72 @@ export class HTMLBuilder {
   }
 
   /**
-   * Generates HTML for the tag filter section
+   * Generates the featured section: up to five featured projects, the first one large, plus a
+   * button that filters the grid to every featured project.
+   * Empty when nothing is featured.
    */
-  generateTagFilter(allTags: string[]): string {
-    const tagButtons = allTags.map(tag => {
-      if (tag === 'featured') {
-        return `<button class="tag-filter" data-tag="${tag}">★ ${tag}</button>`;
-      }
-      return `<button class="tag-filter" data-tag="${tag}">${tag}</button>`;
+  generateFeatured(sortedProjects: Project[]): string {
+    const featured = sortedProjects.filter(p => p.featured);
+    // Prefer projects with a screenshot; title tiles fill in when there aren't five
+    const shown = [...featured.filter(p => p.thumbnailLink), ...featured.filter(p => !p.thumbnailLink)].slice(0, 5);
+    if (shown.length === 0) return '';
+
+    const cards = shown.map(project => {
+      const link = this.resolvePageLink(project.pageLink, this.config.baseUrl);
+      return `
+      <a class="feature-card" href="${link}" target="_blank" rel="noopener noreferrer">
+        ${this.generateThumb(project)}
+        <span class="feature-info">
+          <span class="feature-title">${project.title}<time datetime="${project.creationDate}">${this.formatDate(project.creationDate)}</time></span>
+          <span class="feature-description">${project.description}</span>
+        </span>
+      </a>`;
     }).join('');
 
     return `
-    <div class="filter-section">
-      <div class="search-container">
-        <input type="text" id="search-input" placeholder="Search projects...">
-        <button id="clear-search">Clear</button>
+    <section class="featured-section" id="featured-section">
+      <div class="section-head">
+        <h2>Featured</h2>
+        <button class="see-all" id="see-all-featured" data-tag="featured">See all ${featured.length}</button>
+      </div>
+      <div class="featured-grid">${cards}
+      </div>
+    </section>`;
+  }
+
+  /**
+   * Generates HTML for the tag filter section
+   */
+  generateTagFilter(allTags: string[], counts: Record<string, number> = {}): string {
+    const count = (tag: string) => counts[tag] !== undefined ? `<sup>${counts[tag]}</sup>` : '';
+    const tagButtons = allTags.map(tag => {
+      if (tag === 'featured') {
+        return `<button class="tag-filter tag-featured" data-tag="${tag}">★ ${tag}${count(tag)}</button>`;
+      }
+      return `<button class="tag-filter" data-tag="${tag}">${tag}${count(tag)}</button>`;
+    }).join('');
+
+    return `
+    <div class="filter-section" id="filter-section">
+      <div class="filter-row">
+        <div class="search-container">
+          <input type="search" id="search-input" placeholder="Search projects..." aria-label="Search projects">
+          <button id="clear-search" aria-label="Clear search">Clear</button>
+        </div>
+        <div class="sort-controls">
+          <label for="sort-select">Sort</label>
+          <select id="sort-select">
+            <option value="date">Date (Newest)</option>
+            <option value="date-asc">Date (Oldest)</option>
+            <option value="name">Name (A-Z)</option>
+            <option value="name-desc">Name (Z-A)</option>
+          </select>
+        </div>
       </div>
       <div class="tag-filters">
         <button class="tag-filter active" data-tag="all">All</button>
         ${tagButtons}
-      </div>
-      <div class="sort-controls">
-        <label>Sort by:</label>
-        <select id="sort-select">
-          <option value="date">Date (Newest)</option>
-          <option value="date-asc">Date (Oldest)</option>
-          <option value="name">Name (A-Z)</option>
-          <option value="name-desc">Name (Z-A)</option>
-        </select>
+        <button class="tags-toggle" id="tags-toggle" aria-expanded="false">More tags</button>
       </div>
     </div>`;
   }
@@ -405,11 +458,26 @@ export class HTMLBuilder {
     const projectCards = sortedProjects.map(project => this.generateProjectCard(project)).join('');
 
     // Generate components
-    const tagFilter = this.generateTagFilter(allTags);
+    const tagCounts: Record<string, number> = {};
+    projects.forEach(p => p.tags.forEach(t => { tagCounts[t] = (tagCounts[t] || 0) + 1; }));
+    tagCounts.featured = projects.filter(p => p.featured).length;
+    const tagFilter = this.generateTagFilter(allTags, tagCounts);
+    const featuredSection = this.generateFeatured(sortedProjects);
+
+    const heading = mergedConfig.heading || 'Projects';
+    const siteName = mergedConfig.homeUrl
+      ? `<a href="${mergedConfig.homeUrl}">${mergedConfig.title}</a>`
+      : `<span>${mergedConfig.title}</span>`;
+    const firstYear = projects.length ? Math.min(...projects.map(p => new Date(p.creationDate).getFullYear())) : null;
+    const summary = `${projects.length} project${projects.length === 1 ? '' : 's'}${firstYear ? ` since ${firstYear}` : ''}`;
 
     // Generate dynamic background iframe if configured
-    const dynamicBackgroundHTML = mergedConfig.dynamicBackgrounds && mergedConfig.dynamicBackgrounds.length > 0
+    const hasBackground = !!(mergedConfig.dynamicBackgrounds && mergedConfig.dynamicBackgrounds.length > 0);
+    const dynamicBackgroundHTML = hasBackground
       ? `<iframe id="dynamic-background" src="" frameborder="0" tabindex="-1" title="Background" allow="fullscreen 'none'"></iframe>`
+      : '';
+    const backgroundPill = hasBackground
+      ? `<div class="bg-pill" id="bg-pill"><span class="bg-pill-label">Background</span><span class="bg-pill-name" id="bg-name"></span>${mergedConfig.dynamicBackgrounds!.length > 1 ? '<button id="bg-shuffle" title="Load a different background">Shuffle</button>' : ''}</div>`
       : '';
 
     // Generate admin features if in admin mode
@@ -426,6 +494,9 @@ export class HTMLBuilder {
   <title>${mergedConfig.title}</title>
   <meta name="description" content="${mergedConfig.description}">
   <link rel="icon" type="image/x-icon" href="favicon.ico">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600..800&family=Instrument+Sans:wght@400;500;600&display=swap">
   <link rel="stylesheet" href="styles/main.css">
   <link rel="stylesheet" href="styles/cards.css">
   <!-- <link rel="stylesheet" href="styles/modal.css"> Modal styles not currently used -->${adminStyles}
@@ -433,20 +504,25 @@ export class HTMLBuilder {
 <body${dynamicBackgroundHTML ? ' class="has-dynamic-background"' : ''}>
   ${dynamicBackgroundHTML}
   <header class="site-header">
-    <div class="container">
-      <h1>${mergedConfig.title}${createButton}</h1>
-      <p class="site-description">${mergedConfig.description}</p>
-      <div class="stats">
-        <span>${projects.length} projects</span>
-        <span>${projects.filter(p => p.featured).length} featured</span>
-        <span>Since ${Math.min(...projects.map(p => new Date(p.creationDate).getFullYear()))}</span>
-      </div>
+    <div class="topbar container">
+      <nav class="crumbs" aria-label="Breadcrumb">${siteName}<span class="crumb-sep">/</span><b>${heading}</b></nav>
+      ${backgroundPill}
+    </div>
+    <div class="hero container">
+      <h1>${heading}${createButton}</h1>
+      <p class="site-description">${summary}</p>
     </div>
   </header>
 
-  <main class="container">
+  <main class="page-main">
+   <div class="container">
     ${tagFilter}
-    
+    ${featuredSection}
+
+    <div class="section-head" id="all-head">
+      <h2 id="all-title">Everything</h2>
+      <span class="result-count" id="result-count">${projects.length} projects</span>
+    </div>
     <div class="projects-grid" id="projects-grid">
       ${projectCards}
     </div>
@@ -455,6 +531,7 @@ export class HTMLBuilder {
       <p>No projects found matching your criteria.</p>
       <button id="clear-filters">Clear all filters</button>
     </div>
+   </div>
   </main>
 
   <!-- Modal HTML commented out - currently not used -->

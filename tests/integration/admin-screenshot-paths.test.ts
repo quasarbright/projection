@@ -218,7 +218,7 @@ projects:
     expect(fs.existsSync(path.join(tempDir, 'dist', 'images', 'user-image.png'))).toBe(true);
   });
 
-  it('should use relative paths in background-image CSS', async () => {
+  it('should use relative paths in the thumbnail img', async () => {
     createTestProject('https://example.com/');
 
     await BuildHelper.runBuild({
@@ -228,10 +228,10 @@ projects:
 
     const html = fs.readFileSync(path.join(tempDir, 'dist', 'index.html'), 'utf-8');
     
-    // Check that it's in the background-image style attribute
-    expect(html).toMatch(/background-image:\s*url\(['"]\.\/images\/test-project\.png['"]\)/);
+    // Check that it's the thumbnail's src
+    expect(html).toContain('<img src="./images/test-project.png"');
     
-    // Should NOT have production URL in background-image
-    expect(html).not.toMatch(/background-image:\s*url\(['"]https:\/\/example\.com\/images\//);
+    // Should NOT have production URL in the thumbnail
+    expect(html).not.toContain('<img src="https://example.com/images/');
   });
 });

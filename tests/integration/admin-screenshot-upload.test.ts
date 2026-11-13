@@ -69,11 +69,11 @@ projects:
     const copiedContent = fs.readFileSync(copiedImagePath, 'utf-8');
     expect(copiedContent).toBe('fake image data');
 
-    // Check that HTML references the correct path in background-image style
+    // Check that HTML references the correct path in the thumbnail img
     const html = fs.readFileSync(indexPath, 'utf-8');
     expect(html).toContain('./images/project-123.png');
-    // The admin:// prefix should appear in the embedded JSON data, but not in the background-image style
-    expect(html).toMatch(/background-image:\s*url\(['"]\.\/images\/project-123\.png['"]\)/);
+    // The admin:// prefix should appear in the embedded JSON data, but not in the img src
+    expect(html).toContain('<img src="./images/project-123.png"');
   });
 
   it('should handle multiple admin:// screenshots', async () => {
