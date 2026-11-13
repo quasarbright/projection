@@ -510,11 +510,15 @@ body.is-filtering .featured-section {
     gap: 5px;
   }
 
+  /* its own row under the tags; scripts/filter.js hides the tags past the first row */
   .tags-toggle {
-    display: inline-block;
+    display: block;
+    flex-basis: 100%;
+    text-align: left;
   }
 
-  .filter-section:not(.tags-open) .tag-filter:not(.active):not(.tag-featured):not([data-tag="all"]) {
+  .tags-toggle[hidden],
+  .tag-filter.tag-overflow {
     display: none;
   }
 

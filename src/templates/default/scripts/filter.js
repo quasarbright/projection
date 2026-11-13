@@ -40,21 +40,38 @@ class ProjectFilter {
       this.clearAllFilters();
     });
 
-    // On phones the tag list starts collapsed to All, featured and whatever is selected
+    // On phones the tag list starts collapsed: the tags that fit on the first row, any selected
+    // ones, and a "more tags" link on its own row under them
     const tagsToggle = document.getElementById('tags-toggle');
     const filterSection = document.getElementById('filter-section');
     if (tagsToggle && filterSection) {
-      const hidden = [...this.tagFilters].filter(b => b.dataset.tag !== 'all' && b.dataset.tag !== 'featured').length;
-      const label = () => {
+      const phone = window.matchMedia('(max-width: 720px)');
+      this.layoutTags = () => {
         const open = filterSection.classList.contains('tags-open');
+        this.tagFilters.forEach(b => b.classList.remove('tag-overflow'));
+        let hidden = 0;
+        if (phone.matches && !open) {
+          // hiding a later tag never moves an earlier one, so one pass is enough
+          const firstTop = this.tagFilters[0].offsetTop;
+          this.tagFilters.forEach(b => {
+            if (b.offsetTop > firstTop + 2 && !b.classList.contains('active')) {
+              b.classList.add('tag-overflow');
+              hidden++;
+            }
+          });
+        }
         tagsToggle.textContent = open ? 'Fewer tags' : `${hidden} more tags`;
+        tagsToggle.hidden = !open && hidden === 0;
         tagsToggle.setAttribute('aria-expanded', String(open));
       };
-      label();
       tagsToggle.addEventListener('click', () => {
         filterSection.classList.toggle('tags-open');
-        label();
+        this.layoutTags();
       });
+      phone.addEventListener('change', () => this.layoutTags());
+      window.addEventListener('resize', () => this.layoutTags());
+      document.fonts?.ready.then(() => this.layoutTags());
+      this.layoutTags();
     }
 
     // "See all" in the featured section filters the grid to featured projects
@@ -116,6 +133,9 @@ class ProjectFilter {
     
     // Update tag highlighting in cards and modal
     this.updateTagHighlighting();
+
+    // A newly selected tag stays visible when the phone tag list is collapsed
+    this.layoutTags?.();
   }
   
   updateTagHighlighting() {
