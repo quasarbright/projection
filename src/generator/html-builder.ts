@@ -66,7 +66,7 @@ export class HTMLBuilder {
     .admin-controls {
       position: absolute;
       top: 8px;
-      right: 8px;
+      left: 8px;
       display: flex;
       gap: 8px;
       z-index: 10;
@@ -491,7 +491,7 @@ export class HTMLBuilder {
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  ${this.adminMode ? '<base href="http://localhost:3000/">' : ''}
+  ${this.adminMode ? '<base href="/">' : ''}
   <title>${mergedConfig.title}</title>
   <meta name="description" content="${mergedConfig.description}">
   <link rel="icon" type="image/x-icon" href="favicon.ico">

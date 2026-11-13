@@ -553,7 +553,7 @@ describe('HTMLBuilder', () => {
         };
         const html = builder.generateHTML(projectsData);
         
-        expect(html).toContain('<base href="http://localhost:3000/">');
+        expect(html).toContain('<base href="/">');
       });
 
       it('should not include base tag when adminMode is false', () => {
