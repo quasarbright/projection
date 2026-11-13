@@ -80,10 +80,31 @@
   color: var(--accent-hi);
 }
 
-.project-card.featured .title-link::after {
-  content: " ★";
-  color: var(--accent);
-  font-size: 0.8em;
+/* Featured cards: an accent ring around the screenshot and a "★ Featured" tab in its corner */
+.project-card.featured .card-thumb {
+  outline: none;
+  box-shadow: 0 0 0 2px var(--accent), 0 0 24px rgba(139, 153, 255, 0.25);
+}
+
+.project-card.featured .card-thumb::after {
+  content: "★ Featured";
+  position: absolute;
+  top: 0;
+  right: 0;
+  padding: 4px 10px 5px 12px;
+  background: var(--accent);
+  color: var(--on-accent);
+  font: 600 12px/1 var(--ui);
+  border-bottom-left-radius: var(--radius);
+  text-shadow: none;
+}
+
+@media (max-width: 720px) {
+  .project-card.featured .card-thumb::after {
+    content: "★";
+    padding: 5px 8px 6px 9px;
+    font-size: 12px;
+  }
 }
 
 .project-date {
