@@ -1,3 +1,4 @@
+import * as crypto from 'crypto';
 import * as fs from 'fs';
 import * as path from 'path';
 import * as yaml from 'js-yaml';
@@ -54,6 +55,24 @@ export class Generator {
     this.validator = new Validator(cwd);
     this.htmlBuilder = new HTMLBuilder(config, { adminMode: this.adminMode });
     this.assetCopier = new AssetCopier(cwd, this.outputDir);
+  }
+
+  /**
+   * Appends ?v=<first 8 hex of the file's SHA-1> to every local styles/ and scripts/ link in
+   * the built index.html. Browsers (and GitHub Pages' caching) can otherwise keep serving an
+   * old stylesheet after a deploy; a new hash is a new URL, so a changed file is fetched at once.
+   */
+  versionAssetLinks(): void {
+    const htmlPath = path.join(this.outputDir, 'index.html');
+    if (!fs.existsSync(htmlPath)) return;
+    const html = fs.readFileSync(htmlPath, 'utf-8');
+    const versioned = html.replace(/(href|src)="((?:styles|scripts)\/[^"?#]+)"/g, (match, attr, rel) => {
+      const file = path.join(this.outputDir, rel);
+      if (!fs.existsSync(file)) return match;
+      const hash = crypto.createHash('sha1').update(fs.readFileSync(file)).digest('hex').slice(0, 8);
+      return `${attr}="${rel}?v=${hash}"`;
+    });
+    if (versioned !== html) fs.writeFileSync(htmlPath, versioned, 'utf-8');
   }
 
   /**
@@ -136,6 +155,9 @@ export class Generator {
         .filter((t): t is string => !!t);
       await this.assetCopier.copyAssets(this.config, thumbnails);
       Logger.success('Assets copied');
+
+      // 7. Version the stylesheet and script links so browsers fetch changed files right away
+      this.versionAssetLinks();
 
       Logger.newline();
       Logger.icon('✨', `Build complete! Output: ${this.outputDir}`, '\x1b[32m');
