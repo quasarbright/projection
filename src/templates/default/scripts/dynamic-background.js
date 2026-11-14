@@ -30,6 +30,26 @@
     return words.charAt(0).toUpperCase() + words.slice(1);
   }
 
+  // Fisher–Yates, on a copy
+  function shuffled(list) {
+    const a = list.slice();
+    for (let i = a.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [a[i], a[j]] = [a[j], a[i]];
+    }
+    return a;
+  }
+
+  // Strip query, hash and trailing slash so a background URL can be matched to a project's pageLink
+  function normalizeUrl(u) {
+    try {
+      const url = new URL(u, location.href);
+      return (url.origin + url.pathname).replace(/\/+$/, '');
+    } catch {
+      return u;
+    }
+  }
+
   // The iframe's window and document, or null when it is cross-origin (or not loaded yet).
   function sameOriginFrame(iframe) {
     try {
@@ -92,19 +112,26 @@
       (frame.doc.head || frame.doc.documentElement).append(style);
     });
 
-    // The pill in the top bar names the background, and Shuffle loads a different one
+    // Same as the home page: shuffle the list once per visit, and Shuffle walks through it in
+    // that order, so every background shows once before any repeats.
+    // ?bg=<text> moves the first background whose URL contains <text> to the front.
+    const order = shuffled(backgrounds);
+    const want = new URLSearchParams(location.search).get('bg');
+    const picked = want ? order.findIndex(url => url.includes(want)) : -1;
+    if (picked > 0) order.unshift(...order.splice(picked, 1));
+
+    // The pill in the top bar names the background: the title of the project it belongs to
+    // when this portfolio lists it, otherwise a name made from the URL
+    const titles = new Map((window.PROJECTS_DATA?.projects || []).map(p => [normalizeUrl(p.pageLink), p.title]));
     const nameEl = document.getElementById('bg-name');
-    let current = Math.floor(Math.random() * backgrounds.length);
+    let current = 0;
     function load(index) {
       current = index;
-      iframe.src = withBackgroundParam(backgrounds[index]);
-      if (nameEl) nameEl.textContent = backgroundName(backgrounds[index]);
+      iframe.src = withBackgroundParam(order[index]);
+      if (nameEl) nameEl.textContent = titles.get(normalizeUrl(order[index])) || backgroundName(order[index]);
     }
-    load(current);
-    document.getElementById('bg-shuffle')?.addEventListener('click', () => {
-      const next = (current + 1 + Math.floor(Math.random() * (backgrounds.length - 1))) % backgrounds.length;
-      load(next);
-    });
+    load(0);
+    document.getElementById('bg-shuffle')?.addEventListener('click', () => load((current + 1) % order.length));
 
     // This only fires where the page is on top (cards and controls); elsewhere the event
     // goes to the iframe directly.
