@@ -104,11 +104,14 @@
     // background's own document can't scroll. Some sketches are a few pixels taller than the
     // window (an inline canvas leaves room for a text descender), which captures the scroll,
     // so pin them. Only possible when the iframe is same-origin.
+    // Also, like the home page: the background fades in once loaded, and keeps the normal
+    // cursor (some sketches set a crosshair, which looks broken behind a page of links).
     iframe.addEventListener('load', () => {
+      iframe.classList.add('ready');
       const frame = sameOriginFrame(iframe);
       if (!frame) return;
       const style = frame.doc.createElement('style');
-      style.textContent = 'html { overflow: hidden !important; }';
+      style.textContent = 'html { overflow: hidden !important; } *, *::before, *::after { cursor: auto !important; }';
       (frame.doc.head || frame.doc.documentElement).append(style);
     });
 
@@ -127,6 +130,7 @@
     let current = 0;
     function load(index) {
       current = index;
+      iframe.classList.remove('ready');
       iframe.src = withBackgroundParam(order[index]);
       if (nameEl) nameEl.textContent = titles.get(normalizeUrl(order[index])) || backgroundName(order[index]);
     }

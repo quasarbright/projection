@@ -71,6 +71,13 @@ button, input, select {
   z-index: 0;
   border: none;
   background: transparent;
+  /* each background fades in once it has loaded (dynamic-background.js toggles .ready) */
+  opacity: 0;
+  transition: opacity 0.6s ease;
+}
+
+#dynamic-background.ready {
+  opacity: 1;
 }
 
 body.has-dynamic-background > :not(#dynamic-background) {
