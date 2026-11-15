@@ -638,6 +638,10 @@ After your first deployment:
 
 Your site will be live at `https://username.github.io/repository-name/` within a few minutes!
 
+#### Deploying automatically on push
+
+`projection init` also creates `.github/workflows/deploy.yml`, a GitHub Action that runs on every push to `main` or `master`. It builds your site with the latest npm release of Projection (same major version as the one that ran `init`) and publishes it to the `gh-pages` branch, so you don't need to run `projection deploy` yourself. Set the Pages source to `gh-pages` as above the first time.
+
 #### Configuration Options
 
 ##### In projection.config.json

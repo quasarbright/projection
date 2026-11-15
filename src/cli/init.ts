@@ -43,6 +43,7 @@ CREATED FILES:
   projection.config.json      Site configuration
   .gitignore                  Git ignore patterns
   README.md                   Project documentation
+  .github/workflows/deploy.yml  GitHub Action that deploys to GitHub Pages on push
 
 `);
 }
@@ -61,24 +62,28 @@ export async function init(options: InitOptions = {}): Promise<void> {
   const configFileName = 'projection.config.json';
   const gitignoreFileName = '.gitignore';
   const readmeFileName = 'README.md';
+  const workflowFileName = '.github/workflows/deploy.yml';
 
   const projectsFilePath = path.join(cwd, projectsFileName);
   const configFilePath = path.join(cwd, configFileName);
   const gitignorePath = path.join(cwd, gitignoreFileName);
   const readmePath = path.join(cwd, readmeFileName);
+  const workflowPath = path.join(cwd, workflowFileName);
 
   // Check for existing files
   const projectsExists = fs.existsSync(projectsFilePath);
   const configExists = fs.existsSync(configFilePath);
   const gitignoreExists = fs.existsSync(gitignorePath);
   const readmeExists = fs.existsSync(readmePath);
+  const workflowExists = fs.existsSync(workflowPath);
 
-  if ((projectsExists || configExists || gitignoreExists || readmeExists) && !options.force) {
+  if ((projectsExists || configExists || gitignoreExists || readmeExists || workflowExists) && !options.force) {
     const existingFiles = [];
     if (projectsExists) existingFiles.push(projectsFileName);
     if (configExists) existingFiles.push(configFileName);
     if (gitignoreExists) existingFiles.push(gitignoreFileName);
     if (readmeExists) existingFiles.push(readmeFileName);
+    if (workflowExists) existingFiles.push(workflowFileName);
 
     Logger.newline();
     Logger.warn('The following files already exist:');
@@ -114,8 +119,11 @@ export async function init(options: InitOptions = {}): Promise<void> {
   // Create README.md file
   await createReadmeFile(templateDir, readmePath);
 
+  // Create the GitHub Action that deploys on push
+  await createDeployWorkflow(templateDir, workflowPath);
+
   // Display success message with deployment instructions
-  displaySuccessMessage(projectsFileName, configFileName, gitignoreFileName, readmeFileName, gitInfo);
+  displaySuccessMessage(projectsFileName, configFileName, gitignoreFileName, readmeFileName, workflowFileName, gitInfo);
 }
 
 /**
@@ -282,6 +290,36 @@ async function createReadmeFile(templateDir: string, targetPath: string): Promis
 }
 
 /**
+ * Major version of the running Projection package, so the generated workflow
+ * installs a compatible release from npm.
+ */
+function getProjectionMajorVersion(): string {
+  // __dirname is src/cli in development and lib/cli when installed
+  const packageJsonPath = path.join(__dirname, '..', '..', 'package.json');
+  const { version } = JSON.parse(fs.readFileSync(packageJsonPath, 'utf-8'));
+  return String(version).split('.')[0];
+}
+
+/**
+ * Create a GitHub Actions workflow that builds the site with the npm release
+ * of Projection and publishes it to the gh-pages branch on every push.
+ */
+async function createDeployWorkflow(templateDir: string, targetPath: string): Promise<void> {
+  const templatePath = path.join(templateDir, 'deploy.yml.template');
+
+  if (!fs.existsSync(templatePath)) {
+    throw new Error(`Template file not found: ${templatePath}`);
+  }
+
+  const content = fs
+    .readFileSync(templatePath, 'utf-8')
+    .replace(/\{\{PROJECTION_MAJOR\}\}/g, getProjectionMajorVersion());
+  fs.mkdirSync(path.dirname(targetPath), { recursive: true });
+  fs.writeFileSync(targetPath, content, 'utf-8');
+  Logger.success('Created .github/workflows/deploy.yml');
+}
+
+/**
  * Create minimal projects content
  */
 function createMinimalProjectsContent(format: 'yaml' | 'json'): string {
@@ -371,13 +409,14 @@ function displaySuccessMessage(
   configFile: string,
   gitignoreFile: string,
   readmeFile: string,
+  workflowFile: string,
   gitInfo: GitRepositoryInfo
 ): void {
   Logger.newline();
   Logger.icon('🎉', 'Successfully initialized Projection project!', '\x1b[32m');
   Logger.newline();
   Logger.info('Created files:');
-  Logger.list([projectsFile, configFile, gitignoreFile, readmeFile]);
+  Logger.list([projectsFile, configFile, gitignoreFile, readmeFile, workflowFile]);
   Logger.newline();
 
   // Display Git repository information if detected
@@ -398,7 +437,9 @@ function displaySuccessMessage(
   Logger.info('Next steps:');
   const steps = [
     `Run 'projection admin' to manage your projects and see a live preview`,
-    `Run 'projection dev' to start development server`
+    `Run 'projection dev' to start development server`,
+    `Push to GitHub to deploy: ${workflowFile} builds the site and publishes it to the gh-pages branch.`,
+    `Then in your repository's Settings → Pages, set the source to the gh-pages branch (first time only)`
   ];
 
   Logger.list(steps);

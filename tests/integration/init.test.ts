@@ -43,6 +43,19 @@ describe('CLI init command', () => {
       expect(fs.existsSync(readmePath)).toBe(true);
     });
 
+    it('should create a deploy workflow that builds with the npm release', async () => {
+      await init();
+
+      const workflowPath = path.join(tempDir, '.github', 'workflows', 'deploy.yml');
+      expect(fs.existsSync(workflowPath)).toBe(true);
+
+      const content = fs.readFileSync(workflowPath, 'utf-8');
+      const major = require('../../package.json').version.split('.')[0];
+      expect(content).toContain(`npx --yes @quasarbright/projection@${major} build`);
+      expect(content).toContain('publish_branch: gh-pages');
+      expect(content).not.toContain('{{PROJECTION_MAJOR}}');
+    });
+
     it('should create valid YAML content in projects.yaml', async () => {
       await init();
 

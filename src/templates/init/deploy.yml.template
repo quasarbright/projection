@@ -1,0 +1,37 @@
+# Build the site with Projection and publish it to the gh-pages branch on every push.
+# In your repository's Settings → Pages, set the source to the gh-pages branch (first time only).
+# `projection deploy` still works for deploying from your machine.
+name: Deploy
+
+on:
+  push:
+    branches: [main, master]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: deploy
+  cancel-in-progress: true
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 24
+
+      # The latest {{PROJECTION_MAJOR}}.x release of Projection from npm.
+      - name: Build site
+        run: npx --yes @quasarbright/projection@{{PROJECTION_MAJOR}} build --output dist
+
+      - uses: peaceiris/actions-gh-pages@v4
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: dist
+          publish_branch: gh-pages
+          commit_message: Deploy ${{ github.sha }}

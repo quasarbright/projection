@@ -18,6 +18,8 @@ projection build
 projection deploy
 ```
 
+Pushing to GitHub also deploys: `.github/workflows/deploy.yml` builds the site and publishes it to the `gh-pages` branch.
+
 ## Project Structure
 
 ```
