@@ -1240,32 +1240,25 @@ describe('deploy command', () => {
     it('should call build before deployment by default', async () => {
       await deploy();
 
-      expect(Generator.create).toHaveBeenCalledWith({
+      expect(Generator.create).toHaveBeenCalledWith(expect.objectContaining({
         cwd: process.cwd(),
-        outputDir: 'dist',
-        clean: false
-      });
+        outputDir: 'dist'
+      }));
       expect(mockGenerator.generate).toHaveBeenCalled();
     });
 
-    it('should pass baseUrl from deployment config to build', async () => {
+    it('should build with relative paths, ignoring the deployment config baseUrl', async () => {
+      // The deployment config says '/repo/', but relative paths work on any host,
+      // including GitHub Pages project sites.
       await deploy();
 
-      expect(mockGenerator.getConfig).toHaveBeenCalled();
-      const config = mockGenerator.getConfig();
-      expect(config.baseUrl).toBe('/repo/');
+      expect(Generator.create).toHaveBeenCalledWith(expect.objectContaining({ baseUrl: './' }));
     });
 
-    it('should clean build directory before building', async () => {
-      (fs.existsSync as jest.Mock).mockReturnValue(true);
-
+    it('should have the generator clean the build directory before building', async () => {
       await deploy();
 
-      expect(fs.existsSync).toHaveBeenCalled();
-      expect(fs.rmSync).toHaveBeenCalledWith(
-        expect.stringContaining('dist'),
-        { recursive: true, force: true }
-      );
+      expect(Generator.create).toHaveBeenCalledWith(expect.objectContaining({ clean: true }));
     });
 
     it('should skip build when --no-build flag is set', async () => {
@@ -1322,11 +1315,10 @@ describe('deploy command', () => {
 
       await deploy({ dir: 'build' });
 
-      expect(Generator.create).toHaveBeenCalledWith({
+      expect(Generator.create).toHaveBeenCalledWith(expect.objectContaining({
         cwd: process.cwd(),
-        outputDir: 'build',
-        clean: false
-      });
+        outputDir: 'build'
+      }));
     });
 
     it('should handle non-ProjectionError build failures', async () => {
@@ -1360,20 +1352,6 @@ describe('deploy command', () => {
       
       expect(allOutput).toContain('Build failed');
       expect(allOutput).toContain('Errors:');
-    });
-
-    it('should not clean directory if it does not exist', async () => {
-      let callCount = 0;
-      (fs.existsSync as jest.Mock).mockImplementation((path: string) => {
-        callCount++;
-        // First call is for checking if build dir exists to clean it (should return false)
-        // Subsequent calls are for deployment phase checks (should return true)
-        return callCount > 1;
-      });
-
-      await deploy();
-
-      expect(fs.rmSync).not.toHaveBeenCalled();
     });
   });
 

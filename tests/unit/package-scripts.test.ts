@@ -161,7 +161,7 @@ describe('Package.json Configuration', () => {
 
   describe('Package Metadata', () => {
     it('should have correct package name', () => {
-      expect(packageJson.name).toBe('projection');
+      expect(packageJson.name).toBe('@quasarbright/projection');
     });
 
     it('should have main entry point', () => {

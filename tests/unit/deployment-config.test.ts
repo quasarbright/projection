@@ -131,7 +131,7 @@ describe('DeploymentConfigLoader', () => {
       expect(result).toEqual({
         repositoryUrl: repoUrl,
         homepage: null,
-        baseUrl: '/my-portfolio/',
+        baseUrl: './',
         branch: 'gh-pages',
         buildDir: 'dist',
         remote: 'origin',
@@ -154,7 +154,7 @@ describe('DeploymentConfigLoader', () => {
       expect(result.baseUrl).toBe('/custom-base/');
     });
 
-    it('should auto-generate baseUrl when config has default value', async () => {
+    it('should keep a relative baseUrl instead of deriving one from the repo name', async () => {
       const repoUrl = 'https://github.com/user/awesome-project.git';
       mockGitHelper.getRepositoryUrl.mockResolvedValue(repoUrl);
 
@@ -167,7 +167,8 @@ describe('DeploymentConfigLoader', () => {
 
       const result = await DeploymentConfigLoader.load(tempDir, {});
 
-      expect(result.baseUrl).toBe('/awesome-project/');
+      // Relative paths work on GitHub Pages project sites, so './' is left alone.
+      expect(result.baseUrl).toBe('./');
     });
 
     it('should use homepage from config when provided', async () => {
@@ -309,7 +310,7 @@ describe('DeploymentConfigLoader', () => {
       const result = await DeploymentConfigLoader.load(tempDir, {});
 
       expect(result.repositoryUrl).toBe(repoUrl);
-      expect(result.baseUrl).toBe('/projects/');
+      expect(result.baseUrl).toBe('./');
     });
 
     it('should use output from config for buildDir', async () => {
