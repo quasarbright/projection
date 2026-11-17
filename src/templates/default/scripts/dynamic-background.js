@@ -193,12 +193,19 @@
     // so pin them. Only possible when the iframe is same-origin.
     // Also, like the home page: the background fades in once loaded, and keeps the normal
     // cursor (some sketches set a crosshair, which looks broken behind a page of links).
+    // On touch screens, also undo the sketch's touch-action: none. iOS Safari decides whether a
+    // touch may scroll from the touch-action of everything drawn under the finger, iframe content
+    // included, even though the iframe has pointer-events: none there, so a sketch with
+    // touch-action: none on its canvas kept the page from scrolling. The iframe never gets
+    // touches directly on touch screens, so the sketch loses nothing.
+    const touchScreen = window.matchMedia('(hover: none)');
     iframe.addEventListener('load', () => {
       iframe.classList.add('ready');
       const frame = sameOriginFrame(iframe);
       if (!frame) return;
       const style = frame.doc.createElement('style');
-      style.textContent = 'html { overflow: hidden !important; } *, *::before, *::after { cursor: auto !important; }';
+      style.textContent = 'html { overflow: hidden !important; } *, *::before, *::after { cursor: auto !important; }'
+        + (touchScreen.matches ? ' *, *::before, *::after { touch-action: auto !important; }' : '');
       (frame.doc.head || frame.doc.documentElement).append(style);
     });
 
@@ -226,7 +233,6 @@
 
     // With a mouse, this only fires where the page is on top (cards and controls); elsewhere
     // the event goes to the iframe directly.
-    const touchScreen = window.matchMedia('(hover: none)');
     document.addEventListener('pointermove', (e) => {
       if (!touchScreen.matches) forwardMove(iframe, e);
     });

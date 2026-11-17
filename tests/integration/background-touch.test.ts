@@ -23,9 +23,11 @@ jest.setTimeout(60000);
 const BACKGROUND_HTML = `<!DOCTYPE html>
 <html><head><style>
   html, body { margin: 0; height: 100%; }
+  body { touch-action: none; }
   canvas { display: block; width: 100vw; height: 100vh; touch-action: none; }
 </style></head>
-<body><canvas></canvas><script>
+<body><canvas></canvas><div id="inline"></div><script>
+  document.getElementById('inline').style.touchAction = 'none';
   window.got = [];
   for (const type of ['pointerdown', 'pointermove', 'pointerup', 'mousemove', 'touchstart', 'touchmove', 'touchend']) {
     window.addEventListener(type, (e) => {
@@ -149,6 +151,28 @@ describe('dynamic background on touch screens', () => {
     const last = moves[moves.length - 1];
     expect(last.x).toBeCloseTo(x + 12, 0);
     expect(last.y).toBeCloseTo(y + 60, 0);
+    await page.context().close();
+  });
+
+  // iOS Safari won't scroll the page when the content under the finger has touch-action: none,
+  // even inside an iframe with pointer-events: none, so the background's own touch-action has to
+  // go. Chromium doesn't behave this way, so this checks the cause rather than the scroll.
+  async function frameTouchActions(page: Page): Promise<string[]> {
+    return page.evaluate(() => {
+      const doc = (document.getElementById('dynamic-background') as HTMLIFrameElement).contentDocument!;
+      return ['html', 'body', 'canvas', '#inline'].map((sel) => getComputedStyle(doc.querySelector(sel)!).touchAction);
+    });
+  }
+
+  it("turns off the background's touch-action: none on touch screens", async () => {
+    const page = await open(phone);
+    expect(await frameTouchActions(page)).toEqual(['auto', 'auto', 'auto', 'auto']);
+    await page.context().close();
+  });
+
+  it("leaves the background's touch-action alone on desktop", async () => {
+    const page = await open({ viewport: { width: 1280, height: 800 } });
+    expect(await frameTouchActions(page)).toEqual(['auto', 'none', 'none', 'none']);
     await page.context().close();
   });
 
