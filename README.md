@@ -308,6 +308,8 @@ A background on another origin only gets those moves if it listens for the `post
 
 For a same-origin background, Projection also sets `overflow: hidden` on its document so that scrolling over it scrolls the portfolio. The iframe isn't allowed to go fullscreen.
 
+On touch screens (devices without hover), the background gets no touches directly, because most sketches block touch scrolling on their canvas and a scroll that starts over the background would never move the page. Touches land on the portfolio, which scrolls, and for a same-origin background Projection replays the touch, pointer and mouse events of each touch that starts over the background inside it, at the same spot, so the sketch still follows the finger. A cross-origin background doesn't react to touches.
+
 #### Best Practices
 
 1. **Test performance** - Ensure backgrounds don't slow down your site

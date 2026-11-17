@@ -80,6 +80,14 @@ button, input, select {
   opacity: 1;
 }
 
+/* On touch screens the background takes no touches, since sketches block touch scrolling.
+   Touches land on the page, which scrolls, and dynamic-background.js replays them inside. */
+@media (hover: none) {
+  #dynamic-background {
+    pointer-events: none;
+  }
+}
+
 body.has-dynamic-background > :not(#dynamic-background) {
   position: relative;
   z-index: 1;

@@ -14,6 +14,14 @@
  *   for example a portfolio at user.github.io/portfolio/ with backgrounds at user.github.io/...
  * - If the iframe is cross-origin, the move is sent with postMessage instead, for backgrounds
  *   that listen for { type: 'mousemove', x, y }.
+ *
+ * Touch screens are different. A touch that lands in the iframe belongs to the sketch, and
+ * most sketches block touch scrolling (touch-action: none on the canvas, or preventDefault in
+ * a touchmove handler), so a scroll that started over the background never moved the page.
+ * On touch screens (hover: none) the iframe takes no pointer events at all: the touch lands on
+ * this page, which scrolls natively, and mirrorIntoFrame replays the touch, pointer and mouse
+ * events of gestures that started over the background inside the iframe, so it still follows
+ * the finger.
  */
 
 (function () {
@@ -62,31 +70,110 @@
     return null;
   }
 
+  // Where a page event lands inside the iframe: its coordinates there, and the element under it
+  function frameTarget(iframe, frame, clientX, clientY) {
+    const r = iframe.getBoundingClientRect();
+    const x = clientX - r.left;
+    const y = clientY - r.top;
+    const { doc } = frame;
+    return { x, y, target: doc.elementFromPoint(x, y) || doc.body || doc.documentElement };
+  }
+
+  function mouseInit(win, e, x, y) {
+    return {
+      bubbles: true, cancelable: true, composed: true, view: win,
+      clientX: x, clientY: y, screenX: e.screenX, screenY: e.screenY,
+      movementX: e.movementX, movementY: e.movementY, button: e.button, buttons: e.buttons,
+    };
+  }
+
+  function pointerInit(win, e, x, y) {
+    return {
+      ...mouseInit(win, e, x, y),
+      pointerId: e.pointerId, pointerType: e.pointerType, isPrimary: e.isPrimary,
+      width: e.width, height: e.height, pressure: e.pressure,
+    };
+  }
+
   // Dispatch a synthetic pointermove + mousemove on whatever is under the pointer in the iframe,
   // built with the iframe window's own constructors so the events belong to it.
   function forwardMove(iframe, e) {
-    const r = iframe.getBoundingClientRect();
-    const x = e.clientX - r.left;
-    const y = e.clientY - r.top;
-
     const frame = sameOriginFrame(iframe);
     if (!frame) {
+      const r = iframe.getBoundingClientRect();
+      const x = e.clientX - r.left;
+      const y = e.clientY - r.top;
       iframe.contentWindow?.postMessage({ type: 'mousemove', x, y, pageX: e.pageX, pageY: e.pageY }, '*');
       return;
     }
-
-    const { win, doc } = frame;
-    const target = doc.elementFromPoint(x, y) || doc.body || doc.documentElement;
+    const { win } = frame;
+    const { x, y, target } = frameTarget(iframe, frame, e.clientX, e.clientY);
     if (!target) return;
-    const init = {
-      bubbles: true, cancelable: true, composed: true, view: win,
-      clientX: x, clientY: y, screenX: e.screenX, screenY: e.screenY,
-      movementX: e.movementX, movementY: e.movementY, buttons: e.buttons,
-    };
-    target.dispatchEvent(new win.PointerEvent('pointermove', {
-      ...init, pointerId: e.pointerId, pointerType: e.pointerType, isPrimary: e.isPrimary,
-    }));
-    target.dispatchEvent(new win.MouseEvent('mousemove', init));
+    target.dispatchEvent(new win.PointerEvent('pointermove', pointerInit(win, e, x, y)));
+    target.dispatchEvent(new win.MouseEvent('mousemove', mouseInit(win, e, x, y)));
+  }
+
+  // A touch list moved into the iframe's coordinates. Real Touch objects where the browser can
+  // make them; plain objects with the same fields otherwise (Safari has no Touch constructor).
+  function frameTouches(iframe, frame, list) {
+    const r = iframe.getBoundingClientRect();
+    return Array.from(list, (t) => {
+      const x = t.clientX - r.left;
+      const y = t.clientY - r.top;
+      const fields = {
+        identifier: t.identifier, clientX: x, clientY: y, pageX: x, pageY: y,
+        screenX: t.screenX, screenY: t.screenY, radiusX: t.radiusX, radiusY: t.radiusY,
+        rotationAngle: t.rotationAngle, force: t.force,
+        target: frame.doc.elementFromPoint(x, y) || frame.doc.body,
+      };
+      try {
+        return new frame.win.Touch(fields);
+      } catch {
+        return fields;
+      }
+    });
+  }
+
+  function touchEvent(frame, type, init) {
+    try {
+      if (init.touches.every((t) => t instanceof frame.win.Touch)
+        && init.changedTouches.every((t) => t instanceof frame.win.Touch)) {
+        return new frame.win.TouchEvent(type, init);
+      }
+    } catch {
+      // fall through to a plain event
+    }
+    const event = new frame.win.Event(type, init);
+    for (const key of ['touches', 'targetTouches', 'changedTouches']) {
+      Object.defineProperty(event, key, { value: init[key] });
+    }
+    return event;
+  }
+
+  // Replay one page event inside a same-origin iframe, at the same spot.
+  function mirrorIntoFrame(iframe, e) {
+    const frame = sameOriginFrame(iframe);
+    if (!frame) {
+      if (e.type === 'pointermove') forwardMove(iframe, e);
+      return;
+    }
+    const { win } = frame;
+    if (e.type.startsWith('touch')) {
+      const changed = frameTouches(iframe, frame, e.changedTouches);
+      if (!changed.length) return;
+      const touches = frameTouches(iframe, frame, e.touches);
+      const target = changed[0].target;
+      target.dispatchEvent(touchEvent(frame, e.type, {
+        bubbles: true, cancelable: true, composed: true, view: win,
+        touches, targetTouches: touches, changedTouches: changed,
+      }));
+      return;
+    }
+    const { x, y, target } = frameTarget(iframe, frame, e.clientX, e.clientY);
+    if (!target) return;
+    const Ctor = e.type.startsWith('pointer') ? win.PointerEvent : win.MouseEvent;
+    const init = e.type.startsWith('pointer') ? pointerInit(win, e, x, y) : mouseInit(win, e, x, y);
+    target.dispatchEvent(new Ctor(e.type, init));
   }
 
   function init() {
@@ -137,9 +224,27 @@
     load(0);
     document.getElementById('bg-shuffle')?.addEventListener('click', () => load((current + 1) % order.length));
 
-    // This only fires where the page is on top (cards and controls); elsewhere the event
-    // goes to the iframe directly.
-    document.addEventListener('pointermove', (e) => forwardMove(iframe, e));
+    // With a mouse, this only fires where the page is on top (cards and controls); elsewhere
+    // the event goes to the iframe directly.
+    const touchScreen = window.matchMedia('(hover: none)');
+    document.addEventListener('pointermove', (e) => {
+      if (!touchScreen.matches) forwardMove(iframe, e);
+    });
+
+    // On touch screens the iframe gets nothing directly (main.css), so replay the events of
+    // touches over the background. Touch and pointer events keep the target the touch started
+    // on, so a scroll that started on a card isn't replayed. Passive, so scrolling never waits.
+    const overBackground = (target) => target === document.documentElement || target === document.body;
+    const MIRRORED = [
+      'touchstart', 'touchmove', 'touchend', 'touchcancel',
+      'pointerdown', 'pointermove', 'pointerup', 'pointercancel',
+      'mousedown', 'mousemove', 'mouseup', 'click',
+    ];
+    for (const type of MIRRORED) {
+      document.addEventListener(type, (e) => {
+        if (touchScreen.matches && overBackground(e.target)) mirrorIntoFrame(iframe, e);
+      }, { passive: true });
+    }
   }
 
   window.dynamicBackground = { withBackgroundParam };
