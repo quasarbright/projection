@@ -105,6 +105,8 @@ class ProjectFilter {
       const visible = Array.from(this.projectsGrid.querySelectorAll('.project-card'))
         .filter(card => card.style.display !== 'none').length;
       count.textContent = `${visible} project${visible === 1 ? '' : 's'}`;
+      // the no-results message already says there are none
+      count.hidden = visible === 0;
     }
   }
   

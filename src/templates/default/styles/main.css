@@ -250,7 +250,12 @@ h2 {
 }
 
 .section-head h2 {
-  color: var(--accent-hi);
+  color: var(--accent);
+}
+
+/* while filtering, Featured is hidden and the results head comes first */
+body.is-filtering #all-head {
+  margin-top: 8px;
 }
 
 .result-count {
@@ -260,16 +265,19 @@ h2 {
 
 .see-all {
   margin-left: auto;
-  background: none;
   border: 0;
-  color: var(--accent);
+  /* a dark backing like the tag pills, so it reads over bright backgrounds */
+  padding: 5px 12px;
+  border-radius: 999px;
+  background: rgba(7, 8, 13, 0.7);
+  color: var(--accent-hi);
   font-weight: 600;
   cursor: pointer;
-  padding: 4px 0;
 }
 
 .see-all:hover {
-  color: var(--accent-hi);
+  color: var(--text);
+  background: rgba(16, 18, 26, 0.9);
 }
 
 /* Filters: search and sort on one row, every tag visible under it */
@@ -345,9 +353,10 @@ h2 {
   filter: drop-shadow(0 0 3px rgba(7, 8, 13, 0.9));
 }
 
-/* section headings and counts sit straight on the dimmed background */
+/* section headings and counts sit straight on the background, so they get a heavier halo than
+   other text: they must stay readable over the brightest background */
 .section-head {
-  text-shadow: 0 0 2px rgba(7, 8, 13, 0.9), 0 0 8px rgba(7, 8, 13, 0.9), 0 1px 16px rgba(7, 8, 13, 0.9);
+  text-shadow: 0 0 2px var(--bg), 0 0 4px var(--bg), 0 0 10px rgba(7, 8, 13, 0.95), 0 1px 18px rgba(7, 8, 13, 0.9);
 }
 
 /* the select's own text says what it sorts by, so its label is for screen readers only */
@@ -420,7 +429,8 @@ h2 {
   padding: 5px 4px;
   background: none;
   border: 0;
-  color: var(--accent);
+  text-shadow: 0 0 2px var(--bg), 0 0 4px var(--bg), 0 0 10px rgba(7, 8, 13, 0.95), 0 1px 18px rgba(7, 8, 13, 0.9);
+  color: var(--accent-hi);
   font-size: 13px;
   font-weight: 600;
   cursor: pointer;
@@ -445,7 +455,8 @@ body.is-filtering .featured-section {
 
 .no-results p {
   font-size: 18px;
-  color: var(--muted);
+  color: var(--soft);
+  text-shadow: 0 0 2px rgba(7, 8, 13, 0.9), 0 0 8px rgba(7, 8, 13, 0.9), 0 1px 16px rgba(7, 8, 13, 0.9);
   margin-bottom: 16px;
 }
 
@@ -570,7 +581,12 @@ body.is-filtering .featured-section {
   .tags-toggle {
     display: block;
     flex-basis: 100%;
+    max-width: max-content;
     text-align: left;
+    /* a dark backing like the tag pills above it, so it reads over bright backgrounds */
+    padding: 5px 10px;
+    border-radius: 999px;
+    background: rgba(7, 8, 13, 0.7);
   }
 
   .tags-toggle[hidden],
@@ -589,6 +605,12 @@ body.is-filtering .featured-section {
 
   .section-head {
     margin-top: 34px;
+  }
+
+  /* a 42px tap target without making the header row taller */
+  .see-all {
+    padding: 11px 14px;
+    margin: -6px 0 -6px auto;
   }
 
   .projects-grid {
