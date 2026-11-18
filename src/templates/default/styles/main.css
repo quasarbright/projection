@@ -218,19 +218,44 @@ body.has-dynamic-background :is(a, button, input, select, textarea, label, summa
 }
 
 h2 {
-  font: 700 26px var(--display);
+  font: 700 30px var(--display);
   letter-spacing: -0.02em;
 }
 
+/* Section heads (Featured, Everything) must not read like card titles: an accent bar on the
+   left, the heading in the accent color, and a rule under the whole row */
 .section-head {
+  position: relative;
   display: flex;
-  align-items: baseline;
+  align-items: center;
   gap: 14px;
-  margin: 8px 0 18px;
+  margin: 44px 0 22px;
+  padding: 2px 0 12px 16px;
+  border-bottom: 1px solid rgba(139, 153, 255, 0.22);
+}
+
+.featured-section .section-head {
+  margin-top: 8px;
+}
+
+.section-head::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 2px;
+  bottom: 12px;
+  width: 4px;
+  border-radius: 2px;
+  background: var(--accent);
+}
+
+.section-head h2 {
+  color: var(--accent-hi);
 }
 
 .result-count {
   color: var(--soft);
+  font-weight: 500;
 }
 
 .see-all {
@@ -322,7 +347,7 @@ h2 {
 
 /* section headings and counts sit straight on the dimmed background */
 .section-head {
-  text-shadow: 0 1px 8px rgba(7, 8, 13, 0.9);
+  text-shadow: 0 0 2px rgba(7, 8, 13, 0.9), 0 0 8px rgba(7, 8, 13, 0.9), 0 1px 16px rgba(7, 8, 13, 0.9);
 }
 
 /* the select's own text says what it sorts by, so its label is for screen readers only */
@@ -559,7 +584,11 @@ body.is-filtering .featured-section {
   }
 
   h2 {
-    font-size: 22px;
+    font-size: 26px;
+  }
+
+  .section-head {
+    margin-top: 34px;
   }
 
   .projects-grid {

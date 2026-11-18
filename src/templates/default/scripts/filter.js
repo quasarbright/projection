@@ -18,7 +18,7 @@ class ProjectFilter {
     // Tag filter buttons
     this.tagFilters.forEach(filter => {
       filter.addEventListener('click', (e) => {
-        this.toggleTagFilter(e.target.dataset.tag);
+        this.toggleTagFilter(e.currentTarget.dataset.tag);
       });
     });
     
@@ -26,7 +26,7 @@ class ProjectFilter {
     this.projectTags.forEach(tag => {
       tag.addEventListener('click', (e) => {
         e.preventDefault();
-        this.toggleTagFilter(e.target.dataset.tag);
+        this.toggleTagFilter(e.currentTarget.dataset.tag);
       });
     });
     
