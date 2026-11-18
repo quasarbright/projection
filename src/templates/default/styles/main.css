@@ -399,7 +399,7 @@ body.is-filtering #all-head {
 
 .tag-filter sup {
   font-size: 10px;
-  color: var(--faint);
+  color: var(--muted);
   margin-left: 3px;
   vertical-align: 4px;
 }
